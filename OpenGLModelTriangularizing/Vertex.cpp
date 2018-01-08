@@ -6,3 +6,7 @@ float r, g, b, a;
 Vertex::~Vertex()
 {
 }
+
+void Vertex::normalize()
+{
+}

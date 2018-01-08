@@ -117,28 +117,34 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppDriver.cpp" />
-    <ClCompile Include="Object.cpp" />
-    <ClCompile Include="ObjectLoader.cpp" />
-    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="FileOperations.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="ModelLoader.cpp" />
+    <ClCompile Include="ShaderLoader.cpp" />
+    <ClCompile Include="Transformations.cpp" />
     <ClCompile Include="Vertex.cpp" />
-    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="WindowCanvas.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="ObjectLoader.h" />
-    <ClInclude Include="Shader.h" />
+    <ClInclude Include="FileOperations.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="ModelLoader.h" />
+    <ClInclude Include="ShaderLoader.h" />
+    <ClInclude Include="Transformations.h" />
     <ClInclude Include="Vertex.h" />
-    <ClInclude Include="Window.h" />
+    <ClInclude Include="WindowCanvas.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DefaultFragment.fs" />
-    <None Include="DefaultVertex.vs" />
+    <None Include="GreenFragment.fs" />
     <None Include="packages.config" />
+    <None Include="shaders\DefaultFragment.fs" />
+    <None Include="shaders\DefaultVertex.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets" Condition="Exists('..\packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets')" />
     <Import Project="..\packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets" Condition="Exists('..\packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets')" />
+    <Import Project="..\packages\glm.0.9.8.4\build\native\glm.targets" Condition="Exists('..\packages\glm.0.9.8.4\build\native\glm.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -146,5 +152,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets'))" />
     <Error Condition="!Exists('..\packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nupengl.core.0.1.0.1\build\native\nupengl.core.targets'))" />
+    <Error Condition="!Exists('..\packages\glm.0.9.8.4\build\native\glm.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glm.0.9.8.4\build\native\glm.targets'))" />
   </Target>
 </Project>
