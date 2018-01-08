@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 
+#include <stdlib.h> 
 #include <GL\glew.h>
 #include <GL\freeglut.h>
 #include <glm/glm.hpp>
@@ -20,6 +21,9 @@ public:
 	static void addModel(Model &model);
 	static void setDefaultShader(GLuint shader);
 
+	static unsigned int assignModelID();
+	~WindowCanvas();
 private:
 	static GLuint defaultShader;
+
 };

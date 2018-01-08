@@ -14,5 +14,13 @@ public:
 	std::vector<int> indexData;
 
 	GLuint shader;
+	bool instanced;
+	
+	unsigned int getModelID()
+	{
+		return modelID;
+	}
+private:
+	unsigned int modelID;
 };
 

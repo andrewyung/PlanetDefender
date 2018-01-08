@@ -34,16 +34,16 @@ void renderScene(void) {
 		//if current shader isn't the one vao is to use
 		if (currentShader != currentVAO.shaderID)
 		{
-			std::cout << "change shader" << std::endl;
 			glUseProgram(currentVAO.shaderID);
 		}
-		glm::mat4 trans;
-		trans = glm::scale(trans, glm::vec3(0.2f, 0.2f, 0.2f));
-		trans = glm::translate(trans, glm::vec3(0.05f, -0.05f, 0.0f) * ((float)(frames % 100)));
-		trans = glm::rotate_slow(trans, glm::radians(1.0f) * frames, glm::vec3(1.0f, 0.0f, 1.0f));
-		shaderLoader.setMat4x4(currentVAO.shaderID, "transform", trans);
-
-		std::cout << currentVAO.shaderID << " : " << currentVAO.indexSize << std::endl;
+		if (i == 0)
+		{
+			glm::mat4 trans;
+			trans = glm::scale(trans, glm::vec3(0.2f, 0.2f, 0.2f));
+			trans = glm::translate(trans, glm::vec3(0.05f, -0.05f, 0.0f) * ((float)(frames % 100)));
+			trans = glm::rotate_slow(trans, glm::radians(1.0f) * frames, glm::vec3(1.0f, 0.0f, 1.0f));
+			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", trans);
+		}
 		glBindVertexArray(currentVAO.vertexArrayID);
 		glDrawElements(GL_TRIANGLES, currentVAO.indexSize, GL_UNSIGNED_INT, 0);
 	}
@@ -106,17 +106,6 @@ void WindowCanvas::addModel(Model &model)
 		model.shader = defaultShader;
 	}
 
-	//find if any vao uses the same shader
-	for (int i = 0; i < vertexArrayIDs.size(); i++)
-	{
-		VAOInfo currentVAO = vertexArrayIDs[i];
-		if (model.shader == currentVAO.shaderID)
-		{
-			//place in current vao
-			return;
-		}
-	}
-
 	//no vao with matching shader found, create a new vao
 	GLuint VAO, VBO, EBO;
 	glGenVertexArrays(1, &VAO);
@@ -144,13 +133,15 @@ void WindowCanvas::addModel(Model &model)
 		vertexArrayData.push_back(currentVertex.b);
 		vertexArrayData.push_back(currentVertex.a);
 
+		//normal
+
 		//texture uv
 		vertexArrayData.push_back(currentVertex.xUV);
 		vertexArrayData.push_back(currentVertex.yUV);
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, vertexArrayData.size() * sizeof(float), &vertexArrayData[0], GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexArrayData.size() * sizeof(float), &vertexArrayData[0], GL_STATIC_DRAW);
 
 	//interpretation of data
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), 0);
@@ -173,5 +164,16 @@ void WindowCanvas::addModel(Model &model)
 void WindowCanvas::setDefaultShader(GLuint shader)
 {
 	defaultShader = shader;
+}
+
+unsigned int WindowCanvas::assignModelID()
+{
+	//return a free space
+	return 0;
+}
+
+WindowCanvas::~WindowCanvas()
+{
+
 }
 

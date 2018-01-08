@@ -20,13 +20,20 @@ Model* ModelLoader::createPrimitive(PrimitiveTypes type)
 
 		break;
 	case TRIANGLE:
-		vertexData = {	Vertex(0, 0.5f, 0),			//top
-						Vertex(-0.5f, -0.5f, 0),	//left
-						Vertex(0.5f, -0.5f, 0)		//right
+		vertexData = {	Vertex(0, 0.5f, 0,		//top
+								1, 0, 0, 1),	//color
+
+						Vertex(-0.5f, -0.5f, 0,	//left
+								0, 1, 0, 1),	//color
+
+						Vertex(0.5f, -0.5f, 0,	//right
+								0, 0, 1, 1)		//color
 		};
 
 		indexData = { 0, 1, 2
 		};
+
+		break;
 	case CUBE:
 		vertexData = {	Vertex(0.5f, 0.5f, 0.5f),	//front top right
 						Vertex(-0.5f, 0.5f, 0.5f),	//front top left
@@ -56,6 +63,7 @@ Model* ModelLoader::createPrimitive(PrimitiveTypes type)
 						7, 6, 5,
 						7, 5, 4
 		};
+
 		break;
 	default:
 		break;
