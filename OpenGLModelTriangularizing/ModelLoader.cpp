@@ -8,8 +8,8 @@ Model* ModelLoader::createPrimitive(PrimitiveTypes type)
 	switch (type)
 	{
 	case QUAD:
-		vertexData = {	Vertex(0.5f, 0.5f, 0),		//top right
-						Vertex(0.5f, -0.5f, 0),		//top left
+		vertexData = {	Vertex(1.0f, 0.3f, 0),		//top right
+						Vertex(1.0f, -0.3f, 0),		//top left
 						Vertex(-0.5f, -0.5f, 0),	//bottom left
 						Vertex(-0.5f, 0.5f, 0)		//bottom right
 		};
@@ -20,7 +20,7 @@ Model* ModelLoader::createPrimitive(PrimitiveTypes type)
 
 		break;
 	case TRIANGLE:
-		vertexData = {	Vertex(0, 0.5f, 0,		//top
+		vertexData = {	Vertex(0, 1.0f, 0,		//top
 								1, 0, 0, 1),	//color
 
 						Vertex(-0.5f, -0.5f, 0,	//left

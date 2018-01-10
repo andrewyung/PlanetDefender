@@ -10,7 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "ShaderLoader.h"
-#include "Model.h"
+class Model;
 
 class WindowCanvas
 {
@@ -18,7 +18,7 @@ public:
 	static void initializeWindow(int argc, char ** argv);
 	static void start();
 
-	static void addModel(Model &model);
+	static void addModel(Model &model, bool forceNewVAO);
 	static void setDefaultShader(GLuint shader);
 
 	static unsigned int assignModelID();

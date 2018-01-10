@@ -118,7 +118,6 @@
   <ItemGroup>
     <ClCompile Include="AppDriver.cpp" />
     <ClCompile Include="FileOperations.cpp" />
-    <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="Transformations.cpp" />
