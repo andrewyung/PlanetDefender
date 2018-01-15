@@ -4,10 +4,12 @@
 
 GLuint WindowCanvas::defaultShader;
 
+const int DEFAULT_BUFFER_SIZE = 16;
+
 struct VAOInfo
 {
-	VAOInfo(GLuint vaoID, GLuint vboID, GLuint eboID, GLuint shaderID, GLsizei indexDataSize, GLsizei vertexDataSize) :
-		vertexArrayID(vaoID), vertexBufferID(vboID), indexBufferID(eboID), shaderID(shaderID), indexDataSize(indexDataSize), vertexDataSize(vertexDataSize){};
+	VAOInfo(GLuint vaoID, GLuint vboID, GLuint eboID, GLuint shaderID, int indexDataSize, int vertexDataSize, int nextAvailableVertexIndex) :
+		vertexArrayID(vaoID), vertexBufferID(vboID), indexBufferID(eboID), shaderID(shaderID), indexDataByteSize(indexDataSize), vertexDataByteSize(vertexDataSize), nextAvailableVertexIndex(nextAvailableVertexIndex){};
 
 	bool instanced = false;
 	GLuint vertexArrayID;
@@ -16,8 +18,9 @@ struct VAOInfo
 	GLuint shaderID;
 
 	//in bytes
-	GLsizei vertexDataSize;
-	GLsizei indexDataSize;
+	int vertexDataByteSize;
+	int indexDataByteSize;
+	int nextAvailableVertexIndex;
 };
 
 std::vector<VAOInfo> vertexArrayIDs;
@@ -31,7 +34,7 @@ void printVertexBufferContent(GLuint bufferID)
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
 	const int FLOATS_TO_READ = 100;
-	float *result = new float[FLOATS_TO_READ];
+	float result[FLOATS_TO_READ];
 	glGetBufferSubData(GL_ARRAY_BUFFER, 0, FLOATS_TO_READ  * sizeof(float), result);
 
 	for (int i = 0; i < FLOATS_TO_READ; i++)
@@ -44,7 +47,7 @@ void printIndexBufferContent(GLuint bufferID)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 
 	const int INTS_TO_READ = 100;
-	int *result = new int[INTS_TO_READ];
+	int result[INTS_TO_READ];
 	glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, INTS_TO_READ  * sizeof(int), result);
 
 	for (int i = 0; i < INTS_TO_READ; i++)
@@ -78,8 +81,11 @@ void renderScene(void) {
 			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", trans);
 		}
 		//std::cout << currentVAO.indexDataSize / 4 <<  " : " << currentVAO.vertexDataSize / 9 / 4 << std::endl;
-		glBindVertexArray(currentVAO.vertexArrayID);
-		glDrawElements(GL_TRIANGLES, currentVAO.indexDataSize, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(currentVAO.vertexArrayID);	
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO.indexBufferID);
+		std::cout << "running - model added : vb" << currentVAO.vertexDataByteSize << " : ib" << currentVAO.indexDataByteSize << std::endl;
+
+		glDrawElements(GL_TRIANGLES, currentVAO.indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0);
 	}
 
 	glutSwapBuffers();
@@ -126,6 +132,36 @@ void WindowCanvas::start()
 	glutMainLoop();
 }
 
+/*
+*
+*/
+void resizeBufferObject(GLenum type, GLuint id, int currentSize, int toSize, GLenum usage)
+{
+	// does 2 copies so vertex attributes don't have to be redefined if using a new buffer and type is vbo
+
+	std::cout << "resizing buffer" << std::endl;
+	GLuint tempBufferObject;
+
+	glBindBuffer(type, id);
+
+	glGenBuffers(1, &tempBufferObject);
+	glBindBuffer(GL_COPY_WRITE_BUFFER, tempBufferObject);
+	glBufferData(GL_COPY_WRITE_BUFFER, currentSize, NULL, GL_STATIC_COPY);
+
+	//copy currently bound buffer object to tempBufferObject
+	glCopyBufferSubData(type, GL_COPY_WRITE_BUFFER, 0, 0, currentSize);
+
+	//recreate buffer object
+	glBufferData(type, toSize, NULL, usage);
+
+	//copy back from tempBufferObject to buffer object
+	glCopyBufferSubData(GL_COPY_WRITE_BUFFER, type, 0, 0, currentSize);
+
+	glDeleteBuffers(1, &tempBufferObject);
+
+	std::cout << "resized from " << currentSize << " to " << toSize << std::endl;
+}
+
 void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 {
 	if (model.shader == 0)
@@ -169,31 +205,56 @@ void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 			//uses same shader, include in existing vao
 			if (model.shader == vertexArrayIDs[i].shaderID)
 			{
-				VAOInfo currentVAOInfo = vertexArrayIDs[i];
-				glBindVertexArray(currentVAOInfo.vertexArrayID);
+				VAOInfo *currentVAOInfo = &vertexArrayIDs[i];
+				glBindVertexArray(currentVAOInfo->vertexArrayID);
 
-				glBindBuffer(GL_ARRAY_BUFFER, currentVAOInfo.vertexBufferID);
-				glBufferSubData(GL_ARRAY_BUFFER, currentVAOInfo.vertexDataSize, vertexArrayData.size() * sizeof(float), &vertexArrayData[0]);
+				int currentBufferSize;
+				glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &currentBufferSize);
+				//used to multiply the current size if there is more data than buffer can currently hold
+				int ceilSizeRatio = ceil((currentVAOInfo->vertexDataByteSize + (vertexArrayData.size() * sizeof(float))) / (float) currentBufferSize);
+				if (ceilSizeRatio > 1)
+				{
+					resizeBufferObject(GL_ARRAY_BUFFER, currentVAOInfo->vertexArrayID, currentBufferSize, currentBufferSize * ceilSizeRatio, GL_DYNAMIC_DRAW);
+				}
+
+				glBindBuffer(GL_ARRAY_BUFFER, currentVAOInfo->vertexBufferID);
+				glBufferSubData(GL_ARRAY_BUFFER, currentVAOInfo->vertexDataByteSize, vertexArrayData.size() * sizeof(float), &vertexArrayData[0]);
+				
 				//std::cout << currentVAOInfo.vertexBufferID << std::endl;
 
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAOInfo.indexBufferID);
-				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentVAOInfo.indexDataSize, model.indexData.size() * sizeof(int), &model.indexData[0]);
+				//set indices to proper index offset
+				for (int i = 0; i < model.indexData.size(); i++)
+				{
+					model.indexData[i] += currentVAOInfo->nextAvailableVertexIndex;
+				}
+
+				glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &currentBufferSize);
+				//used to multiply the current size if there is more data than buffer can currently hold
+				ceilSizeRatio = ceil((currentVAOInfo->indexDataByteSize + (model.indexData.size() * sizeof(int))) / (float) currentBufferSize);
+				if (ceilSizeRatio > 1)
+				{
+					resizeBufferObject(GL_ELEMENT_ARRAY_BUFFER, currentVAOInfo->indexBufferID, currentBufferSize, currentBufferSize * ceilSizeRatio, GL_DYNAMIC_DRAW);
+				}
+
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAOInfo->indexBufferID);
+				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, currentVAOInfo->indexDataByteSize, model.indexData.size() * sizeof(int), &model.indexData[0]);
 				//std::cout << currentVAOInfo.indexBufferID << std::endl;
 
 				//update where the data for model begins in the buffers
-				model.vertexDataOffset = currentVAOInfo.vertexDataSize;
-				model.indexDataOffset = currentVAOInfo.indexDataSize;
+				model.vertexDataOffset = currentVAOInfo->vertexDataByteSize;
+				model.indexDataOffset = currentVAOInfo->indexDataByteSize;
 
 				//update size of buffers
-				currentVAOInfo.vertexDataSize += vertexArrayData.size() * sizeof(float);
-				currentVAOInfo.indexDataSize += model.indexData.size() * sizeof(int);
+				currentVAOInfo->vertexDataByteSize += vertexArrayData.size() * sizeof(float);
+				currentVAOInfo->indexDataByteSize += model.indexData.size() * sizeof(int);
+				currentVAOInfo->nextAvailableVertexIndex += model.vertexData.size();
 
-				//printVertexBufferContent(currentVAOInfo.vertexBufferID);
-				printIndexBufferContent(currentVAOInfo.indexBufferID);
+				//printVertexBufferContent(currentVAOInfo->vertexBufferID);
+				//printIndexBufferContent(currentVAOInfo.indexBufferID);
 
 				glBindVertexArray(0);
-				std::cout << "model added : vb" << currentVAOInfo.vertexDataSize << " : ib"  << currentVAOInfo.indexDataSize << std::endl;
-				
+				std::cout << "model added : vb " << currentVAOInfo->vertexDataByteSize << " : ib "  << currentVAOInfo->indexDataByteSize << std::endl;
+
 				return;
 			}
 		}
@@ -208,12 +269,17 @@ void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 	VAOInfo info = VAOInfo(VAO, VBO, EBO,								//id's
 							model.shader,								//shader program
 							model.indexData.size() * sizeof(int),		//index size
-							vertexArrayData.size() * sizeof(float));	//vertex size
+							vertexArrayData.size() * sizeof(float),		//vertex size
+							model.vertexData.size());					//number of vertices
 
 	glBindVertexArray(VAO);
 
+	// > 1 when default buffer size isn't large enough
+	int bufferSizeMultiplier = ceil((vertexArrayData.size() * sizeof(float)) / (float) DEFAULT_BUFFER_SIZE);
+
+	std::cout << bufferSizeMultiplier << std::endl;
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, info.vertexDataSize * 4, &vertexArrayData[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, DEFAULT_BUFFER_SIZE * bufferSizeMultiplier, &vertexArrayData[0], GL_STATIC_DRAW);
 
 	//interpretation of data
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), 0);
@@ -225,10 +291,12 @@ void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
 	glDisableVertexAttribArray(2);
 
+	bufferSizeMultiplier = ceil((model.indexData.size() * sizeof(int)) / (float) DEFAULT_BUFFER_SIZE);
+
 	//element buffer object
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, info.indexDataSize * 4, &model.indexData[0], GL_STATIC_DRAW);
-	
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, DEFAULT_BUFFER_SIZE * bufferSizeMultiplier, &model.indexData[0], GL_STATIC_DRAW);
+
 	vertexArrayIDs.push_back(info);
 
 	//this model uses the vao that was pushed into the vao list right above
@@ -243,12 +311,6 @@ void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 void WindowCanvas::setDefaultShader(GLuint shader)
 {
 	defaultShader = shader;
-}
-
-unsigned int WindowCanvas::assignModelID()
-{
-	//return a free space
-	return 0;
 }
 
 WindowCanvas::~WindowCanvas()

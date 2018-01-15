@@ -36,10 +36,12 @@ int main(int argc, char **argv)
 	ModelLoader modelLoader;
 	Model* model1 = modelLoader.createPrimitive(modelLoader.TRIANGLE);
 	Model* model2 = modelLoader.createPrimitive(modelLoader.QUAD);
+	Model* model3 = modelLoader.createPrimitive(modelLoader.CUBE);
 	//model1->shader = shaderID1;
 	//std::cout << "Model data : " << "indices - " << model1->indexData.size() << " : " << "vertices - " << model1->vertexData.size() << std::endl;
+	canvas.addModel(*model1, false);
 	canvas.addModel(*model2, false);
-	canvas.addModel(*model1, true);
+	canvas.addModel(*model3, false);
 
 	canvas.start();
 
