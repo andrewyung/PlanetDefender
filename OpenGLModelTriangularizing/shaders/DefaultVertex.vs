@@ -11,5 +11,5 @@ out vec4 v2fCOLOR;
 void main()
 {
 	gl_Position = transform * vec4(pos, 1.0f);
-uniform int time;
+	v2fCOLOR = color * sin(time / 150f);
 }
