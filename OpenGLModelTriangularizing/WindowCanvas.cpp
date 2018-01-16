@@ -57,6 +57,8 @@ void printIndexBufferContent(GLuint bufferID)
 }
 
 void renderScene(void) {
+	int time = glutGet(GLUT_ELAPSED_TIME);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.5, 0.5, 0.5, 1);
 
@@ -72,18 +74,27 @@ void renderScene(void) {
 		{
 			glUseProgram(currentVAO.shaderID);
 		}
+		//move shader uniform changes to game loop later
 		if (i == 0)
 		{
-			glm::mat4 trans;
-			trans = glm::scale(trans, glm::vec3(0.2f, 0.2f, 0.2f));
-			trans = glm::translate(trans, glm::vec3(0.05f, -0.05f, 0.0f) * ((float)(frames % 100)));
-			trans = glm::rotate_slow(trans, glm::radians(1.0f) * frames, glm::vec3(1.0f, 0.0f, 1.0f));
-			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", trans);
+			glm::mat4 transform;
+			transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
+			transform = glm::translate(transform, glm::vec3(0.05f, -0.05f, 0.0f) * ((float)(frames % 100)));
+			transform = glm::rotate_slow(transform, glm::radians(1.0f) * frames, glm::vec3(1.0f, 0.0f, 1.0f));
+			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", transform);
 		}
-		//std::cout << currentVAO.indexDataSize / 4 <<  " : " << currentVAO.vertexDataSize / 9 / 4 << std::endl;
+		else if (i == 1)
+		{
+			glm::mat4 transform;
+			transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
+			transform = glm::rotate(transform, glm::radians(50.0f), glm::vec3(1, 1, 1));
+			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", transform);
+		}
+		shaderLoader.setInt(currentVAO.shaderID, "time", time);
+		//std::cout << time << std::endl;
 		glBindVertexArray(currentVAO.vertexArrayID);	
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO.indexBufferID);
-		std::cout << "running - model added : vb" << currentVAO.vertexDataByteSize << " : ib" << currentVAO.indexDataByteSize << std::endl;
+		//std::cout << "running - model added : vb" << currentVAO.vertexDataByteSize << " : ib" << currentVAO.indexDataByteSize << std::endl;
 
 		glDrawElements(GL_TRIANGLES, currentVAO.indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0);
 	}
@@ -192,6 +203,9 @@ void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 		vertexArrayData.push_back(currentVertex.a);
 
 		//normal
+		//vertexArrayData.push_back(currentVertex.xNormal);
+		//vertexArrayData.push_back(currentVertex.yNormal);
+		//vertexArrayData.push_back(currentVertex.zNormal);
 
 		//texture uv
 		vertexArrayData.push_back(currentVertex.xUV);

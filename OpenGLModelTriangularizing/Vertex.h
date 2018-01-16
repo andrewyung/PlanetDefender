@@ -2,15 +2,38 @@
 class Vertex
 {
 public:
-	Vertex(float x, float y, float z) 
-		: x(x), y(y), z(z), r(0), g(0), b(0), a(1), xUV(0), yUV(0) {};
+	Vertex(float x, float y, float z)
+		:	x(x), y(y), z(z) {};
 
-	Vertex(float x, float y, float z, float r, float g, float b, float a) 
-		: x(x), y(y), z(z), r(r), g(g), b(b), a(a), xUV(0), yUV(0) {};
+	Vertex(	float x, float y, float z, 
+			float r, float g, float b, float a,
+			float UVx, float UVy, 
+			float xNormal, float yNormal, float zNormal)
 
-	Vertex(float x, float y, float z, float r, float g, float b, float a, float UVx, float UVy)
-		: x(x), y(y), z(z), r(r), g(g), b(b), a(a), xUV(UVx), yUV(UVy){};
+		:	x(x), y(y), z(z), 
+			r(r), g(g), b(b), a(a), 
+			xUV(UVx), yUV(UVy),
+			xNormal(xNormal), yNormal(yNormal), zNormal(zNormal) {};
 	~Vertex();
+
+	void setNormals(float xNormal, float yNormal, float zNormal)
+	{
+		this->xNormal = xNormal; 
+		this->yNormal = yNormal;
+		this->zNormal = zNormal;
+	}
+	void setUVCoordinate(float UVx, float UVy)
+	{
+		this->xUV = xUV;
+		this->yUV = yUV;
+	}
+	void setColor(float r, float g, float b, float a)
+	{
+		this->r = r;
+		this->g = g;
+		this->b = b;
+		this->a = a;
+	}
 
 	void normalize();
 	
@@ -18,6 +41,8 @@ public:
 	float x, y, z;
 	//color with alpha
 	float r, g, b, a;
+	//normals
+	float xNormal, yNormal, zNormal;
 	//texture coordinate
 	float xUV, yUV;
 };

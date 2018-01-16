@@ -66,9 +66,21 @@ GLuint ShaderLoader::load(const GLchar* vertexString, const GLchar* fragmentStri
 	return shader;
 }
 
+void ShaderLoader::setInt(GLuint shaderID, const std::string &name, int value)
+{
+	//check if uniform location is not -1
+	//std::cout << glGetUniformLocation(shaderID, name.c_str()) << std::endl;
+
+	glUniform1i(glGetUniformLocation(shaderID, name.c_str()), value);
+
+	//check if any errors
+	//GLenum err = glGetError();
+	//std::cout << err << std::endl;
+}
+
 void ShaderLoader::setFloat(GLuint shaderID, const std::string &name, float value)
 {
-	glUniform1d(glGetUniformLocation(shaderID, name.c_str()), value);
+	glUniform1f(glGetUniformLocation(shaderID, name.c_str()), value);
 }
 
 void ShaderLoader::setMat4x4(GLuint shaderID, const std::string & name, glm::mat4 matrix4x4)
