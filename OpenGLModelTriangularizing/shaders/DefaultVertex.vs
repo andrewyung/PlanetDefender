@@ -4,6 +4,7 @@ layout (location = 1) in vec4 color;
 layout (location = 2) in vec2 uv;
 
 uniform mat4 transform;
+uniform int time;
 
 out vec4 v2fCOLOR;
 
