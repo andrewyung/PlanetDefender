@@ -8,25 +8,25 @@ Model* ModelLoader::createPrimitive(PrimitiveTypes type)
 	switch (type)
 	{
 	case QUAD:
-		vertexData = {	Vertex(	1.0f, 0.3f, 0,	//top right position
+		vertexData = {	Vertex(	0.5f, 0.5f, 0,	//top right position
 								1, 1, 1 ,1,		//color
 								0, 0,			//uv
-								0, 0, -1),		//normal
+								0, 0, 1),		//normal
 
-						Vertex(	1.0f, -0.3f, 0,	//top left position
+						Vertex(	0.5f, -0.5f, 0,	//top left position
 								1, 1, 1 ,1,		
 								0, 0,			
-								0, 0, -1),				
+								0, 0, 1),				
 
 						Vertex(	-0.5f, -0.5f, 0,//bottom left position
 								1, 1, 1 ,1,		
 								0, 0,			
-								0, 0, -1),		
+								0, 0, 1),		
 
 						Vertex(	-0.5f, 0.5f, 0,//bottom right position
 								1, 1, 1 ,1,		
 								0, 0,			
-								0, 0, -1),		
+								0, 0, 1),		
 		};
 
 		indexData = {	0, 1, 2,	
@@ -38,56 +38,56 @@ Model* ModelLoader::createPrimitive(PrimitiveTypes type)
 		vertexData = {	Vertex(	0, 1.0f, 0,		//top vertex position
 								1, 0, 0, 1,		//color
 								0, 0,			//uv
-								0, 0, -1),		//normal
+								0, 0, 1),		//normal
 
 						Vertex(	-0.5f, -0.5f, 0,	//left vertex position
 								0, 1, 0, 1,
 								0, 0,
-								0, 0, -1),	
+								0, 0, 1),	
 
 						Vertex(	0.5f, -0.5f, 0,	//right vertex position
 								0, 0, 1, 1,
 								0, 0,
-								0, 0, -1)		
+								0, 0, 1)		
 		};
 
 		indexData = { 0, 1, 2
 		};
 
 		break;
-	case CUBE:
+	case CUBE: //optimized cube that shares vertices, normals are opposite to the sum of adjacent edges (as vectors)
 		vertexData = {	Vertex(	0.5f, 0.5f, 0.5f,	//front top right
 								0, 0, 1, 1,
 								0, 0,
-								1, 1, -1),
+								1, 1, 1),
 						Vertex(	-0.5f, 0.5f, 0.5f,	//front top left
 								0, 0, 1, 1,
 								0, 0,
-								-1, 1, -1),
+								-1, 1, 1),
 						Vertex(	-0.5f, -0.5f, 0.5f,	//front bottom left
 								0, 0, 1, 1,
 								0, 0,
-								-1, -1, -1),
+								-1, -1, 1),
 						Vertex(	0.5f, -0.5f, 0.5f,	//front bottom right
 								0, 0, 1, 1,
 								0, 0,
-								1, -1, -1),
+								1, -1, 1),
 						Vertex(	0.5f, 0.5f, -0.5f,	//back top right
 								0, 0, 1, 1,
 								0, 0,
-								1, 1, 1),
+								1, 1, -1),
 						Vertex(	-0.5f, 0.5f, -0.5f,	//back top left
 								0, 0, 1, 1,
 								0, 0,
-								-1, 1, 1),
+								-1, 1, -1),
 						Vertex(	-0.5f, -0.5f, -0.5f,//back bottom left
 								0, 0, 1, 1,
 								0, 0,
-								-1, -1, 1),
+								-1, -1, -1),
 						Vertex(	0.5f, -0.5f, -0.5f,	//back bottom right
 								0, 0, 1, 1,
 								0, 0,
-								1, -1, 1),
+								1, -1, -1),
 		};
 
 		indexData = {	0, 1, 2,	//front

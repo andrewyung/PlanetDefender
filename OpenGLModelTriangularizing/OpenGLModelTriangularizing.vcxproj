@@ -139,6 +139,7 @@
     <None Include="shaders\ChangingVertex.vs" />
     <None Include="shaders\DefaultFragment.fs" />
     <None Include="shaders\DefaultVertex.vs" />
+    <None Include="shaders\ExpandingOnNormal.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -80,5 +80,8 @@
     <None Include="shaders\ChangingVertex.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="shaders\ExpandingOnNormal.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

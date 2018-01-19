@@ -90,6 +90,13 @@ void renderScene(void) {
 			transform = glm::rotate(transform, glm::radians(50.0f), glm::vec3(1, 1, 1));
 			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", transform);
 		}
+		else if (i == 2)
+		{
+			glm::mat4 transform;
+			transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
+			transform = glm::rotate(transform, glm::radians(50.0f), glm::vec3(1, 1, 1));
+			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", transform);
+		}
 		shaderLoader.setInt(currentVAO.shaderID, "time", time);
 		//std::cout << time << std::endl;
 		glBindVertexArray(currentVAO.vertexArrayID);	
@@ -203,9 +210,9 @@ void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 		vertexArrayData.push_back(currentVertex.a);
 
 		//normal
-		//vertexArrayData.push_back(currentVertex.xNormal);
-		//vertexArrayData.push_back(currentVertex.yNormal);
-		//vertexArrayData.push_back(currentVertex.zNormal);
+		vertexArrayData.push_back(currentVertex.xNormal);
+		vertexArrayData.push_back(currentVertex.yNormal);
+		vertexArrayData.push_back(currentVertex.zNormal);
 
 		//texture uv
 		vertexArrayData.push_back(currentVertex.xUV);
@@ -296,14 +303,17 @@ void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 	glBufferData(GL_ARRAY_BUFFER, DEFAULT_BUFFER_SIZE * bufferSizeMultiplier, &vertexArrayData[0], GL_STATIC_DRAW);
 
 	//interpretation of data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(7 * sizeof(float)));
 	glDisableVertexAttribArray(2);
+
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_TRUE, 12 * sizeof(float), (void*)(9 * sizeof(float)));
+	glEnableVertexAttribArray(3);
 
 	bufferSizeMultiplier = ceil((model.indexData.size() * sizeof(int)) / (float) DEFAULT_BUFFER_SIZE);
 
