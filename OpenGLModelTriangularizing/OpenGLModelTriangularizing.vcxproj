@@ -117,6 +117,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AppDriver.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
@@ -124,6 +125,7 @@
     <ClCompile Include="WindowCanvas.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />

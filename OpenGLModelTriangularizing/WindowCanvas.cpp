@@ -2,6 +2,7 @@
 #include "Model.h"
 
 GLuint WindowCanvas::defaultShader;
+Camera camera;
 
 const int TARGET_FPS = 60;
 const int DEFAULT_BUFFER_SIZE = 16;
@@ -71,6 +72,7 @@ void renderScene(void) {
 			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", transform);
 		}
 		*/
+		shaderLoader.setMat4x4(currentVAO.shaderID, "MVP", camera.getMVP());
 		shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
 		shaderLoader.setInt(currentVAO.shaderID, "time", lastRenderCallTime);
 		//std::cout << time << std::endl;
@@ -124,6 +126,21 @@ void gameLoopWrapper()
 	currentFrame = WindowCanvas::frames;
 }
 
+void mouseInput(int button, int state, int x, int y)
+{
+	if ((button == 3) || (button == 4)) // It's a wheel event
+	{
+		if (button == 3)
+		{
+			camera.ModelMatrix = glm::translate(camera.ModelMatrix, glm::vec3(0, -0.1, 0));
+		}
+		else
+		{
+			camera.ModelMatrix = glm::translate(camera.ModelMatrix, glm::vec3(0, 0.1, 0));
+		}
+	}
+}
+
 void WindowCanvas::start(void (*gameLoopCallback)(), void(*gameInitializeCallback)())
 {
 	gameInitializeCallback();
@@ -134,7 +151,7 @@ void WindowCanvas::start(void (*gameLoopCallback)(), void(*gameInitializeCallbac
 	glutIdleFunc(gameLoopWrapper);
 	glutDisplayFunc(renderScene);
 	//glutKeyboardFunc(keyboard);
-	//glutMouseFunc(mouse);
+	glutMouseFunc(mouseInput);
 
 	glutMainLoop();
 }
@@ -324,6 +341,11 @@ void WindowCanvas::addModel(Model &model, bool group)
 void WindowCanvas::setDefaultShader(GLuint shader)
 {
 	defaultShader = shader;
+}
+
+void WindowCanvas::setCamera(Camera &mainCamera)
+{
+	camera = mainCamera;
 }
 
 WindowCanvas::~WindowCanvas()

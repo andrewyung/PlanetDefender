@@ -13,6 +13,6 @@ out vec4 v2fCOLOR;
 void main()
 {
 	//just multiplies vertex, will vary greatly depending on what transformations have been done on transform
-	gl_Position = transform  * (1.7f - cos(time / 250f) * vec4(pos, 1.0f));
+	gl_Position = MVP * transform  * (1.7f - cos(time / 250f) * vec4(pos, 1.0f));
 	v2fCOLOR = color;
 }

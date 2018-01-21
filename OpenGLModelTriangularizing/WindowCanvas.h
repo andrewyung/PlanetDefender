@@ -7,6 +7,8 @@
 #include <GL\freeglut.h>
 
 #include "ShaderLoader.h"
+#include "Camera.h"
+
 class Model;
 struct VAOInfo
 {
@@ -35,6 +37,7 @@ public:
 
 	static void addModel(Model &model, bool forceNewVAO);
 	static void setDefaultShader(GLuint shader);
+	static void setCamera(Camera &camera);
 
 	static int frames;
 	static float deltaFrameTime;
@@ -42,5 +45,4 @@ public:
 	~WindowCanvas();
 private:
 	static GLuint defaultShader;
-
 };

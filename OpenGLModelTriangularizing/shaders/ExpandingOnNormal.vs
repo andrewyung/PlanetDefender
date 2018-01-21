@@ -14,6 +14,6 @@ void main()
 {
 	//just multiplies vertex, will vary greatly depending on what transformations have been done on transform
 	//needs mvp matrix
-	gl_Position = transform * vec4(pos, 1.0f) + vec4(normal * (1f - cos(time / 250f)) * 0.4f, 0.0f);
+	gl_Position = MVP * transform * vec4(pos, 1.0f) + vec4(normal * (1f - cos(time / 250f)) * 0.4f, 0.0f);
 	v2fCOLOR = color;
 }
