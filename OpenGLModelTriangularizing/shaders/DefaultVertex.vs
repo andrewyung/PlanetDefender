@@ -6,6 +6,7 @@ layout (location = 3) in vec3 normal;
 
 uniform mat4 transform;
 uniform int time;
+uniform mat4 MVP;
 
 out vec4 v2fCOLOR;
 

@@ -120,7 +120,6 @@
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
-    <ClCompile Include="Transformations.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="WindowCanvas.cpp" />
   </ItemGroup>
@@ -129,7 +128,6 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="ShaderLoader.h" />
-    <ClInclude Include="Transformations.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WindowCanvas.h" />
   </ItemGroup>

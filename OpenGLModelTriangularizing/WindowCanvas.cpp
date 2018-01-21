@@ -1,33 +1,17 @@
 #include "WindowCanvas.h"
 #include "Model.h"
-#define BUFFER_OFFSET(offset) (static_cast<char*>(0) + (offset))
 
 GLuint WindowCanvas::defaultShader;
 
+const int TARGET_FPS = 60;
 const int DEFAULT_BUFFER_SIZE = 16;
 
-struct VAOInfo
-{
-	VAOInfo(GLuint vaoID, GLuint vboID, GLuint eboID, GLuint shaderID, int indexDataSize, int vertexDataSize, int nextAvailableVertexIndex) :
-		vertexArrayID(vaoID), vertexBufferID(vboID), indexBufferID(eboID), shaderID(shaderID), indexDataByteSize(indexDataSize), vertexDataByteSize(vertexDataSize), nextAvailableVertexIndex(nextAvailableVertexIndex){};
-
-	bool instanced = false;
-	GLuint vertexArrayID;
-	GLuint vertexBufferID;
-	GLuint indexBufferID;
-	GLuint shaderID;
-
-	//in bytes
-	int vertexDataByteSize;
-	int indexDataByteSize;
-	int nextAvailableVertexIndex;
-};
-
-std::vector<VAOInfo> vertexArrayIDs;
+std::vector<VAOInfo*> vertexArrayIDs;
 ShaderLoader shaderLoader;
+int WindowCanvas::frames = 0;
+float WindowCanvas::deltaFrameTime = 0;
 
-int frames = 0;
-
+void(*externalGameLoop)();
 
 void printVertexBufferContent(GLuint bufferID)
 {
@@ -42,22 +26,10 @@ void printVertexBufferContent(GLuint bufferID)
 		printf("%f \n", result[i]);
 	}
 }
-void printIndexBufferContent(GLuint bufferID)
-{
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-
-	const int INTS_TO_READ = 100;
-	int result[INTS_TO_READ];
-	glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, INTS_TO_READ  * sizeof(int), result);
-
-	for (int i = 0; i < INTS_TO_READ; i++)
-	{
-		printf("%i \n", (int) result[i]);
-	}
-}
 
 void renderScene(void) {
-	int time = glutGet(GLUT_ELAPSED_TIME);
+
+	int lastRenderCallTime = glutGet(GLUT_ELAPSED_TIME);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.5, 0.5, 0.5, 1);
@@ -68,19 +40,20 @@ void renderScene(void) {
 	{
 		glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
 
-		VAOInfo currentVAO = vertexArrayIDs[i];
+		VAOInfo currentVAO = *vertexArrayIDs[i];
 		//if current shader isn't the one vao is to use
 		if (currentShader != currentVAO.shaderID)
 		{
 			glUseProgram(currentVAO.shaderID);
 		}
 		//move shader uniform changes to game loop later
-		if (i == 0)
+		
+		/*if (i == 0)
 		{
 			glm::mat4 transform;
 			transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
-			transform = glm::translate(transform, glm::vec3(0.05f, -0.05f, 0.0f) * ((float)(frames % 100)));
-			transform = glm::rotate_slow(transform, glm::radians(1.0f) * frames, glm::vec3(1.0f, 0.0f, 1.0f));
+			transform = glm::translate(transform, glm::vec3(0.05f, -0.05f, 0.0f) * ((float)(WindowCanvas::frames % 100)));
+			transform = glm::rotate_slow(transform, glm::radians(1.0f) * WindowCanvas::frames, glm::vec3(1.0f, 0.0f, 1.0f));
 			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", transform);
 		}
 		else if (i == 1)
@@ -97,7 +70,9 @@ void renderScene(void) {
 			transform = glm::rotate(transform, glm::radians(50.0f), glm::vec3(1, 1, 1));
 			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", transform);
 		}
-		shaderLoader.setInt(currentVAO.shaderID, "time", time);
+		*/
+		shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
+		shaderLoader.setInt(currentVAO.shaderID, "time", lastRenderCallTime);
 		//std::cout << time << std::endl;
 		glBindVertexArray(currentVAO.vertexArrayID);	
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO.indexBufferID);
@@ -114,12 +89,12 @@ void renderScene(void) {
 
 void frameTimer(int value)
 {
-	const int targetFPS = 60;
-	glutTimerFunc(1000 / targetFPS, frameTimer, ++value);
+	glutTimerFunc(1000 / TARGET_FPS, frameTimer, ++value);
 
-	frames++;
-	//std::cout << "frame" << std::endl;
+	WindowCanvas::frames++;
+
 	glutPostRedisplay();
+	//std::cout << WindowCanvas::deltaFrameTime << std::endl;
 }
 
 void WindowCanvas::initializeWindow(int argc, char **argv)
@@ -138,11 +113,25 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 	glewInit();
 }
 
-void WindowCanvas::start()
+int currentFrame;
+void gameLoopWrapper()
 {
+	int deltaFrame = WindowCanvas::frames - currentFrame;
+	WindowCanvas::deltaFrameTime = (float) deltaFrame / (float) TARGET_FPS;
+
+	externalGameLoop();
+
+	currentFrame = WindowCanvas::frames;
+}
+
+void WindowCanvas::start(void (*gameLoopCallback)(), void(*gameInitializeCallback)())
+{
+	gameInitializeCallback();
+	externalGameLoop = gameLoopCallback;
+
 	// register callbacks
 	glutTimerFunc(0, frameTimer, 0);
-	//glutIdleFunc(idle);
+	glutIdleFunc(gameLoopWrapper);
 	glutDisplayFunc(renderScene);
 	//glutKeyboardFunc(keyboard);
 	//glutMouseFunc(mouse);
@@ -180,7 +169,7 @@ void resizeBufferObject(GLenum type, GLuint id, int currentSize, int toSize, GLe
 	std::cout << "resized from " << currentSize << " to " << toSize << std::endl;
 }
 
-void WindowCanvas::addModel(Model &model, bool forceNewVAO)
+void WindowCanvas::addModel(Model &model, bool group)
 {
 	if (model.shader == 0)
 	{
@@ -219,14 +208,14 @@ void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 		vertexArrayData.push_back(currentVertex.yUV);
 	}
 
-	if (!forceNewVAO)
+	if (group)
 	{
 		for (int i = 0; i < vertexArrayIDs.size(); i++)
 		{
 			//uses same shader, include in existing vao
-			if (model.shader == vertexArrayIDs[i].shaderID)
+			if (model.shader == vertexArrayIDs[i]->shaderID)
 			{
-				VAOInfo *currentVAOInfo = &vertexArrayIDs[i];
+				VAOInfo *currentVAOInfo = vertexArrayIDs[i];
 				glBindVertexArray(currentVAOInfo->vertexArrayID);
 
 				int currentBufferSize;
@@ -262,8 +251,8 @@ void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 				//std::cout << currentVAOInfo.indexBufferID << std::endl;
 
 				//update where the data for model begins in the buffers
-				model.vertexDataOffset = currentVAOInfo->vertexDataByteSize;
-				model.indexDataOffset = currentVAOInfo->indexDataByteSize;
+				model.setVertexBufferAndArrayData(currentVAOInfo->vertexDataByteSize, currentVAOInfo->indexDataByteSize);
+				model.setVAOInfo(*currentVAOInfo);
 
 				//update size of buffers
 				currentVAOInfo->vertexDataByteSize += vertexArrayData.size() * sizeof(float);
@@ -287,11 +276,11 @@ void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 
-	VAOInfo info = VAOInfo(VAO, VBO, EBO,								//id's
-							model.shader,								//shader program
-							model.indexData.size() * sizeof(int),		//index size
-							vertexArrayData.size() * sizeof(float),		//vertex size
-							model.vertexData.size());					//number of vertices
+	VAOInfo *info = new VAOInfo(VAO, VBO, EBO,								//id's
+								model.shader,								//shader program
+								model.indexData.size() * sizeof(int),		//index size
+								vertexArrayData.size() * sizeof(float),		//vertex size
+								model.vertexData.size());					//number of vertices
 
 	glBindVertexArray(VAO);
 
@@ -321,12 +310,12 @@ void WindowCanvas::addModel(Model &model, bool forceNewVAO)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, DEFAULT_BUFFER_SIZE * bufferSizeMultiplier, &model.indexData[0], GL_STATIC_DRAW);
 
-	vertexArrayIDs.push_back(info);
-
 	//this model uses the vao that was pushed into the vao list right above
-	model.vaoIndex = vertexArrayIDs.size() - 1;
+	model.setVAOInfo(*info);
 	//only object in buffer, so no offset
 	model.setVertexBufferAndArrayData(0, 0);
+
+	vertexArrayIDs.push_back(info);
 
 	glBindVertexArray(0);
 	std::cout << "model created" << std::endl;
