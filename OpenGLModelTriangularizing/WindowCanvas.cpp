@@ -2,7 +2,7 @@
 #include "Model.h"
 
 GLuint WindowCanvas::defaultShader;
-Camera camera;
+Camera *camera;
 
 const int TARGET_FPS = 60;
 const int DEFAULT_BUFFER_SIZE = 16;
@@ -14,6 +14,7 @@ float WindowCanvas::deltaFrameTime = 0;
 
 void(*externalGameLoop)();
 
+//used for debugging buffers
 void printVertexBufferContent(GLuint bufferID)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
@@ -28,6 +29,7 @@ void printVertexBufferContent(GLuint bufferID)
 	}
 }
 
+//render call
 void renderScene(void) {
 
 	int lastRenderCallTime = glutGet(GLUT_ELAPSED_TIME);
@@ -72,7 +74,7 @@ void renderScene(void) {
 			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", transform);
 		}
 		*/
-		shaderLoader.setMat4x4(currentVAO.shaderID, "MVP", camera.getMVP());
+		shaderLoader.setMat4x4(currentVAO.shaderID, "MVP", camera->getMVP());
 		shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
 		shaderLoader.setInt(currentVAO.shaderID, "time", lastRenderCallTime);
 		//std::cout << time << std::endl;
@@ -89,6 +91,7 @@ void renderScene(void) {
 	glBindVertexArray(0);
 }
 
+//timer that queues for rendering at TARGET_FPS frames per second
 void frameTimer(int value)
 {
 	glutTimerFunc(1000 / TARGET_FPS, frameTimer, ++value);
@@ -99,6 +102,7 @@ void frameTimer(int value)
 	//std::cout << WindowCanvas::deltaFrameTime << std::endl;
 }
 
+//initalizes glut
 void WindowCanvas::initializeWindow(int argc, char **argv)
 {
 	int windowHeight = 800;
@@ -116,6 +120,7 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 }
 
 int currentFrame;
+//wraps the game loop with anything that needs to be done before and/or after
 void gameLoopWrapper()
 {
 	int deltaFrame = WindowCanvas::frames - currentFrame;
@@ -126,22 +131,8 @@ void gameLoopWrapper()
 	currentFrame = WindowCanvas::frames;
 }
 
-void mouseInput(int button, int state, int x, int y)
-{
-	if ((button == 3) || (button == 4)) // It's a wheel event
-	{
-		if (button == 3)
-		{
-			camera.ModelMatrix = glm::translate(camera.ModelMatrix, glm::vec3(0, -0.1, 0));
-		}
-		else
-		{
-			camera.ModelMatrix = glm::translate(camera.ModelMatrix, glm::vec3(0, 0.1, 0));
-		}
-	}
-}
-
-void WindowCanvas::start(void (*gameLoopCallback)(), void(*gameInitializeCallback)())
+//register callbacks and starts glut main loop
+void WindowCanvas::start(void (*gameLoopCallback)(), void(*gameInitializeCallback)(), void(*mouseCallback)(int button, int state, int x, int y), void(*keyboardCallback)(unsigned char key, int x, int y))
 {
 	gameInitializeCallback();
 	externalGameLoop = gameLoopCallback;
@@ -150,15 +141,13 @@ void WindowCanvas::start(void (*gameLoopCallback)(), void(*gameInitializeCallbac
 	glutTimerFunc(0, frameTimer, 0);
 	glutIdleFunc(gameLoopWrapper);
 	glutDisplayFunc(renderScene);
-	//glutKeyboardFunc(keyboard);
-	glutMouseFunc(mouseInput);
+	glutKeyboardFunc(keyboardCallback);
+	glutMouseFunc(mouseCallback);
 
 	glutMainLoop();
 }
 
-/*
-*
-*/
+//resize the param id buffer
 void resizeBufferObject(GLenum type, GLuint id, int currentSize, int toSize, GLenum usage)
 {
 	// does 2 copies so vertex attributes don't have to be redefined if using a new buffer and type is vbo
@@ -186,6 +175,9 @@ void resizeBufferObject(GLenum type, GLuint id, int currentSize, int toSize, GLe
 	std::cout << "resized from " << currentSize << " to " << toSize << std::endl;
 }
 
+//Called externally to add models to be rendered. 
+//Allows for grouping of models so that multiple objects can be done with a single draw (such as static models that share the same shader)
+//TODO: instancing
 void WindowCanvas::addModel(Model &model, bool group)
 {
 	if (model.shader == 0)
@@ -345,7 +337,7 @@ void WindowCanvas::setDefaultShader(GLuint shader)
 
 void WindowCanvas::setCamera(Camera &mainCamera)
 {
-	camera = mainCamera;
+	camera = &mainCamera;
 }
 
 WindowCanvas::~WindowCanvas()

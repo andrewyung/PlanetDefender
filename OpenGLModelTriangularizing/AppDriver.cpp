@@ -21,9 +21,13 @@ Model* model6 = modelLoader.createPrimitive(modelLoader.CUBE);
 Model* model4 = modelLoader.createPrimitive(modelLoader.CUBE);
 Model* model5 = modelLoader.createPrimitive(modelLoader.CUBE);
 
+Camera mainCamera;
+
 //called once at the beginning
 void gameInitialization()
 {
+	canvas.setCamera(mainCamera);
+
 	model2->scale(glm::vec3(0.1f, 0.1f, 0.1f));
 
 	model1->scale(glm::vec3(0.2f, 0.2f, 0.2f));
@@ -47,7 +51,50 @@ void gameLoop()
 	model6->rotate(60 * WindowCanvas::deltaFrameTime, glm::vec3(-1.0f, 0.0f, -1.0f));
 	if (WindowCanvas::deltaFrameTime != 0)
 	{
-		std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames / 10000.0f << std::endl;
+		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames / 10000.0f << std::endl;
+	}
+}
+
+void mouseCallback(int button, int state, int x, int y)
+{
+	if ((button == 3) || (button == 4)) // It's a wheel event
+	{
+		if (button == 3)
+		{
+			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, -0.1, 0));
+			mainCamera.translate(glm::vec3(0, -0.1, 0));
+		}
+		else
+		{
+			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, 0.1, 0));
+			mainCamera.translate(glm::vec3(0, 0.1, 0));
+		}
+	}
+	else if (button == 0)
+	{
+		mainCamera.translate(glm::vec3(0.1f, 0, 0));
+	}
+	else if (button == 2)
+	{
+		mainCamera.translate(glm::vec3(-0.1f, 0, 0));
+	}
+}
+
+void keyboardCallback(unsigned char key, int x, int y)
+{
+	//rotate doesnt currently work
+	switch (key)
+	{
+		case GLUT_KEY_DOWN:
+			mainCamera.rotate(glm::vec3(1, 0, 0));		
+			std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames / 10000.0f << std::endl;
+
+			break;
+		case GLUT_KEY_LEFT:
+			mainCamera.rotate(glm::vec3(-1, 0, 0));	
+			std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames / 10000.0f << std::endl;
+
+			break;
 	}
 }
 
@@ -58,6 +105,7 @@ int main(int argc, char **argv)
 
 	canvas.initializeWindow(argc, argv);
 	
+	//load shaders
 	GLuint shaderID, shaderID1, shaderID2;
 	try
 	{
@@ -65,6 +113,7 @@ int main(int argc, char **argv)
 		std::string defaultFragment = fileOp.readFile("shaders/DefaultFragment.fs");
 		ShaderLoader shader;
 		shaderID = shader.load(defaultVertex.c_str(), defaultFragment.c_str());
+		//set a shader for models to use if not set
 		canvas.setDefaultShader(shaderID);
 
 		std::string changingVertex = fileOp.readFile("shaders/ChangingVertex.vs");
@@ -80,6 +129,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 	
+	//add models and assign shaders to models if desired otherwise default shader is used.
 	//model1->shader = shaderID1;
 	//std::cout << "Model data : " << "indices - " << model1->indexData.size() << " : " << "vertices - " << model1->vertexData.size() << std::endl;
 
@@ -96,7 +146,7 @@ int main(int argc, char **argv)
 
 	canvas.addModel(*model6, false);
 
-	canvas.start(gameLoop, gameInitialization);
+	canvas.start(gameLoop, gameInitialization, mouseCallback, keyboardCallback);
 
 	return 0;
 }

@@ -13,6 +13,10 @@ public:
 
 	glm::mat4 getMVP();
 
+	void translate(glm::vec3 translation);
+
+	void rotate(glm::vec3 rotation);
+
 	Camera();
 	~Camera();
 };

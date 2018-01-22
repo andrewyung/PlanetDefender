@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include <stdlib.h> 
 #include <GL\glew.h>
@@ -33,7 +34,7 @@ class WindowCanvas
 {
 public:
 	static void initializeWindow(int argc, char ** argv);
-	static void start(void(*gameLoopCallback)(), void(*gameInitializeCallback)());
+	static void start(void(*gameLoopCallback)(), void(*gameInitializeCallback)(), void(*mouseCallback)(int button, int state, int x, int y), void(*keyboardCallback)(unsigned char key, int x, int y));
 
 	static void addModel(Model &model, bool forceNewVAO);
 	static void setDefaultShader(GLuint shader);
