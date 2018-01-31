@@ -15,9 +15,15 @@ public:
 
 	void translate(glm::vec3 translation);
 
+	void translate(glm::vec3 translation, bool worldSpace);
+
 	void rotate(glm::vec3 rotation);
+
+	void rotate(glm::vec3 rotation, bool worldSpace);
 
 	Camera();
 	~Camera();
+private:
+	void printMVP();
 };
 

@@ -27,6 +27,8 @@ Camera mainCamera;
 void gameInitialization()
 {
 	canvas.setCamera(mainCamera);
+	//translate camera to view test objects (since camera is at origin)
+	mainCamera.translate(glm::vec3(0, 0, -3), true);
 
 	model2->scale(glm::vec3(0.1f, 0.1f, 0.1f));
 
@@ -57,44 +59,65 @@ void gameLoop()
 
 void mouseCallback(int button, int state, int x, int y)
 {
-	if ((button == 3) || (button == 4)) // It's a wheel event
+	if ((button == 3) || (button == 4)) // scroll wheel event
 	{
 		if (button == 3)
 		{
 			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, -0.1, 0));
-			mainCamera.translate(glm::vec3(0, -0.1, 0));
+			mainCamera.translate(glm::vec3(0, 0, 0.1), true);
 		}
 		else
 		{
 			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, 0.1, 0));
-			mainCamera.translate(glm::vec3(0, 0.1, 0));
+			mainCamera.translate(glm::vec3(0, 0, -0.1), true);
 		}
 	}
 	else if (button == 0)
 	{
-		mainCamera.translate(glm::vec3(0.1f, 0, 0));
+		mainCamera.translate(glm::vec3(0.1f, 0, 0), true);
 	}
 	else if (button == 2)
 	{
-		mainCamera.translate(glm::vec3(-0.1f, 0, 0));
+		mainCamera.translate(glm::vec3(-0.1f, 0, 0), true);
 	}
 }
 
 void keyboardCallback(unsigned char key, int x, int y)
 {
 	//rotate doesnt currently work
-	switch (key)
+	if (key == 's')
 	{
-		case GLUT_KEY_DOWN:
-			mainCamera.rotate(glm::vec3(1, 0, 0));		
-			std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames / 10000.0f << std::endl;
+		mainCamera.rotate(glm::vec3(0, 5, 0));
+		std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 
-			break;
-		case GLUT_KEY_LEFT:
-			mainCamera.rotate(glm::vec3(-1, 0, 0));	
-			std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames / 10000.0f << std::endl;
+	}
+	else if (key == 'w')
+	{
+		mainCamera.rotate(glm::vec3(0, -5, 0));
+	}
+	
+	if (key == 'd')
+	{
+		mainCamera.rotate(glm::vec3(5, 0, 0));
+		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 
-			break;
+	}
+	else if (key == 'a')
+	{
+		mainCamera.rotate(glm::vec3(-5, 0, 0));
+		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
+	}
+
+	if (key == 'q')
+	{
+		mainCamera.rotate(glm::vec3(0, 0, 5));
+		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
+
+	}
+	else if (key == 'e')
+	{
+		mainCamera.rotate(glm::vec3(0, 0, 5));
+		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 	}
 }
 
