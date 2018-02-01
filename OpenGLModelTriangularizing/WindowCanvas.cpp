@@ -207,14 +207,14 @@ void WindowCanvas::addModel(Model &model, bool group)
 		vertexArrayData.push_back(currentVertex.b);
 		vertexArrayData.push_back(currentVertex.a);
 
+		//texture uv
+		vertexArrayData.push_back(currentVertex.xUV);
+		vertexArrayData.push_back(currentVertex.yUV);
+
 		//normal
 		vertexArrayData.push_back(currentVertex.xNormal);
 		vertexArrayData.push_back(currentVertex.yNormal);
 		vertexArrayData.push_back(currentVertex.zNormal);
-
-		//texture uv
-		vertexArrayData.push_back(currentVertex.xUV);
-		vertexArrayData.push_back(currentVertex.yUV);
 	}
 
 	if (group)

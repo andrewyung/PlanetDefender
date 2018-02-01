@@ -60,7 +60,7 @@ void Camera::rotate(glm::vec3 rotation, bool worldSpace)
 Camera::Camera()
 {
 	//fov (radians), aspect ratio, near clip, far clip
-	ProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
+	ProjectionMatrix = glm::perspective(glm::radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
 }
 
 

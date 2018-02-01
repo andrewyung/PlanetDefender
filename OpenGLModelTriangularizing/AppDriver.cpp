@@ -110,7 +110,7 @@ void keyboardCallback(unsigned char key, int x, int y)
 
 	if (key == 'q')
 	{
-		mainCamera.rotate(glm::vec3(0, 0, 5));
+		mainCamera.rotate(glm::vec3(0, 0, -5));
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 
 	}
