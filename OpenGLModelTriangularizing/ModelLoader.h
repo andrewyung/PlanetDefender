@@ -13,5 +13,7 @@ public:
 
 	static Model* createPrimitive(PrimitiveTypes type);
 
+	static Model* loadModel(std::string objPath);
+
 	~ModelLoader();
 };

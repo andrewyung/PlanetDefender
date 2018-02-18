@@ -10,6 +10,8 @@ using namespace std;
 
 WindowCanvas canvas;
 
+GLuint shaderID, shaderID1, shaderID2;
+
 ModelLoader modelLoader;
 Model* model1 = modelLoader.createPrimitive(modelLoader.TRIANGLE);
 Model* model2 = modelLoader.createPrimitive(modelLoader.QUAD);
@@ -21,11 +23,29 @@ Model* model6 = modelLoader.createPrimitive(modelLoader.CUBE);
 Model* model4 = modelLoader.createPrimitive(modelLoader.CUBE);
 Model* model5 = modelLoader.createPrimitive(modelLoader.CUBE);
 
+Model* loadedModel = modelLoader.loadModel("cup.obj");
+
 Camera mainCamera;
 
 //called once at the beginning
 void gameInitialization()
 {
+	/*
+	canvas.addModel(*model3, true);
+	canvas.addModel(*model1, true);
+
+	canvas.addModel(*model2, false);
+
+	model4->shader = shaderID1;
+	canvas.addModel(*model4, false);
+
+	model5->shader = shaderID2;
+	canvas.addModel(*model5, false);
+
+	canvas.addModel(*model6, false);
+	*/
+	canvas.addModel(*loadedModel, false);
+
 	canvas.setCamera(mainCamera);
 	//translate camera to view test objects (since camera is at origin)
 	mainCamera.translate(glm::vec3(0, 0, -3), true);
@@ -129,7 +149,6 @@ int main(int argc, char **argv)
 	canvas.initializeWindow(argc, argv);
 	
 	//load shaders
-	GLuint shaderID, shaderID1, shaderID2;
 	try
 	{
 		std::string defaultVertex = fileOp.readFile("shaders/DefaultVertex.vs");
@@ -156,18 +175,6 @@ int main(int argc, char **argv)
 	//model1->shader = shaderID1;
 	//std::cout << "Model data : " << "indices - " << model1->indexData.size() << " : " << "vertices - " << model1->vertexData.size() << std::endl;
 
-	canvas.addModel(*model3, true);
-	canvas.addModel(*model1, true);
-
-	canvas.addModel(*model2, false);
-
-	model4->shader = shaderID1;
-	canvas.addModel(*model4, false);
-
-	model5->shader = shaderID2;
-	canvas.addModel(*model5, false);
-
-	canvas.addModel(*model6, false);
 
 	canvas.start(gameLoop, gameInitialization, mouseCallback, keyboardCallback);
 
