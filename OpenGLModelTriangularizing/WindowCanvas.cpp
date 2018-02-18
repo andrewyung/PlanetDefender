@@ -1,3 +1,5 @@
+#pragma once
+
 #include "WindowCanvas.h"
 #include "Model.h"
 
@@ -51,41 +53,22 @@ void renderScene(void) {
 			{
 				glUseProgram(currentVAO.shaderID);
 			}
-			//move shader uniform changes to game loop later
-
-			/*if (i == 0)
+			if (currentVAO.instanced)//this vao is to be instanced
 			{
-				glm::mat4 transform;
-				transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
-				transform = glm::translate(transform, glm::vec3(0.05f, -0.05f, 0.0f) * ((float)(WindowCanvas::frames % 100)));
-				transform = glm::rotate_slow(transform, glm::radians(1.0f) * WindowCanvas::frames, glm::vec3(1.0f, 0.0f, 1.0f));
-				shaderLoader.setMat4x4(currentVAO.shaderID, "transform", transform);
-			}
-			else if (i == 1)
-			{
-				glm::mat4 transform;
-				transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
-				transform = glm::rotate(transform, glm::radians(50.0f), glm::vec3(1, 1, 1));
-				shaderLoader.setMat4x4(currentVAO.shaderID, "transform", transform);
-			}
-			else if (i == 2)
-			{
-				glm::mat4 transform;
-				transform = glm::scale(transform, glm::vec3(0.2f, 0.2f, 0.2f));
-				transform = glm::rotate(transform, glm::radians(50.0f), glm::vec3(1, 1, 1));
-				shaderLoader.setMat4x4(currentVAO.shaderID, "transform", transform);
-			}
-			*/
-			shaderLoader.setMat4x4(currentVAO.shaderID, "MVP", camera->getMVP());
-			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
-			shaderLoader.setInt(currentVAO.shaderID, "time", lastRenderCallTime);
-			//std::cout << time << std::endl;
-			glBindVertexArray(currentVAO.vertexArrayID);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO.indexBufferID);
-			//std::cout << "running - model added : vb" << currentVAO.vertexDataByteSize << " : ib" << currentVAO.indexDataByteSize << std::endl;
 
-			glDrawElements(GL_TRIANGLES, currentVAO.indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0);
+			}
+			else
+			{
+				shaderLoader.setMat4x4(currentVAO.shaderID, "MVP", camera->getMVP());
+				shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
+				shaderLoader.setInt(currentVAO.shaderID, "time", lastRenderCallTime);
+				//std::cout << time << std::endl;
+				glBindVertexArray(currentVAO.vertexArrayID);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO.indexBufferID);
+				//std::cout << "running - model added : vb" << currentVAO.vertexDataByteSize << " : ib" << currentVAO.indexDataByteSize << std::endl;
 
+				glDrawElements(GL_TRIANGLES, currentVAO.indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0);
+			}
 		}
 	}
 
@@ -179,6 +162,11 @@ void resizeBufferObject(GLenum type, GLuint id, int currentSize, int toSize, GLe
 	glDeleteBuffers(1, &tempBufferObject);
 
 	std::cout << "resized from " << currentSize << " to " << toSize << std::endl;
+}
+
+void WindowCanvas::addParticles(Model &model)
+{
+
 }
 
 //Called externally to add models to be rendered. 

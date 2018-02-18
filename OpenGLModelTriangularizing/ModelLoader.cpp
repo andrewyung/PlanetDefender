@@ -1,3 +1,5 @@
+#pragma once
+
 #include "ModelLoader.h"
 
 // OBJ_Loader - .obj Loader
