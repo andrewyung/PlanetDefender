@@ -15,6 +15,8 @@ public:
 
 	GLuint shader;
 
+	bool drawing() const { return vaoInfo->drawing; };
+
 	void scale(glm::vec3 scale)
 	{
 		if (vaoInfo != nullptr)
@@ -51,6 +53,11 @@ public:
 		{
 			vaoInfo->transformation = glm::rotate(vaoInfo->transformation, glm::radians(angle), axis);
 		}
+	}
+
+	void setDrawing(bool toBeDrawn)
+	{
+		this->vaoInfo->drawing = toBeDrawn;
 	}
 	
 private:

@@ -118,6 +118,9 @@
   <ItemGroup>
     <ClCompile Include="AppDriver.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="e1_loadandprint.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
@@ -129,17 +132,32 @@
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />
+    <ClInclude Include="OBJ_Loader.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WindowCanvas.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GreenFragment.fs" />
+    <None Include="Models\Avent.mtl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Models\box_stack.mtl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="packages.config" />
     <None Include="shaders\ChangingVertex.vs" />
     <None Include="shaders\DefaultFragment.fs" />
     <None Include="shaders\DefaultVertex.vs" />
     <None Include="shaders\ExpandingOnNormal.vs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Models\Avent.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="Models\box_stack.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

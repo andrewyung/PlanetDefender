@@ -23,7 +23,7 @@ Model* model6 = modelLoader.createPrimitive(modelLoader.CUBE);
 Model* model4 = modelLoader.createPrimitive(modelLoader.CUBE);
 Model* model5 = modelLoader.createPrimitive(modelLoader.CUBE);
 
-Model* loadedModel = modelLoader.loadModel("cup.obj");
+Model* loadedModel = modelLoader.loadModel("airboat.obj");
 
 Camera mainCamera;
 
@@ -71,8 +71,15 @@ void gameLoop()
 	model1->rotate(60 * WindowCanvas::deltaFrameTime, glm::vec3(1.0f, 0.0f, 1.0f));
 
 	model6->rotate(60 * WindowCanvas::deltaFrameTime, glm::vec3(-1.0f, 0.0f, -1.0f));
-	if (WindowCanvas::deltaFrameTime != 0)
+	std::cout << WindowCanvas::frames << std::endl;
+	if (WindowCanvas::frames > 200)
 	{
+		loadedModel->setDrawing(false);
+		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames / 10000.0f << std::endl;
+	}
+	if (WindowCanvas::frames > 400)
+	{
+		loadedModel->setDrawing(true);
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames / 10000.0f << std::endl;
 	}
 }
