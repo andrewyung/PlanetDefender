@@ -30,7 +30,7 @@ Camera mainCamera;
 //called once at the beginning
 void gameInitialization()
 {
-	/*
+	
 	canvas.addModel(*model3, true);
 	canvas.addModel(*model1, true);
 
@@ -43,7 +43,7 @@ void gameInitialization()
 	canvas.addModel(*model5, false);
 
 	canvas.addModel(*model6, false);
-	*/
+	
 	canvas.addModel(*loadedModel, false);
 
 	canvas.setCamera(mainCamera);
@@ -181,7 +181,6 @@ int main(int argc, char **argv)
 	//add models and assign shaders to models if desired otherwise default shader is used.
 	//model1->shader = shaderID1;
 	//std::cout << "Model data : " << "indices - " << model1->indexData.size() << " : " << "vertices - " << model1->vertexData.size() << std::endl;
-
 
 	canvas.start(gameLoop, gameInitialization, mouseCallback, keyboardCallback);
 
