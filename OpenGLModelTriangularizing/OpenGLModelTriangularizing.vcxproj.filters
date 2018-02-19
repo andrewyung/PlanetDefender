@@ -24,9 +24,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Vertex.cpp">
-      <Filter>Source Files\utilities</Filter>
-    </ClCompile>
     <ClCompile Include="ModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -74,6 +71,9 @@
     <ClInclude Include="OBJ_Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Particles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -97,6 +97,9 @@
     </None>
     <None Include="Models\Avent.mtl">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\DefaultParticleVertex.vs">
+      <Filter>Source Files\shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

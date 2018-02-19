@@ -124,7 +124,6 @@
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
-    <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="WindowCanvas.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -133,6 +132,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="OBJ_Loader.h" />
+    <ClInclude Include="Particles.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WindowCanvas.h" />
@@ -148,6 +148,7 @@
     <None Include="packages.config" />
     <None Include="shaders\ChangingVertex.vs" />
     <None Include="shaders\DefaultFragment.fs" />
+    <None Include="shaders\DefaultParticleVertex.vs" />
     <None Include="shaders\DefaultVertex.vs" />
     <None Include="shaders\ExpandingOnNormal.vs" />
   </ItemGroup>

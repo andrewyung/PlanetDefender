@@ -3,10 +3,12 @@
 #include <iostream>
 #include <filesystem>
 
-#include "AppDriver.h"
 #include "WindowCanvas.h"
 #include "ModelLoader.h"
 #include "FileOperations.h"
+#include "Particles.h"
+
+#include "AppDriver.h"
 
 using namespace std;
 
@@ -27,12 +29,21 @@ Model* model5 = modelLoader.createPrimitive(modelLoader.CUBE);
 
 Model* loadedModel = modelLoader.loadModel("airboat.obj");
 
+Particles* particles = new Particles(modelLoader.createPrimitive(modelLoader.CUBE));
+
 Camera mainCamera;
 
 //called once at the beginning
 void gameInitialization()
 {
-	
+	canvas.setCamera(mainCamera);
+	//translate camera to view test objects (since camera is at origin)
+	mainCamera.translate(glm::vec3(0, 0, -3), true);
+
+	std::vector<glm::mat4> particleTransforms = { glm::mat4() };
+	canvas.addParticles(*particles, 1, particleTransforms);
+
+	/*
 	canvas.addModel(*model3, true);
 	canvas.addModel(*model1, true);
 
@@ -48,9 +59,6 @@ void gameInitialization()
 	
 	canvas.addModel(*loadedModel, false);
 
-	canvas.setCamera(mainCamera);
-	//translate camera to view test objects (since camera is at origin)
-	mainCamera.translate(glm::vec3(0, 0, -3), true);
 
 	model2->scale(glm::vec3(0.1f, 0.1f, 0.1f));
 
@@ -64,11 +72,13 @@ void gameInitialization()
 
 	model5->scale(glm::vec3(0.2f, 0.2f, 0.2f));
 	model5->translate(glm::vec3(0.0f, -2.0f, 0));
+	*/
 }
 
 //called repeatly as soon as possible
 void gameLoop()
 {
+	/*
 	model1->translate((float) WindowCanvas::deltaFrameTime * glm::vec3(0.3f, 0.3f, 0) * (float) sin((float) WindowCanvas::frames / 10.0f) * 3.0f, false);
 	model1->rotate(60 * WindowCanvas::deltaFrameTime, glm::vec3(1.0f, 0.0f, 1.0f));
 
@@ -84,6 +94,7 @@ void gameLoop()
 		loadedModel->setDrawing(true);
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames / 10000.0f << std::endl;
 	}
+	*/
 }
 
 void mouseCallback(int button, int state, int x, int y)
@@ -173,6 +184,10 @@ int main(int argc, char **argv)
 
 		std::string expandingNormalsVertex = fileOp.readFile("shaders/ExpandingOnNormal.vs");
 		shaderID2 = shader.load(expandingNormalsVertex.c_str(), defaultFragment.c_str());
+
+		std::string defaultParticleVertex = fileOp.readFile("shaders/DefaultParticleVertex.vs");
+		GLuint particleShaderID = shader.load(defaultParticleVertex.c_str(), defaultFragment.c_str());
+		canvas.setDefaultParticleShader(particleShaderID);
 	}
 	catch (std::invalid_argument& e)
 	{

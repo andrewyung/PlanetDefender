@@ -8,10 +8,10 @@
 class Particles
 {
 public:
-	Particles(Model model) :
+	Particles(Model *model) :
 		particleModel(model) {};
 
-	Model particleModel;
+	Model* particleModel;
 	std::vector<glm::mat4> particleOffsets;
 
 	GLuint shader;

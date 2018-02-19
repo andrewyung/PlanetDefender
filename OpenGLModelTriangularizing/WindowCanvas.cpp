@@ -2,8 +2,10 @@
 
 #include "WindowCanvas.h"
 #include "Model.h"
+#include "Particles.h"
 
 GLuint WindowCanvas::defaultShader;
+GLuint WindowCanvas::defaultParticleShader;
 Camera *camera;
 
 const int TARGET_FPS = 60;
@@ -53,20 +55,22 @@ void renderScene(void) {
 			{
 				glUseProgram(currentVAO.shaderID);
 			}
+
+			shaderLoader.setMat4x4(currentVAO.shaderID, "MVP", camera->getMVP());
+			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
+			shaderLoader.setInt(currentVAO.shaderID, "time", lastRenderCallTime);
+
+			//std::cout << time << std::endl;
+			glBindVertexArray(currentVAO.vertexArrayID);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO.indexBufferID);
+			//std::cout << "running - model added : vb" << currentVAO.vertexDataByteSize << " : ib" << currentVAO.indexDataByteSize << std::endl;
+
 			if (currentVAO.instanced)//this vao is to be instanced
 			{
-
+				glDrawElementsInstanced(GL_TRIANGLES, currentVAO.indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0, currentVAO.instances);
 			}
 			else
 			{
-				shaderLoader.setMat4x4(currentVAO.shaderID, "MVP", camera->getMVP());
-				shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
-				shaderLoader.setInt(currentVAO.shaderID, "time", lastRenderCallTime);
-				//std::cout << time << std::endl;
-				glBindVertexArray(currentVAO.vertexArrayID);
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO.indexBufferID);
-				//std::cout << "running - model added : vb" << currentVAO.vertexDataByteSize << " : ib" << currentVAO.indexDataByteSize << std::endl;
-
 				glDrawElements(GL_TRIANGLES, currentVAO.indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0);
 			}
 		}
@@ -164,9 +168,130 @@ void resizeBufferObject(GLenum type, GLuint id, int currentSize, int toSize, GLe
 	std::cout << "resized from " << currentSize << " to " << toSize << std::endl;
 }
 
-void WindowCanvas::addParticles(Model &model)
+void WindowCanvas::addParticles(Particles &particles, int instances, std::vector<glm::mat4> particleTransformations)
 {
+	if (particleTransformations.empty())
+	{
+		particleTransformations.resize(instances);
+	}
+	if (particleTransformations.size() != instances)
+	{
+		std::cout << "number of particle transformations (" << particleTransformations.size() << ") isnt equal to instances (" << instances << ")" << std::endl;
+		return;
+	}
 
+	//array for the raw vertex data thats to be put into the vbo
+	std::vector<float> vertexArrayData;
+
+	//vertex information from model
+	for (int i = 0; i < particles.particleModel->vertexData.size(); i++)
+	{
+		Vertex currentVertex = particles.particleModel->vertexData[i];
+
+		//position
+		vertexArrayData.push_back(currentVertex.x);
+		vertexArrayData.push_back(currentVertex.y);
+		vertexArrayData.push_back(currentVertex.z);
+
+		//rgba
+		vertexArrayData.push_back(currentVertex.r);
+		vertexArrayData.push_back(currentVertex.g);
+		vertexArrayData.push_back(currentVertex.b);
+		vertexArrayData.push_back(currentVertex.a);
+
+		//texture uv
+		vertexArrayData.push_back(currentVertex.xUV);
+		vertexArrayData.push_back(currentVertex.yUV);
+
+		//normal
+		vertexArrayData.push_back(currentVertex.xNormal);
+		vertexArrayData.push_back(currentVertex.yNormal);
+		vertexArrayData.push_back(currentVertex.zNormal);
+	}
+
+
+	std::vector<float> particleTransformationsData;
+
+	for (int i = 0; i < instances; i++)
+	{
+		const float *matArray = (const float*)glm::value_ptr(particleTransformations[i]);
+		//particle transformation
+		for (int i = 0; i < 16; i++)//4x4 matrix, 16 values
+		{
+			particleTransformationsData.push_back(matArray[i]);
+		}
+	}
+
+
+	//no vao with matching shader found, create a new vao
+	GLuint VAO, VBO, transformVBO, EBO;
+
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
+	glGenBuffers(1, &transformVBO);
+
+	VAOInfo *info = new VAOInfo(VAO, VBO, EBO,								//id's
+		particles.shader,											//shader program
+		particles.particleModel->indexData.size() * sizeof(int),		//index size of particle model
+		vertexArrayData.size() * sizeof(float),		//vertex size
+		particles.particleModel->vertexData.size());					//number of vertices of particle model
+	info->instanced = true;
+	info->instances = instances;
+
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vertexArrayData.size() * sizeof(float), &vertexArrayData[0], GL_STATIC_DRAW);
+
+	//interpretation of data
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), 0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(7 * sizeof(float)));
+	glDisableVertexAttribArray(2);
+
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_TRUE, 12 * sizeof(float), (void*)(9 * sizeof(float)));
+	glEnableVertexAttribArray(3);
+
+
+	//vbo containing particle transformations
+	glBindBuffer(GL_ARRAY_BUFFER, transformVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instances, &particleTransformationsData[0], GL_STREAM_DRAW);
+
+	int pos = glGetAttribLocation(particles.shader, "particleTransformations");
+	std::cout << "should be 4... " << pos << std::endl;
+	int pos1 = pos + 0;
+	int pos2 = pos + 1;
+	int pos3 = pos + 2;
+	int pos4 = pos + 3;
+	glEnableVertexAttribArray(pos1);
+	glEnableVertexAttribArray(pos2);
+	glEnableVertexAttribArray(pos3);
+	glEnableVertexAttribArray(pos4);
+	glVertexAttribPointer(pos1, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(0));
+	glVertexAttribPointer(pos2, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(sizeof(float) * 4));
+	glVertexAttribPointer(pos3, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(sizeof(float) * 8));
+	glVertexAttribPointer(pos4, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(sizeof(float) * 12));
+	glVertexAttribDivisor(pos1, 1);
+	glVertexAttribDivisor(pos2, 1);
+	glVertexAttribDivisor(pos3, 1);
+	glVertexAttribDivisor(pos4, 1);
+
+	//element buffer object
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, particles.particleModel->indexData.size() * sizeof(float), &particles.particleModel->indexData[0], GL_STATIC_DRAW);
+
+	//this model uses the vao that was pushed into the vao list right above
+	particles.setVAOInfo(*info);
+
+	vertexArrayIDs.push_back(info);
+
+	glBindVertexArray(0);
+	std::cout << "particle created" << std::endl;
 }
 
 //Called externally to add models to be rendered. 
@@ -327,6 +452,11 @@ void WindowCanvas::addModel(Model &model, bool group)
 void WindowCanvas::setDefaultShader(GLuint shader)
 {
 	defaultShader = shader;
+}
+
+void WindowCanvas::setDefaultParticleShader(GLuint shader)
+{
+	defaultParticleShader = shader;
 }
 
 void WindowCanvas::setCamera(Camera &mainCamera)

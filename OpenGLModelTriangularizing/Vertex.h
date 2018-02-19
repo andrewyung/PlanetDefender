@@ -1,4 +1,5 @@
 #pragma once
+
 class Vertex
 {
 public:
@@ -14,7 +15,7 @@ public:
 			r(r), g(g), b(b), a(a), 
 			xUV(UVx), yUV(UVy),
 			xNormal(xNormal), yNormal(yNormal), zNormal(zNormal) {};
-	~Vertex();
+	//~Vertex();
 
 	void setNormals(float xNormal, float yNormal, float zNormal)
 	{
@@ -35,7 +36,7 @@ public:
 		this->a = a;
 	}
 
-	void normalize();
+	//void normalize();
 	
 	//3d vector
 	float x, y, z;
