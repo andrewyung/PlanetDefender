@@ -40,8 +40,8 @@ void gameInitialization()
 	//translate camera to view test objects (since camera is at origin)
 	mainCamera.translate(glm::vec3(0, 0, -3), true);
 
-	std::vector<glm::mat4> particleTransforms = { glm::mat4() };
-	canvas.addParticles(*particles, 1, particleTransforms);
+	std::vector<glm::mat4> particleTransforms = { glm::mat4(), glm::translate(glm::mat4(), glm::vec3(0, 2.5f, 0)) };
+	canvas.addParticles(*particles, 2, particleTransforms);
 
 	/*
 	canvas.addModel(*model3, true);

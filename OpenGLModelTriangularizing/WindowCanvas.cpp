@@ -180,6 +180,15 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 		return;
 	}
 
+	if (particles.shader == 0)
+	{
+		if (defaultParticleShader == 0)
+		{
+			std::cout << "Default particle shader not set" << std::endl;
+		}
+		particles.shader = defaultParticleShader;
+	}
+
 	//array for the raw vertex data thats to be put into the vbo
 	std::vector<float> vertexArrayData;
 
@@ -256,8 +265,7 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_TRUE, 12 * sizeof(float), (void*)(9 * sizeof(float)));
 	glEnableVertexAttribArray(3);
-
-
+	
 	//vbo containing particle transformations
 	glBindBuffer(GL_ARRAY_BUFFER, transformVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instances, &particleTransformationsData[0], GL_STREAM_DRAW);
