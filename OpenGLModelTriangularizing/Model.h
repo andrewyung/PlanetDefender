@@ -58,6 +58,11 @@ public:
 
 	void setDrawing(bool toBeDrawn)
 	{
+		if (vaoInfo == nullptr)
+		{
+			std::cout << "Model has not been added" << std::endl;
+			return;
+		}
 		this->vaoInfo->drawing = toBeDrawn;
 	}
 	
