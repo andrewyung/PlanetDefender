@@ -14,7 +14,8 @@ const int DEFAULT_BUFFER_SIZE = 16;
 std::vector<VAOInfo*> vertexArrayIDs;
 ShaderLoader shaderLoader;
 int WindowCanvas::frames = 0;
-float WindowCanvas::deltaFrameTime = 0;
+float WindowCanvas::deltaCallbackTime = 0;
+int lastCallbackTime;
 
 void(*externalGameLoop)();
 
@@ -36,8 +37,6 @@ void printVertexBufferContent(GLuint bufferID)
 //render call
 void renderScene(void) {
 
-	int lastRenderCallTime = glutGet(GLUT_ELAPSED_TIME);
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.5, 0.5, 0.5, 1);
 
@@ -48,6 +47,7 @@ void renderScene(void) {
 		glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
 
 		VAOInfo currentVAO = *vertexArrayIDs[i];
+
 		if (currentVAO.drawing)//is vao is set to be rendered
 		{
 			//if current shader isn't the one vao is to use
@@ -58,7 +58,7 @@ void renderScene(void) {
 
 			shaderLoader.setMat4x4(currentVAO.shaderID, "MVP", camera->getMVP());
 			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
-			shaderLoader.setInt(currentVAO.shaderID, "time", lastRenderCallTime);
+			shaderLoader.setInt(currentVAO.shaderID, "time", glutGet(GLUT_ELAPSED_TIME));
 
 			//std::cout << time << std::endl;
 			glBindVertexArray(currentVAO.vertexArrayID);
@@ -115,9 +115,15 @@ int currentFrame;
 void gameLoopWrapper()
 {
 	int deltaFrame = WindowCanvas::frames - currentFrame;
-	WindowCanvas::deltaFrameTime = (float) deltaFrame / (float) TARGET_FPS;
 
-	externalGameLoop();
+	WindowCanvas::deltaCallbackTime = (glutGet(GLUT_ELAPSED_TIME) - lastCallbackTime) * 0.001f;
+	
+	if (WindowCanvas::deltaCallbackTime != 0)//can be increased to control frequency of external gmae loop call
+	{
+		lastCallbackTime = glutGet(GLUT_ELAPSED_TIME);
+
+		externalGameLoop();
+	}
 
 	currentFrame = WindowCanvas::frames;
 }
@@ -299,7 +305,7 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 	vertexArrayIDs.push_back(info);
 
 	glBindVertexArray(0);
-	std::cout << "particle created" << std::endl;
+	std::cout << "particle created" << particles.shader << std::endl;
 }
 
 //Called externally to add models to be rendered. 
@@ -349,7 +355,7 @@ void WindowCanvas::addModel(Model &model, bool group)
 		for (int i = 0; i < vertexArrayIDs.size(); i++)
 		{
 			//uses same shader, include in existing vao
-			if (model.shader == vertexArrayIDs[i]->shaderID)
+			if (model.shader == vertexArrayIDs[i]->shaderID && !vertexArrayIDs[i]->instanced)
 			{
 				VAOInfo *currentVAOInfo = vertexArrayIDs[i];
 				glBindVertexArray(currentVAOInfo->vertexArrayID);

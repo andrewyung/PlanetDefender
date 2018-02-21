@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "WindowCanvas.h"
 
+//could do inheritance as it has same transformation functions as model
 class Particles
 {
 public:
@@ -23,6 +24,36 @@ public:
 		if (vaoInfo != nullptr)
 		{
 			vaoInfo->transformation = glm::scale(vaoInfo->transformation, scale);
+		}
+	}
+
+	void translate(glm::vec3 translateVector)
+	{
+		if (vaoInfo != nullptr)
+		{
+			vaoInfo->transformation = glm::translate(vaoInfo->transformation, translateVector);
+		}
+	}
+	void translate(glm::vec3 translateVector, bool localSpace)
+	{
+		if (vaoInfo != nullptr)
+		{
+			if (!localSpace)
+			{
+				vaoInfo->transformation = glm::translate(glm::mat4(), translateVector) * vaoInfo->transformation;
+			}
+			else
+			{
+				vaoInfo->transformation = glm::translate(vaoInfo->transformation, translateVector);
+			}
+		}
+	}
+
+	void rotate(float angle, glm::vec3 axis)
+	{
+		if (vaoInfo != nullptr)
+		{
+			vaoInfo->transformation = glm::rotate(vaoInfo->transformation, glm::radians(angle), axis);
 		}
 	}
 

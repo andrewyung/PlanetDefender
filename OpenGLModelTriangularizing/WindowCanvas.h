@@ -16,6 +16,7 @@ class Model;
 class Particles;
 struct VAOInfo
 {
+	//maybe remove vboID as not used
 	VAOInfo(GLuint vaoID, GLuint vboID, GLuint eboID, GLuint shaderID, int indexDataSize, int vertexDataSize, int nextAvailableVertexIndex) :
 		vertexArrayID(vaoID), vertexBufferID(vboID), indexBufferID(eboID), shaderID(shaderID), indexDataByteSize(indexDataSize), vertexDataByteSize(vertexDataSize), nextAvailableVertexIndex(nextAvailableVertexIndex) {};
 
@@ -49,7 +50,7 @@ public:
 	static void setCamera(Camera &camera);
 
 	static int frames;
-	static float deltaFrameTime;
+	static float deltaCallbackTime;
 
 	~WindowCanvas();
 private:

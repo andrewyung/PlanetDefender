@@ -29,23 +29,24 @@ Model* model5 = modelLoader.createPrimitive(modelLoader.CUBE);
 
 Model* loadedModel = modelLoader.loadModel("airboat.obj");
 
-Particles* particles = new Particles(modelLoader.createPrimitive(modelLoader.CUBE));
+Particles* particles1 = new Particles(modelLoader.createPrimitive(modelLoader.CUBE));
+Particles* particles2 = new Particles(modelLoader.createPrimitive(modelLoader.TRIANGLE));
 
 Camera mainCamera;
 
 //called once at the beginning
 void gameInitialization()
 {
+	//camera
 	canvas.setCamera(mainCamera);
 	//translate camera to view test objects (since camera is at origin)
 	mainCamera.translate(glm::vec3(0, 0, -3), true);
 
-	std::vector<glm::mat4> particleTransforms = { glm::mat4(), glm::translate(glm::mat4(), glm::vec3(0, 2.5f, 0)) };
-	canvas.addParticles(*particles, 2, particleTransforms);
 
-	/*
-	canvas.addModel(*model3, true);
+	//models
 	canvas.addModel(*model1, true);
+
+	canvas.addModel(*model3, true);
 
 	canvas.addModel(*model2, false);
 
@@ -56,10 +57,31 @@ void gameInitialization()
 	canvas.addModel(*model5, false);
 
 	canvas.addModel(*model6, false);
-	
+
 	canvas.addModel(*loadedModel, false);
 
+	//particles
+	std::vector<glm::mat4> particleTransforms;
+	for (int i = 1; i < 201; i++)
+	{
+		for (int k = 1; k < 201; k++)
+		{
+			particleTransforms.push_back(glm::translate(glm::mat4(), glm::vec3(k * 2.5, i * 2.5f, 0)));
+		}
+	}
+	canvas.addParticles(*particles1, 200 * 200, particleTransforms);
 
+	particleTransforms.clear();
+	for (int i = 1; i < 201; i++)
+	{
+		for (int k = 1; k < 201; k++)
+		{
+			particleTransforms.push_back(glm::translate(glm::mat4(), glm::vec3(k * -2.5, i * -2.5f, 0)));
+		}
+	}
+	canvas.addParticles(*particles2, 200 * 200, particleTransforms);
+
+	//model transformations
 	model2->scale(glm::vec3(0.1f, 0.1f, 0.1f));
 
 	model1->scale(glm::vec3(0.2f, 0.2f, 0.2f));
@@ -72,18 +94,17 @@ void gameInitialization()
 
 	model5->scale(glm::vec3(0.2f, 0.2f, 0.2f));
 	model5->translate(glm::vec3(0.0f, -2.0f, 0));
-	*/
 }
 
 //called repeatly as soon as possible
 void gameLoop()
 {
-	/*
-	model1->translate((float) WindowCanvas::deltaFrameTime * glm::vec3(0.3f, 0.3f, 0) * (float) sin((float) WindowCanvas::frames / 10.0f) * 3.0f, false);
-	model1->rotate(60 * WindowCanvas::deltaFrameTime, glm::vec3(1.0f, 0.0f, 1.0f));
+	model1->translate((float) WindowCanvas::deltaCallbackTime * glm::vec3(0.3f, 0.3f, 0) * (float) sin((float) WindowCanvas::frames / 10.0f) * 3.0f, false);
+	model1->rotate(60 * WindowCanvas::deltaCallbackTime, glm::vec3(1.0f, 0.0f, 1.0f));
 
-	model6->rotate(60 * WindowCanvas::deltaFrameTime, glm::vec3(-1.0f, 0.0f, -1.0f));
-	std::cout << WindowCanvas::frames << std::endl;
+	model6->rotate(60 * WindowCanvas::deltaCallbackTime, glm::vec3(-1.0f, 0.0f, -1.0f));
+
+	//std::cout << WindowCanvas::frames << std::endl;
 	if (WindowCanvas::frames > 200)
 	{
 		loadedModel->setDrawing(false);
@@ -94,7 +115,6 @@ void gameLoop()
 		loadedModel->setDrawing(true);
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames / 10000.0f << std::endl;
 	}
-	*/
 }
 
 void mouseCallback(int button, int state, int x, int y)
@@ -114,11 +134,11 @@ void mouseCallback(int button, int state, int x, int y)
 	}
 	else if (button == 0)
 	{
-		mainCamera.translate(glm::vec3(0.1f, 0, 0), true);
+		mainCamera.translate(glm::vec3(0.1f, 0, 0) * WindowCanvas::deltaCallbackTime, true);
 	}
 	else if (button == 2)
 	{
-		mainCamera.translate(glm::vec3(-0.1f, 0, 0), true);
+		mainCamera.translate(glm::vec3(-0.1f, 0, 0) * WindowCanvas::deltaCallbackTime, true);
 	}
 }
 
@@ -128,7 +148,7 @@ void keyboardCallback(unsigned char key, int x, int y)
 	if (key == 's')
 	{
 		mainCamera.rotate(glm::vec3(0, 5, 0));
-		std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
+		std::cout << WindowCanvas::deltaCallbackTime << " : " << (float)WindowCanvas::frames << std::endl;
 
 	}
 	else if (key == 'w')
