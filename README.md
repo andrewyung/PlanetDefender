@@ -11,7 +11,7 @@ Work in progress. So far uses glew, glut, glm and OBJ_Loader
 
 -Uses OBJ_Loader to load and render .obj models
 
--Non-interpolated camera translation and rotation
+-Camera translation and rotation
 
 
 
