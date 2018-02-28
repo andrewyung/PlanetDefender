@@ -101,6 +101,12 @@
     <None Include="shaders\DefaultParticleVertex.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="shaders\DiffuseVert.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\DiffuseFrag.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Object Include="Models\box_stack.obj">

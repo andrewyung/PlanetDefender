@@ -150,6 +150,8 @@
     <None Include="shaders\DefaultFragment.fs" />
     <None Include="shaders\DefaultParticleVertex.vs" />
     <None Include="shaders\DefaultVertex.vs" />
+    <None Include="shaders\DiffuseFrag.fs" />
+    <None Include="shaders\DiffuseVert.vs" />
     <None Include="shaders\ExpandingOnNormal.vs" />
   </ItemGroup>
   <ItemGroup>

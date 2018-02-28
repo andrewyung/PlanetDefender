@@ -88,5 +88,10 @@ void ShaderLoader::setMat4x4(GLuint shaderID, const std::string & name, glm::mat
 	glUniformMatrix4fv(glGetUniformLocation(shaderID, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix4x4));
 }
 
+void ShaderLoader::setVector3(GLuint shaderID, const std::string & name, glm::vec3 vector)
+{
+	glUniform3fv(glGetUniformLocation(shaderID, name.c_str()), 1, glm::value_ptr(vector));
+}
+
 
 

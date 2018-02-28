@@ -14,7 +14,7 @@ using namespace std;
 
 WindowCanvas canvas;
 
-GLuint shaderID, shaderID1, shaderID2;
+GLuint shaderID, shaderID1, shaderID2, diffuseShader;
 
 ModelLoader modelLoader;
 Model* model1 = modelLoader.createPrimitive(modelLoader.TRIANGLE);
@@ -58,6 +58,8 @@ void gameInitialization()
 
 	canvas.addModel(*model6, false);
 
+	//check if setting shader after addModel works
+	loadedModel->shader = diffuseShader;
 	canvas.addModel(*loadedModel, false);
 
 	//particles
@@ -104,6 +106,7 @@ void gameLoop()
 
 	model6->rotate(60 * WindowCanvas::deltaCallbackTime, glm::vec3(-1.0f, 0.0f, -1.0f));
 
+	/*
 	//std::cout << WindowCanvas::frames << std::endl;
 	if (WindowCanvas::frames > 200)
 	{
@@ -114,7 +117,7 @@ void gameLoop()
 	{
 		loadedModel->setDrawing(true);
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames / 10000.0f << std::endl;
-	}
+	*/
 }
 
 void mouseCallback(int button, int state, int x, int y)
@@ -208,6 +211,10 @@ int main(int argc, char **argv)
 		std::string defaultParticleVertex = fileOp.readFile("shaders/DefaultParticleVertex.vs");
 		GLuint particleShaderID = shader.load(defaultParticleVertex.c_str(), defaultFragment.c_str());
 		canvas.setDefaultParticleShader(particleShaderID);
+
+		std::string diffuseShaderVertex = fileOp.readFile("shaders/DiffuseVert.vs");
+		std::string diffueShaderFragment = fileOp.readFile("shaders/DiffuseFrag.fs");
+		diffuseShader = shader.load(diffuseShaderVertex.c_str(), diffueShaderFragment.c_str());
 	}
 	catch (std::invalid_argument& e)
 	{

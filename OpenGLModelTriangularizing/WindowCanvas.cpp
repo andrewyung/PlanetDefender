@@ -55,8 +55,14 @@ void renderScene(void) {
 			{
 				glUseProgram(currentVAO.shaderID);
 			}
-
+			//MVP temp for vertex shaders that were used for testing
 			shaderLoader.setMat4x4(currentVAO.shaderID, "MVP", camera->getMVP());
+			shaderLoader.setMat4x4(currentVAO.shaderID, "model", camera->ModelMatrix);
+			shaderLoader.setMat4x4(currentVAO.shaderID, "view", camera->ViewMatrix);
+			shaderLoader.setMat4x4(currentVAO.shaderID, "projection", camera->ProjectionMatrix);
+			
+			shaderLoader.setVector3(currentVAO.shaderID, "lightPos", glm::vec3(0, -10, 0));
+
 			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
 			shaderLoader.setInt(currentVAO.shaderID, "time", glutGet(GLUT_ELAPSED_TIME));
 
