@@ -7,6 +7,7 @@
 #include "ModelLoader.h"
 #include "FileOperations.h"
 #include "Particles.h"
+#include "Light.h"
 
 #include "AppDriver.h"
 
@@ -33,10 +34,13 @@ Particles* particles1 = new Particles(modelLoader.createPrimitive(modelLoader.CU
 Particles* particles2 = new Particles(modelLoader.createPrimitive(modelLoader.TRIANGLE));
 
 Camera mainCamera;
+Light light = Light(glm::vec3(0, -10, 0));
 
 //called once at the beginning
 void gameInitialization()
 {
+	canvas.setLight(light);
+
 	//camera
 	canvas.setCamera(mainCamera);
 	//translate camera to view test objects (since camera is at origin)
@@ -128,11 +132,13 @@ void mouseCallback(int button, int state, int x, int y)
 		{
 			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, -0.1, 0));
 			mainCamera.translate(glm::vec3(0, 0, 0.1), true);
+			light.translate(glm::vec3(0, 0, 0.1));
 		}
 		else
 		{
 			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, 0.1, 0));
 			mainCamera.translate(glm::vec3(0, 0, -0.1), true);
+			light.translate(glm::vec3(0, 0, -0.1));
 		}
 	}
 	else if (button == 0)

@@ -14,6 +14,7 @@
 
 class Model;
 class Particles;
+class Light;
 struct VAOInfo
 {
 	//maybe remove vboID as not used
@@ -48,6 +49,7 @@ public:
 	static void setDefaultShader(GLuint shader); 
 	static void setDefaultParticleShader(GLuint shader);
 	static void setCamera(Camera &camera);
+	static void setLight(Light &mainLight);
 
 	static int frames;
 	static float deltaCallbackTime;

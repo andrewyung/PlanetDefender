@@ -3,10 +3,12 @@
 #include "WindowCanvas.h"
 #include "Model.h"
 #include "Particles.h"
+#include "Light.h"
 
 GLuint WindowCanvas::defaultShader;
 GLuint WindowCanvas::defaultParticleShader;
 Camera *camera;
+Light *light;
 
 const int TARGET_FPS = 60;
 const int DEFAULT_BUFFER_SIZE = 16;
@@ -61,7 +63,7 @@ void renderScene(void) {
 			shaderLoader.setMat4x4(currentVAO.shaderID, "view", camera->ViewMatrix);
 			shaderLoader.setMat4x4(currentVAO.shaderID, "projection", camera->ProjectionMatrix);
 			
-			shaderLoader.setVector3(currentVAO.shaderID, "lightPos", glm::vec3(0, -10, 0));
+			shaderLoader.setVector3(currentVAO.shaderID, "lightPos", light->lightPosition);
 
 			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
 			shaderLoader.setInt(currentVAO.shaderID, "time", glutGet(GLUT_ELAPSED_TIME));
@@ -482,6 +484,11 @@ void WindowCanvas::setDefaultParticleShader(GLuint shader)
 void WindowCanvas::setCamera(Camera &mainCamera)
 {
 	camera = &mainCamera;
+}
+
+void WindowCanvas::setLight(Light &mainLight)
+{
+	light = &mainLight;
 }
 
 WindowCanvas::~WindowCanvas()

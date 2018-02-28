@@ -19,6 +19,6 @@ void main()
 {
 	gl_Position = MVP * transform * vec4(pos, 1.0f);
 	v2fCOLOR = color;
-	v2fWorldPos = vec3(model * vec4(pos, 1.0f));
-	v2fNormal = vec3(model * vec4(normal, 1.0f));
+	v2fWorldPos = vec3(model * transform * vec4(pos, 1.0f));
+	v2fNormal = mat3(transpose(inverse(model))) * normal;
 }
