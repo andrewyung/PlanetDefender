@@ -13,11 +13,10 @@ Work in progress. So far uses glew, glut, glm and OBJ_Loader
 
 -Camera translation and rotation
 
+-Diffuse shader
 
 
 ### TODO:
-
--Implement diffuse shader
 
 -Implement model materials
 
