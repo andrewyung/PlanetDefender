@@ -45,9 +45,6 @@
     <ClCompile Include="e1_loadandprint.cpp">
       <Filter>Source Files\OBJ_Loader_example</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">

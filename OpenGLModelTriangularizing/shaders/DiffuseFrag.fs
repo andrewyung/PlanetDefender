@@ -4,10 +4,17 @@ in vec3 v2fWorldPos;
 in vec3 v2fNormal;
 out vec4 fragColor;
 
-uniform vec3 lightPos;
+#define MAX_LIGHTS 9
+uniform vec4 lightPos[MAX_LIGHTS];
+uniform vec3 lightColor[MAX_LIGHTS];
 
 void main()
 {
-	float dotProd = max(dot(normalize(v2fNormal), normalize(lightPos - v2fWorldPos)), 0.0f);
-	fragColor = dotProd * vec4(1, 1, 1, 1);
+	float attenuation = 1 / length(v2fWorldPos - lightPos[0].xyz);
+	float dotProd = max(dot(normalize(v2fNormal), normalize(v2fWorldPos - lightPos[0].xyz)), 0.0f);
+	fragColor = lightPos[0].w * dotProd * attenuation * vec4(lightColor[0].xyz, 1);
+	
+	attenuation = 1 / length(v2fWorldPos - lightPos[1].xyz);
+	dotProd = max(dot(normalize(v2fNormal), normalize(v2fWorldPos - lightPos[1].xyz)), 0.0f);
+	fragColor = lightPos[1].w * dotProd * attenuation * vec4(lightColor[1].xyz, 1) + vec4(0.1f, 0.1f, 0.1f, 1) + fragColor;
 }

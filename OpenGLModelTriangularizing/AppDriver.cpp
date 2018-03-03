@@ -34,18 +34,16 @@ Particles* particles1 = new Particles(modelLoader.createPrimitive(modelLoader.CU
 Particles* particles2 = new Particles(modelLoader.createPrimitive(modelLoader.TRIANGLE));
 
 Camera mainCamera;
-Light light = Light(glm::vec3(0, -10, 0));
+
+int currentControlledLightIndex = 0; //used to switch between lights to move around
 
 //called once at the beginning
 void gameInitialization()
 {
-	canvas.setLight(light);
-
 	//camera
 	canvas.setCamera(mainCamera);
 	//translate camera to view test objects (since camera is at origin)
 	mainCamera.translate(glm::vec3(0, 0, -3), true);
-
 
 	//models
 	canvas.addModel(*model1, true);
@@ -87,7 +85,16 @@ void gameInitialization()
 	}
 	canvas.addParticles(*particles2, 200 * 200, particleTransforms);
 
-	//model transformations
+	//light
+	Light* light1 = modelLoader.createLight();
+	Light* light2 = modelLoader.createLight();
+	light1->lightColor = glm::vec3(0, 1, 0);
+	canvas.addLight(*light1);
+	light2->lightColor = glm::vec3(0, 0, 1);
+	light2->strength = 1;
+	canvas.addLight(*light2);
+
+	//model initial transformations
 	model2->scale(glm::vec3(0.1f, 0.1f, 0.1f));
 
 	model1->scale(glm::vec3(0.2f, 0.2f, 0.2f));
@@ -132,13 +139,11 @@ void mouseCallback(int button, int state, int x, int y)
 		{
 			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, -0.1, 0));
 			mainCamera.translate(glm::vec3(0, 0, 0.1), true);
-			light.translate(glm::vec3(0, 0, 0.1));
 		}
 		else
 		{
 			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, 0.1, 0));
 			mainCamera.translate(glm::vec3(0, 0, -0.1), true);
-			light.translate(glm::vec3(0, 0, -0.1));
 		}
 	}
 	else if (button == 0)
@@ -188,6 +193,32 @@ void keyboardCallback(unsigned char key, int x, int y)
 		mainCamera.rotate(glm::vec3(0, 0, 5));
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 	}
+
+	//light movement
+	if (key == 'i')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, -0.3f));
+	}
+	else if(key == 'k')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, 0.3f));
+	}
+	else if (key == 'j')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(-0.3f, 0, 0));
+	}
+	else if (key == 'l')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0.3f, 0, 0));
+	}
+	else if (key == 'o')
+	{
+		currentControlledLightIndex++;
+		if (currentControlledLightIndex >= canvas.lights.size())
+		{
+			currentControlledLightIndex = 0;
+		}
+	}
 }
 
 int main(int argc, char **argv)
@@ -225,6 +256,8 @@ int main(int argc, char **argv)
 	catch (std::invalid_argument& e)
 	{
 		std::cout << "Could not set default shader : " << e.what() << std::endl;
+
+		system("pause");
 		return 0;
 	}
 	

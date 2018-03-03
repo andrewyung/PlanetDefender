@@ -41,6 +41,8 @@ struct VAOInfo
 class WindowCanvas
 {
 public:
+	static std::vector<Light*> lights;
+
 	static void initializeWindow(int argc, char ** argv);
 	static void start(void(*gameLoopCallback)(), void(*gameInitializeCallback)(), void(*mouseCallback)(int button, int state, int x, int y), void(*keyboardCallback)(unsigned char key, int x, int y));
 
@@ -49,7 +51,8 @@ public:
 	static void setDefaultShader(GLuint shader); 
 	static void setDefaultParticleShader(GLuint shader);
 	static void setCamera(Camera &camera);
-	static void setLight(Light &mainLight);
+	static void addLight(Light &mainLight);
+	static glm::mat4 getCurrentCameraModelMatrix();
 
 	static int frames;
 	static float deltaCallbackTime;

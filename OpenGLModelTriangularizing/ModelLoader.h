@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Model.h"
+#include "Light.h"
 
 class ModelLoader
 {
@@ -13,6 +14,8 @@ public:
 	};
 
 	static Model* createPrimitive(PrimitiveTypes type);
+
+	static Light * createLight();
 
 	static Model* loadModel(std::string objPath);
 

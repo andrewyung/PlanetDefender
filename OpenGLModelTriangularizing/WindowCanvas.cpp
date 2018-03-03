@@ -8,11 +8,11 @@
 GLuint WindowCanvas::defaultShader;
 GLuint WindowCanvas::defaultParticleShader;
 Camera *camera;
-Light *light;
 
 const int TARGET_FPS = 60;
 const int DEFAULT_BUFFER_SIZE = 16;
 
+std::vector<Light*> WindowCanvas::lights;
 std::vector<VAOInfo*> vertexArrayIDs;
 ShaderLoader shaderLoader;
 int WindowCanvas::frames = 0;
@@ -42,6 +42,15 @@ void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.5, 0.5, 0.5, 1);
 
+	//better way of doing this rather than getting all positions every render frame
+	std::vector <glm::vec4> lightPositions;
+	std::vector <glm::vec3> lightColors;
+	for (int i = 0; i < WindowCanvas::lights.size(); i++)
+	{
+		lightPositions.push_back(WindowCanvas::lights[i]->getLightPosition());
+		lightColors.push_back(WindowCanvas::lights[i]->lightColor);
+	}
+
 	GLint currentShader;
 	//go through all VAOs that need to be rendered
 	for (int i = 0; i < vertexArrayIDs.size(); i++)
@@ -63,7 +72,8 @@ void renderScene(void) {
 			shaderLoader.setMat4x4(currentVAO.shaderID, "view", camera->ViewMatrix);
 			shaderLoader.setMat4x4(currentVAO.shaderID, "projection", camera->ProjectionMatrix);
 			
-			shaderLoader.setVector3(currentVAO.shaderID, "lightPos", light->lightPosition);
+			shaderLoader.setVector4(currentVAO.shaderID, "lightPos", lightPositions.size(), glm::value_ptr(lightPositions[0]));
+			shaderLoader.setVector3(currentVAO.shaderID, "lightColor", lightPositions.size(), glm::value_ptr(lightColors[0]));
 
 			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
 			shaderLoader.setInt(currentVAO.shaderID, "time", glutGet(GLUT_ELAPSED_TIME));
@@ -486,9 +496,19 @@ void WindowCanvas::setCamera(Camera &mainCamera)
 	camera = &mainCamera;
 }
 
-void WindowCanvas::setLight(Light &mainLight)
+void WindowCanvas::addLight(Light &light)
 {
-	light = &mainLight;
+	WindowCanvas::lights.push_back(&light);
+	addModel(light, false);
+}
+
+glm::mat4 WindowCanvas::getCurrentCameraModelMatrix()
+{
+	if (camera == nullptr)
+	{
+		return glm::mat4();
+	}
+	return camera->ModelMatrix;
 }
 
 WindowCanvas::~WindowCanvas()
