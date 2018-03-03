@@ -16,9 +16,9 @@ public:
 
 	GLuint shader;
 
-	bool drawing() const { return vaoInfo->drawing; };
+	virtual bool drawing() const { return vaoInfo->drawing; };
 
-	void scale(glm::vec3 scale)
+	virtual void scale(glm::vec3 scale)
 	{
 		if (vaoInfo != nullptr)
 		{
@@ -26,14 +26,14 @@ public:
 		}
 	}
 
-	void translate(glm::vec3 translateVector)
+	virtual void translate(glm::vec3 translateVector)
 	{
 		if (vaoInfo != nullptr)
 		{
 			vaoInfo->transformation = glm::translate(vaoInfo->transformation, translateVector);
 		}
 	}
-	void translate(glm::vec3 translateVector, bool localSpace)
+	virtual void translate(glm::vec3 translateVector, bool localSpace)
 	{
 		if (vaoInfo != nullptr)
 		{
@@ -48,7 +48,7 @@ public:
 		}
 	}
 
-	void rotate(float angle, glm::vec3 axis)
+	virtual void rotate(float angle, glm::vec3 axis)
 	{
 		if (vaoInfo != nullptr)
 		{
@@ -56,7 +56,7 @@ public:
 		}
 	}
 
-	void setDrawing(bool toBeDrawn)
+	virtual void setDrawing(bool toBeDrawn)
 	{
 		if (vaoInfo == nullptr)
 		{
@@ -65,20 +65,20 @@ public:
 		}
 		this->vaoInfo->drawing = toBeDrawn;
 	}
-	
-private:
+
+protected:
 	//Information used by WindowCanvas to manage Model
 	GLsizeiptr vertexDataOffset = -1;
 	GLsizeiptr indexDataOffset = -1;
 	VAOInfo *vaoInfo;
 
-	void setVertexBufferAndArrayData(GLsizeiptr vertexDataOffset, GLsizeiptr indexDataOffset)
+	virtual void setVertexBufferAndArrayData(GLsizeiptr vertexDataOffset, GLsizeiptr indexDataOffset)
 	{
 		this->vertexDataOffset = vertexDataOffset;
 		this->indexDataOffset = indexDataOffset;
 	}
 
-	void setVAOInfo(VAOInfo &index)
+	virtual void setVAOInfo(VAOInfo &index)
 	{
 		this->vaoInfo = &index;
 	}
