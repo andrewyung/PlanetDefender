@@ -16,5 +16,8 @@ public:
 	static void setFloat(GLuint shaderID, const std::string &name, float value);
 	static void setMat4x4(GLuint shaderID, const std::string &name, glm::mat4 matrix4x4);
 	static void setVector3(GLuint shaderID, const std::string & name, glm::vec3 vector);
+	static void setVector3(GLuint shaderID, const std::string & name, int numberOfVectors, float * vectors);
+	static void setVector4(GLuint shaderID, const std::string & name, glm::vec4 vector);
+	static void setVector4(GLuint shaderID, const std::string & name, int numberOfVectors, float * vectors);
 };
 

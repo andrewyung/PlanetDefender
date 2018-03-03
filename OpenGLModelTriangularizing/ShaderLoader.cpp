@@ -93,5 +93,19 @@ void ShaderLoader::setVector3(GLuint shaderID, const std::string & name, glm::ve
 	glUniform3fv(glGetUniformLocation(shaderID, name.c_str()), 1, glm::value_ptr(vector));
 }
 
+void ShaderLoader::setVector3(GLuint shaderID, const std::string & name, int numberOfVectors, float *vectors)
+{
+	glUniform3fv(glGetUniformLocation(shaderID, name.c_str()), numberOfVectors, vectors);
+}
+
+void ShaderLoader::setVector4(GLuint shaderID, const std::string & name, glm::vec4 vector)
+{
+	glUniform4fv(glGetUniformLocation(shaderID, name.c_str()), 1, glm::value_ptr(vector));
+}
+
+void ShaderLoader::setVector4(GLuint shaderID, const std::string & name, int numberOfVectors, float * vectors)
+{
+	glUniform4fv(glGetUniformLocation(shaderID, name.c_str()), numberOfVectors, vectors);
+}
 
 
