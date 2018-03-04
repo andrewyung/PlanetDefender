@@ -30,7 +30,7 @@ Model* model5 = modelLoader.createPrimitive(modelLoader.CUBE);
 
 Model* loadedModel = modelLoader.loadModel("airboat.obj");
 
-Particles* particles1 = new Particles(modelLoader.createPrimitive(modelLoader.CUBE));
+Particles* particles1 = new Particles(modelLoader.createPrimitive(modelLoader.QUAD));
 Particles* particles2 = new Particles(modelLoader.createPrimitive(modelLoader.TRIANGLE));
 
 Camera mainCamera;
@@ -76,7 +76,7 @@ void gameInitialization()
 	canvas.addParticles(*particles1, 200 * 200, particleTransforms);
 
 	particleTransforms.clear();
-	for (int i = 1; i < 201; i++)
+	for (int i = 2; i < 202; i++)
 	{
 		for (int k = 1; k < 201; k++)
 		{
@@ -88,11 +88,17 @@ void gameInitialization()
 	//light
 	Light* light1 = modelLoader.createLight();
 	Light* light2 = modelLoader.createLight();
+	Light* light3 = modelLoader.createLight();
+
 	light1->lightColor = glm::vec3(0, 1, 0);
 	canvas.addLight(*light1);
+
 	light2->lightColor = glm::vec3(0, 0, 1);
-	light2->strength = 1;
+	light2->strength = 5;
 	canvas.addLight(*light2);
+
+	light3->lightColor = glm::vec3(1, 0, 0);
+	canvas.addLight(*light3);
 
 	//model initial transformations
 	model2->scale(glm::vec3(0.1f, 0.1f, 0.1f));
@@ -210,6 +216,14 @@ void keyboardCallback(unsigned char key, int x, int y)
 	else if (key == 'l')
 	{
 		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0.3f, 0, 0));
+	}
+	else if (key == 'p')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0.3f, 0));
+	}
+	else if (key == ';')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, -0.3f, 0));
 	}
 	else if (key == 'o')
 	{
