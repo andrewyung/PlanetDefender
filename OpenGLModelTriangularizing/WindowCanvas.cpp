@@ -119,7 +119,7 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 
 	//create window
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutInitWindowPosition((GLUT_SCREEN_WIDTH / 2) - (windowWidth / 2), (GLUT_SCREEN_HEIGHT / 2) - (windowHeight / 2));
 	glutInitWindowSize(windowWidth, windowHeight);
 
@@ -150,6 +150,7 @@ void gameLoopWrapper()
 void WindowCanvas::start(void (*gameLoopCallback)(), void(*gameInitializeCallback)(), void(*mouseCallback)(int button, int state, int x, int y), void(*keyboardCallback)(unsigned char key, int x, int y))
 {
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_MULTISAMPLE);
 
 	gameInitializeCallback();
 	externalGameLoop = gameLoopCallback;
