@@ -9,7 +9,7 @@
 #include "Particles.h"
 #include "Light.h"
 
-#include "AppDriver.h"
+#include "qhullTest.h"
 
 using namespace std;
 
@@ -235,13 +235,10 @@ void keyboardCallback(unsigned char key, int x, int y)
 	}
 }
 
-int main(int argc, char **argv)
+void loadShaders()
 {
-	WindowCanvas canvas;
 	FileOperations fileOp;
 
-	canvas.initializeWindow(argc, argv);
-	
 	//load shaders
 	try
 	{
@@ -272,8 +269,18 @@ int main(int argc, char **argv)
 		std::cout << "Could not set default shader : " << e.what() << std::endl;
 
 		system("pause");
-		return 0;
 	}
+}
+
+int main(int argc, char **argv)
+{
+	qhullTest test;
+
+	WindowCanvas canvas;
+
+	canvas.initializeWindow(argc, argv);
+	
+	loadShaders();
 	
 	//add models and assign shaders to models if desired otherwise default shader is used.
 	//model1->shader = shaderID1;
