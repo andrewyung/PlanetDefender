@@ -27,7 +27,7 @@ public:
 	glm::vec4 getLightPosition()
 	{
 		//could possible use w for extra data
-		return WindowCanvas::getCurrentCameraModelMatrix() * Model::Model::vaoInfo->transformation * glm::vec4(lightPosition, strength);
+		return glm::vec4(glm::vec3(WindowCanvas::getCurrentCameraModelMatrix() * Model::Model::vaoInfo->transformation * glm::vec4(lightPosition, 1)), strength);
 	}
 
 private:
