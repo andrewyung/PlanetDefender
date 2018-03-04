@@ -1,5 +1,5 @@
 # OpenglTriangularization
-Work in progress. So far uses glew, glut, glm and OBJ_Loader
+Work in progress. So far uses glew, freeglut, glm and OBJ_Loader
 
 ### Implementations:
 
