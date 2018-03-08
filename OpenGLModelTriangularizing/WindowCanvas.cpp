@@ -374,7 +374,7 @@ void WindowCanvas::addModel(Model &model, bool group)
 		for (int i = 0; i < vertexArrayIDs.size(); i++)
 		{
 			//uses same shader, include in existing vao
-			if (model.shader == vertexArrayIDs[i]->shaderID && !vertexArrayIDs[i]->instanced)
+			if (model.shader == vertexArrayIDs[i]->shaderID && !vertexArrayIDs[i]->instanced && vertexArrayIDs[i]->batched)
 			{
 				VAOInfo *currentVAOInfo = vertexArrayIDs[i];
 				glBindVertexArray(currentVAOInfo->vertexArrayID);
@@ -442,6 +442,7 @@ void WindowCanvas::addModel(Model &model, bool group)
 								model.indexData.size() * sizeof(int),		//index size
 								vertexArrayData.size() * sizeof(float),		//vertex size
 								model.vertexData.size());					//number of vertices
+	info->batched = group;
 
 	glBindVertexArray(VAO);
 

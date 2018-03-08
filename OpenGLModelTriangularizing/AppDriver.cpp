@@ -20,7 +20,6 @@ GLuint shaderID, shaderID1, shaderID2, diffuseShader;
 ModelLoader modelLoader;
 Model* model1 = modelLoader.createPrimitive(modelLoader.TRIANGLE);
 Model* model2 = modelLoader.createPrimitive(modelLoader.QUAD);
-Model* model3 = modelLoader.createPrimitive(modelLoader.CUBE);
 
 Model* model6 = modelLoader.createPrimitive(modelLoader.CUBE);
 
@@ -46,9 +45,7 @@ void gameInitialization()
 	mainCamera.translate(glm::vec3(0, 0, -3), true);
 
 	//models
-	canvas.addModel(*model1, true);
-
-	canvas.addModel(*model3, true);
+	canvas.addModel(*model1, false);
 
 	canvas.addModel(*model2, false);
 
