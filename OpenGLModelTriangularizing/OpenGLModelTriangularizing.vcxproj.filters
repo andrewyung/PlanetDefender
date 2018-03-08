@@ -45,9 +45,6 @@
     <ClCompile Include="e1_loadandprint.cpp">
       <Filter>Source Files\OBJ_Loader_example</Filter>
     </ClCompile>
-    <ClCompile Include="qhullTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -78,9 +75,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Light.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="qhullTest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
