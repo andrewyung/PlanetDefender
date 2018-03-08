@@ -20,4 +20,4 @@ Work in progress. So far uses glew, freeglut, glm and OBJ_Loader
 
 -Implement model materials
 
--Use qhull? for delaunay triangularization
+-Determine and use library for delaunay triangularization
