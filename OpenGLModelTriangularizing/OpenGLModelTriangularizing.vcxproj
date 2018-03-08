@@ -69,8 +69,9 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\Andy\Documents\Visual Studio 2015\Projects\OpenglTriangularization\packages\nupengl.core.0.1.0.1\build\native\lib\x64;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Andy\Documents\Visual Studio 2015\Projects\OpenglTriangularization\OpenGLModelTriangularizing\lib\qhull-2015.2\src\libqhull_r;C:\Users\Andy\Documents\Visual Studio 2015\Projects\OpenglTriangularization\packages\nupengl.core.0.1.0.1\build\native\lib\x64;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Andy\Documents\Visual Studio 2015\Projects\OpenglTriangularization\packages\nupengl.core.0.1.0.1\build\native\lib\x64;$(LibraryPath)</LibraryPath>
+    <SourcePath>C:\Users\Andy\Documents\Visual Studio 2015\Projects\OpenglTriangularization\OpenGLModelTriangularizing\lib\qhull-2015.2\src\libqhull_r;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -84,7 +85,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Andy\Documents\Visual Studio 2015\Projects\OpenglTriangularization\OpenGLModelTriangularizing\lib\qhull-2015.2\src\libqhull_r</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Andy\Documents\Visual Studio 2015\Projects\OpenglTriangularization\OpenGLModelTriangularizing\lib\qhull-2015.2\src\libqhull_r;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
