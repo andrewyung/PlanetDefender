@@ -9,8 +9,6 @@
 #include "Particles.h"
 #include "Light.h"
 
-#include "qhullTest.h"
-
 using namespace std;
 
 WindowCanvas canvas;
@@ -271,7 +269,6 @@ void loadShaders()
 
 int main(int argc, char **argv)
 {
-	qhullTest test;
 
 	WindowCanvas canvas;
 

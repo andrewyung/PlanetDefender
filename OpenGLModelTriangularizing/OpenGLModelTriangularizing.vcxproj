@@ -125,7 +125,6 @@
     </ClCompile>
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
-    <ClCompile Include="qhullTest.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="WindowCanvas.cpp" />
   </ItemGroup>
@@ -137,7 +136,6 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="OBJ_Loader.h" />
     <ClInclude Include="Particles.h" />
-    <ClInclude Include="qhullTest.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WindowCanvas.h" />
