@@ -147,7 +147,11 @@ void gameLoopWrapper()
 }
 
 //register callbacks and starts glut main loop
-void WindowCanvas::start(void (*gameLoopCallback)(), void(*gameInitializeCallback)(), void(*mouseCallback)(int button, int state, int x, int y), void(*keyboardCallback)(unsigned char key, int x, int y))
+void WindowCanvas::start(void (*gameLoopCallback)(), 
+						void(*gameInitializeCallback)(), 
+						void(*mouseCallback)(int button, int state, int x, int y), 
+						void(*keyboardCallback)(unsigned char key, int x, int y),
+						void(*mouseMotionCallback)(int x, int y))
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
@@ -161,6 +165,7 @@ void WindowCanvas::start(void (*gameLoopCallback)(), void(*gameInitializeCallbac
 	glutDisplayFunc(renderScene);
 	glutKeyboardFunc(keyboardCallback);
 	glutMouseFunc(mouseCallback);
+	glutMotionFunc(mouseMotionCallback);
 
 	glutMainLoop();
 }

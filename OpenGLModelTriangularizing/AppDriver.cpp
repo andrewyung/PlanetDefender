@@ -34,6 +34,11 @@ Camera mainCamera;
 
 int currentControlledLightIndex = 0; //used to switch between lights to move around
 
+bool leftMouseDown = false;
+bool rightMouseDown = false;
+int lastMouseX;
+int lastMouseY;
+
 //called once at the beginning
 void gameInitialization()
 {
@@ -134,6 +139,7 @@ void gameLoop()
 
 void mouseCallback(int button, int state, int x, int y)
 {
+	std::cout << x << " : " << y << std::endl;
 	if ((button == 3) || (button == 4)) // scroll wheel event
 	{
 		if (button == 3)
@@ -149,12 +155,49 @@ void mouseCallback(int button, int state, int x, int y)
 	}
 	else if (button == 0)
 	{
-		mainCamera.translate(glm::vec3(0.1f, 0, 0) * WindowCanvas::deltaCallbackTime, true);
+		if (state == GLUT_DOWN)
+		{
+			leftMouseDown = true;
+			lastMouseX = x;
+			lastMouseY = y;
+		}
+		else
+		{
+			leftMouseDown = false;
+		}
 	}
 	else if (button == 2)
 	{
-		mainCamera.translate(glm::vec3(-0.1f, 0, 0) * WindowCanvas::deltaCallbackTime, true);
+		if (state == GLUT_DOWN)
+		{
+			rightMouseDown = true;
+			lastMouseX = x;
+			lastMouseY = y;
+		}
+		else
+		{
+			rightMouseDown = false;
+		}
 	}
+}
+
+void mouseMotionCallback(int x, int y)
+{
+	if (leftMouseDown)
+	{
+		mainCamera.translate(glm::vec3(x - lastMouseX, lastMouseY - y, 0) * WindowCanvas::deltaCallbackTime, true);
+	}
+	if (rightMouseDown)
+	{
+		mainCamera.rotate(glm::vec3(x - lastMouseX, 0, 0), true);
+		mainCamera.rotate(glm::vec3(0, y - lastMouseY, 0), true);
+	}
+	if (leftMouseDown || rightMouseDown)
+	{
+		lastMouseX = x;
+		lastMouseY = y;
+	}
+
 }
 
 void keyboardCallback(unsigned char key, int x, int y)
@@ -267,6 +310,8 @@ void loadShaders()
 	}
 }
 
+
+
 int main(int argc, char **argv)
 {
 
@@ -280,7 +325,7 @@ int main(int argc, char **argv)
 	//model1->shader = shaderID1;
 	//std::cout << "Model data : " << "indices - " << model1->indexData.size() << " : " << "vertices - " << model1->vertexData.size() << std::endl;
 
-	canvas.start(gameLoop, gameInitialization, mouseCallback, keyboardCallback);
+	canvas.start(gameLoop, gameInitialization, mouseCallback, keyboardCallback, mouseMotionCallback);
 
 	return 0;
 }

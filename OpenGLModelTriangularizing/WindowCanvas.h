@@ -45,7 +45,7 @@ public:
 	static std::vector<Light*> lights;
 
 	static void initializeWindow(int argc, char ** argv);
-	static void start(void(*gameLoopCallback)(), void(*gameInitializeCallback)(), void(*mouseCallback)(int button, int state, int x, int y), void(*keyboardCallback)(unsigned char key, int x, int y));
+	static void start(void(*gameLoopCallback)(), void(*gameInitializeCallback)(), void(*mouseCallback)(int button, int state, int x, int y), void(*keyboardCallback)(unsigned char key, int x, int y), void(*mouseMotionCallback)(int x, int y));
 
 	static void addParticles(Particles &particles, int instances, std::vector<glm::mat4> particleTransformations);
 	static void addModel(Model &model, bool group);
