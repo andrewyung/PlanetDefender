@@ -19,9 +19,6 @@
     <Filter Include="Source Files\shaders">
       <UniqueIdentifier>{8bed49b2-f359-41ae-91a7-3fa9673edccc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\OBJ_Loader_example">
-      <UniqueIdentifier>{a9e68a42-b1d0-4c09-8cad-7cf1ecb3d100}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ModelLoader.cpp">
@@ -41,9 +38,6 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="e1_loadandprint.cpp">
-      <Filter>Source Files\OBJ_Loader_example</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -95,12 +89,6 @@
     <None Include="shaders\ExpandingOnNormal.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
-    <None Include="Models\box_stack.mtl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Models\Avent.mtl">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="shaders\DefaultParticleVertex.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
@@ -112,14 +100,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Object Include="Models\box_stack.obj">
-      <Filter>Resource Files</Filter>
-    </Object>
-    <Object Include="Models\Avent.obj">
-      <Filter>Resource Files</Filter>
-    </Object>
+    <Xml Include="MIConvexHull.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="MIConvexHull.xml" />
+    <Object Include="Models\airboat.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
   </ItemGroup>
 </Project>

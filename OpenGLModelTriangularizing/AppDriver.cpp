@@ -66,24 +66,24 @@ void gameInitialization()
 
 	//particles
 	std::vector<glm::mat4> particleTransforms;
-	for (int i = 1; i < 201; i++)
+	for (int i = 1; i < 2001; i++)
 	{
-		for (int k = 1; k < 201; k++)
+		for (int k = 1; k < 2001; k++)
 		{
-			particleTransforms.push_back(glm::translate(glm::mat4(), glm::vec3(k * 2.5, i * 2.5f, 0)));
+			particleTransforms.push_back(glm::translate(glm::mat4(), glm::vec3(k * 1.5, i * 1.5f, 0)));
 		}
 	}
-	canvas.addParticles(*particles1, 200 * 200, particleTransforms);
+	canvas.addParticles(*particles1, 2000 * 2000, particleTransforms);
 
 	particleTransforms.clear();
-	for (int i = 2; i < 202; i++)
+	for (int i = 2; i < 2002; i++)
 	{
-		for (int k = 1; k < 201; k++)
+		for (int k = 1; k < 2001; k++)
 		{
-			particleTransforms.push_back(glm::translate(glm::mat4(), glm::vec3(k * -2.5, i * -2.5f, 0)));
+			particleTransforms.push_back(glm::translate(glm::mat4(), glm::vec3(k * -0.3f, i * -0.3f, 0)));
 		}
 	}
-	canvas.addParticles(*particles2, 200 * 200, particleTransforms);
+	canvas.addParticles(*particles2, 2000 * 2000, particleTransforms);
 
 	//light
 	Light* light1 = modelLoader.createLight();
