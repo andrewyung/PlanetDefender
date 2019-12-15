@@ -16,9 +16,9 @@ public:
 
 	GLuint shader;
 
-	virtual bool drawing() const { return vaoInfo->drawing; };
+	bool drawing() const { return vaoInfo->drawing; };
 
-	virtual void scale(glm::vec3 scale)
+	void scale(glm::vec3 scale)
 	{
 		if (vaoInfo != nullptr)
 		{
@@ -26,14 +26,14 @@ public:
 		}
 	}
 
-	virtual void translate(glm::vec3 translateVector)
+	void translate(glm::vec3 translateVector)
 	{
 		if (vaoInfo != nullptr)
 		{
 			vaoInfo->transformation = glm::translate(vaoInfo->transformation, translateVector);
 		}
 	}
-	virtual void translate(glm::vec3 translateVector, bool localSpace)
+	void translate(glm::vec3 translateVector, bool localSpace)
 	{
 		if (vaoInfo != nullptr)
 		{
@@ -48,7 +48,7 @@ public:
 		}
 	}
 
-	virtual void rotate(float angle, glm::vec3 axis)
+	void rotate(float angle, glm::vec3 axis)
 	{
 		if (vaoInfo != nullptr)
 		{
@@ -56,7 +56,7 @@ public:
 		}
 	}
 
-	virtual void setDrawing(bool toBeDrawn)
+	void setDrawing(bool toBeDrawn)
 	{
 		if (vaoInfo == nullptr)
 		{
