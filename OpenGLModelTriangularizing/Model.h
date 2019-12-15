@@ -66,19 +66,36 @@ public:
 		this->vaoInfo->drawing = toBeDrawn;
 	}
 
+	std::vector<float> getCenter()
+	{
+		std::vector<float> center{ 0, 0, 0 };
+		for (int i = 0; i < vertexData.size(); i++)
+		{
+			center[0] += vertexData[i].x;
+			center[1] += vertexData[i].y;
+			center[2] += vertexData[i].z;
+		}
+
+		center[0] /= vertexData.size();
+		center[1] /= vertexData.size();
+		center[2] /= vertexData.size();
+
+		return center;
+	}
+
 protected:
 	//Information used by WindowCanvas to manage Model
 	GLsizeiptr vertexDataOffset = -1;
 	GLsizeiptr indexDataOffset = -1;
 	VAOInfo *vaoInfo;
 
-	virtual void setVertexBufferAndArrayData(GLsizeiptr vertexDataOffset, GLsizeiptr indexDataOffset)
+	void setVertexBufferAndArrayData(GLsizeiptr vertexDataOffset, GLsizeiptr indexDataOffset)
 	{
 		this->vertexDataOffset = vertexDataOffset;
 		this->indexDataOffset = indexDataOffset;
 	}
 
-	virtual void setVAOInfo(VAOInfo &index)
+	void setVAOInfo(VAOInfo &index)
 	{
 		this->vaoInfo = &index;
 	}
