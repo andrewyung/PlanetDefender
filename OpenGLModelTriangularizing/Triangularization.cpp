@@ -25,5 +25,15 @@ bool Triangularization::isConvexVertex(Vertex v1, Vertex v2, Vertex v3)
 
 void Triangularization::EarTriangularize(Model m)
 {
-
+	vector<Model> ears;
+	for (int i = 0; i < m.vertexData.size - 2; i++)
+	{
+		if (isConvexVertex(m.vertexData[i], m.vertexData[i + 1], m.vertexData[i + 2]))
+		{
+			// split ear
+			// erase convex vertex from model
+			// add model into ears vector
+		}
+	}
+	// repeat until triangle left?
 }
