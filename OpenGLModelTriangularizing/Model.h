@@ -18,32 +18,35 @@ public:
 
 	bool drawing() const { return vaoInfo->drawing; };
 
-	void scale(glm::vec3 scale)
+	void scale(glm::vec3 scale, bool localScale = true)
 	{
 		if (vaoInfo != nullptr)
 		{
-			vaoInfo->transformation = glm::scale(vaoInfo->transformation, scale);
+			if (localScale)
+			{
+				vaoInfo->scale = glm::scale(vaoInfo->scale, scale);
+			}
+			else
+			{
+				vaoInfo->scale[0][0] = scale[0];
+				vaoInfo->scale[1][1] = scale[1];
+				vaoInfo->scale[2][2] = scale[2];
+				vaoInfo->scale[3][3] = 1;
+			}
 		}
 	}
 
-	void translate(glm::vec3 translateVector)
-	{
-		if (vaoInfo != nullptr)
-		{
-			vaoInfo->transformation = glm::translate(vaoInfo->transformation, translateVector);
-		}
-	}
-	void translate(glm::vec3 translateVector, bool localSpace)
+	void translate(glm::vec3 translateVector, bool localSpace = true)
 	{
 		if (vaoInfo != nullptr)
 		{
 			if (!localSpace)
 			{
-				vaoInfo->transformation = glm::translate(glm::mat4(), translateVector) * vaoInfo->transformation;
+				vaoInfo->translation = glm::translate(glm::mat4(), translateVector) * vaoInfo->translation;
 			}
 			else
 			{
-				vaoInfo->transformation = glm::translate(vaoInfo->transformation, translateVector);
+				vaoInfo->translation = glm::translate(vaoInfo->translation, translateVector);
 			}
 		}
 	}
@@ -52,7 +55,7 @@ public:
 	{
 		if (vaoInfo != nullptr)
 		{
-			vaoInfo->transformation = glm::rotate(vaoInfo->transformation, glm::radians(angle), axis);
+			vaoInfo->rotation = glm::rotate(vaoInfo->rotation, glm::radians(angle), axis);
 		}
 	}
 
