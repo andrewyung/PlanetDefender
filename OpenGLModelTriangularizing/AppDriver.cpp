@@ -12,25 +12,21 @@
 
 using namespace std;
 
-WindowCanvas canvas;
-Triangularization triangularize;
-
 GLuint shaderID, shaderID1, shaderID2, diffuseShader;
 
-ModelLoader modelLoader;
-Model* model1 = modelLoader.createPrimitive(modelLoader.TRIANGLE);
-Model* model2 = modelLoader.createPrimitive(modelLoader.QUAD);
+Model* model1 = ModelLoader::createPrimitive(ModelLoader::TRIANGLE);
+Model* model2 = ModelLoader::createPrimitive(ModelLoader::QUAD);
 
-Model* model6 = modelLoader.createPrimitive(modelLoader.CUBE);
+Model* model6 = ModelLoader::createPrimitive(ModelLoader::CUBE);
 
 //using different shaders
-Model* model4 = modelLoader.createPrimitive(modelLoader.CUBE);
-Model* model5 = modelLoader.createPrimitive(modelLoader.CUBE);
+Model* model4 = ModelLoader::createPrimitive(ModelLoader::CUBE);
+Model* model5 = ModelLoader::createPrimitive(ModelLoader::CUBE);
 
-Model* loadedModel = modelLoader.loadModel("airboat.obj");
+Model* loadedModel = ModelLoader::loadModel("airboat.obj");
 
-Particles* particles1 = new Particles(modelLoader.createPrimitive(modelLoader.QUAD));
-Particles* particles2 = new Particles(modelLoader.createPrimitive(modelLoader.TRIANGLE));
+Particles* particles1 = new Particles(ModelLoader::createPrimitive(ModelLoader::QUAD));
+Particles* particles2 = new Particles(ModelLoader::createPrimitive(ModelLoader::TRIANGLE));
 
 Camera mainCamera;
 
@@ -45,26 +41,26 @@ int lastMouseY;
 void gameInitialization()
 {
 	//camera
-	canvas.setCamera(mainCamera);
+	WindowCanvas::setCamera(mainCamera);
 	//translate camera to view test objects (since camera is at origin)
 	mainCamera.translate(glm::vec3(0, 0, -3), true);
 
 	//models
-	canvas.addModel(*model1, false);
+	WindowCanvas::addModel(*model1, false);
 
-	canvas.addModel(*model2, false);
+	WindowCanvas::addModel(*model2, false);
 
 	model4->shader = shaderID1;
-	canvas.addModel(*model4, false);
+	WindowCanvas::addModel(*model4, false);
 
 	model5->shader = shaderID2;
-	canvas.addModel(*model5, false);
+	WindowCanvas::addModel(*model5, false);
 
-	canvas.addModel(*model6, false);
+	WindowCanvas::addModel(*model6, false);
 
 	//check if setting shader after addModel works
 	loadedModel->shader = diffuseShader;
-	canvas.addModel(*loadedModel, false);
+	WindowCanvas::addModel(*loadedModel, false);
 
 	//particles
 	std::vector<glm::mat4> particleTransforms;
@@ -75,7 +71,7 @@ void gameInitialization()
 			particleTransforms.push_back(glm::translate(glm::mat4(), glm::vec3(k * 1.5, i * 1.5f, 0)));
 		}
 	}
-	canvas.addParticles(*particles1, 2000 * 2000, particleTransforms);
+	WindowCanvas::addParticles(*particles1, 2000 * 2000, particleTransforms);
 
 	particleTransforms.clear();
 	for (int i = 2; i < 2002; i++)
@@ -85,23 +81,23 @@ void gameInitialization()
 			particleTransforms.push_back(glm::translate(glm::mat4(), glm::vec3(k * -0.3f, i * -0.3f, 0)));
 		}
 	}
-	canvas.addParticles(*particles2, 2000 * 2000, particleTransforms);
+	WindowCanvas::addParticles(*particles2, 2000 * 2000, particleTransforms);
 
 	//light
-	Light* light1 = modelLoader.createLight();
-	Light* light2 = modelLoader.createLight();
-	Light* light3 = modelLoader.createLight();
+	Light* light1 = ModelLoader::createLight();
+	Light* light2 = ModelLoader::createLight();
+	Light* light3 = ModelLoader::createLight();
 
 	light1->lightColor = glm::vec3(0, 1, 0);
 	light1->strength = 3;
-	canvas.addLight(*light1);
+	WindowCanvas::addLight(*light1);
 
 	light2->lightColor = glm::vec3(0, 0, 1);
 	light2->strength = 5;
-	canvas.addLight(*light2);
+	WindowCanvas::addLight(*light2);
 
 	light3->lightColor = glm::vec3(1, 0, 0);
-	canvas.addLight(*light3);
+	WindowCanvas::addLight(*light3);
 
 	//model initial transformations
 	model2->scale(glm::vec3(2.0f, 2.0f, 2.0f));
@@ -117,7 +113,7 @@ void gameInitialization()
 	model5->scale(glm::vec3(0.2f, 0.2f, 0.2f));
 	model5->translate(glm::vec3(0.0f, -2.0f, 0));
 
-	bool result = triangularize.isConvexVertex(model2->vertexData[0], model2->vertexData[1], model2->vertexData[2]);
+	bool result = Triangularization::isConvexVertex(model2->vertexData[0], model2->vertexData[1], model2->vertexData[2]);
 	
 	cout << "result is " << result << endl;
 }
@@ -248,32 +244,32 @@ void keyboardCallback(unsigned char key, int x, int y)
 	//light movement
 	if (key == 'i')
 	{
-		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, -0.3f));
+		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, -0.3f));
 	}
 	else if(key == 'k')
 	{
-		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, 0.3f));
+		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, 0.3f));
 	}
 	else if (key == 'j')
 	{
-		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(-0.3f, 0, 0));
+		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(-0.3f, 0, 0));
 	}
 	else if (key == 'l')
 	{
-		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0.3f, 0, 0));
+		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(0.3f, 0, 0));
 	}
 	else if (key == 'p')
 	{
-		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0.3f, 0));
+		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(0, 0.3f, 0));
 	}
 	else if (key == ';')
 	{
-		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, -0.3f, 0));
+		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(0, -0.3f, 0));
 	}
 	else if (key == 'o')
 	{
 		currentControlledLightIndex++;
-		if (currentControlledLightIndex >= canvas.lights.size())
+		if (currentControlledLightIndex >= WindowCanvas::lights.size())
 		{
 			currentControlledLightIndex = 0;
 		}
@@ -292,7 +288,7 @@ void loadShaders()
 		ShaderLoader shader;
 		shaderID = shader.load(defaultVertex.c_str(), defaultFragment.c_str());
 		//set a shader for models to use if not set
-		canvas.setDefaultShader(shaderID);
+		WindowCanvas::setDefaultShader(shaderID);
 
 		std::string changingVertex = fileOp.readFile("shaders/ChangingVertex.vs");
 		std::string greenFragment = fileOp.readFile("shaders/GreenFragment.fs");
@@ -303,7 +299,7 @@ void loadShaders()
 
 		std::string defaultParticleVertex = fileOp.readFile("shaders/DefaultParticleVertex.vs");
 		GLuint particleShaderID = shader.load(defaultParticleVertex.c_str(), defaultFragment.c_str());
-		canvas.setDefaultParticleShader(particleShaderID);
+		WindowCanvas::setDefaultParticleShader(particleShaderID);
 
 		std::string diffuseShaderVertex = fileOp.readFile("shaders/DiffuseVert.vs");
 		std::string diffueShaderFragment = fileOp.readFile("shaders/DiffuseFrag.fs");
@@ -324,7 +320,7 @@ int main(int argc, char **argv)
 
 	WindowCanvas canvas;
 
-	canvas.initializeWindow(argc, argv);
+	WindowCanvas::initializeWindow(argc, argv);
 	
 	loadShaders();
 	
@@ -332,7 +328,7 @@ int main(int argc, char **argv)
 	//model1->shader = shaderID1;
 	//std::cout << "Model data : " << "indices - " << model1->indexData.size() << " : " << "vertices - " << model1->vertexData.size() << std::endl;
 
-	canvas.start(gameLoop, gameInitialization, mouseCallback, keyboardCallback, mouseMotionCallback);
+	WindowCanvas::start(gameLoop, gameInitialization, mouseCallback, keyboardCallback, mouseMotionCallback);
 
 	return 0;
 }

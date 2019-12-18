@@ -1,4 +1,5 @@
 ﻿#include "Triangularization.h"
+#include "ModelLoader.h"
 
 using namespace std;
 
@@ -26,17 +27,18 @@ bool Triangularization::isConvexVertex(Vertex v1, Vertex v2, Vertex v3)
 vector<Model> Triangularization::EarTriangularize(Model m)
 {
 	// If only triangle remaining
-	if (m.vertexData.size == 3)
+	if (m.vertexData.size() == 3)
 	{
 		return vector<Model> {m};
 	}
 
 	vector<Model> ears;
-	for (int i = 0; i < m.vertexData.size - 2; i++)
+	for (int i = 0; i < m.vertexData.size() - 2; i++)
 	{
-		if (isConvexVertex(m.vertexData[i], m.vertexData[i + 1], m.vertexData[i + 2]))
+		if (Triangularization::isConvexVertex(m.vertexData[i], m.vertexData[i + 1], m.vertexData[i + 2]))
 		{
 			// split ear
+			Model *ear = ModelLoader::createPrimitive(ModelLoader::TRIANGLE);
 			// erase convex vertex from model
 			// add model into ears vector
 		}
