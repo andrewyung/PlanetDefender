@@ -2,24 +2,28 @@
 
 using namespace std;
 
-bool isConvexVertex(Vertex v1, Vertex v2, Vertex v3)
+bool Triangularization::isConvexVertex(Vertex v1, Vertex v2, Vertex v3)
 {
 	// v1 - v2
-	vector<float> a { v1.x, v1.y, v1.z };
+	glm::vec3 a { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
 	// v3 - v2
-	vector<float> b { v1.x, v1.y, v1.z };
+	glm::vec3 b { v3.x - v2.x, v3.y - v2.y, v3.z - v2.z};
 
-	//inner_product()
-	// find cross product of a and b
-	// det[abu]=a×b⋅u where u is cross prod of a and b
-	// if result is positive then right-handed, if negative then left-handed
+	// Calculate area. Negative means convex
+	float areaSum = 0;
+	areaSum += a[0] * (b[2] - b[1]);
+	areaSum += a[1] * (b[0] - b[2]);
+	areaSum += a[2] * (b[1] - b[0]);
+	areaSum *= 0.5f;
 
-	// check angle (cos0)
-	// if angle is < 180 and is left-handed then convex
-
+	if (areaSum < 0)
+	{
+		return true;
+	}
+	return false;
 }
 
-void EarTriangularize(Model m)
+void Triangularization::EarTriangularize(Model m)
 {
 
 }

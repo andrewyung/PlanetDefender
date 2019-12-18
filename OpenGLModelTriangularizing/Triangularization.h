@@ -2,6 +2,7 @@
 #include "Vertex.h"
 #include "Model.h"
 
+#include <glm/glm.hpp>
 #include <vector>
 #include <math.h>
 

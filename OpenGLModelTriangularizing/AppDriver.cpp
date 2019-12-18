@@ -8,10 +8,12 @@
 #include "FileOperations.h"
 #include "Particles.h"
 #include "Light.h"
+#include "Triangularization.h"
 
 using namespace std;
 
 WindowCanvas canvas;
+Triangularization triangularize;
 
 GLuint shaderID, shaderID1, shaderID2, diffuseShader;
 
@@ -102,7 +104,7 @@ void gameInitialization()
 	canvas.addLight(*light3);
 
 	//model initial transformations
-	model2->scale(glm::vec3(0.1f, 0.1f, 0.1f));
+	model2->scale(glm::vec3(2.0f, 2.0f, 2.0f));
 
 	model1->scale(glm::vec3(0.2f, 0.2f, 0.2f));
 	model1->translate(glm::vec3(2.0f, 2.0f, 0));
@@ -114,6 +116,10 @@ void gameInitialization()
 
 	model5->scale(glm::vec3(0.2f, 0.2f, 0.2f));
 	model5->translate(glm::vec3(0.0f, -2.0f, 0));
+
+	bool result = triangularize.isConvexVertex(model2->vertexData[0], model2->vertexData[1], model2->vertexData[2]);
+	
+	cout << "result is " << result << endl;
 }
 
 //called repeatly as soon as possible
