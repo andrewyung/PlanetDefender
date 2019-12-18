@@ -91,6 +91,7 @@ void gameInitialization()
 	Light* light3 = modelLoader.createLight();
 
 	light1->lightColor = glm::vec3(0, 1, 0);
+	light1->strength = 3;
 	canvas.addLight(*light1);
 
 	light2->lightColor = glm::vec3(0, 0, 1);
