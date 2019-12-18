@@ -23,7 +23,7 @@ bool Triangularization::isConvexVertex(Vertex v1, Vertex v2, Vertex v3)
 	return false;
 }
 
-void Triangularization::EarTriangularize(Model m)
+vector<Model> Triangularization::EarTriangularize(Model m)
 {
 	vector<Model> ears;
 	for (int i = 0; i < m.vertexData.size - 2; i++)

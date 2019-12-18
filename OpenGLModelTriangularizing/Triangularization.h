@@ -14,5 +14,5 @@ public:
 
 	// http://www-cgrl.cs.mcgill.ca/~godfried/teaching/cg-projects/97/Ian/algorithm1.html
 	// Triangularizes 2D polygons
-	void EarTriangularize(Model m);
+	vector<Model> EarTriangularize(Model m);
 };
