@@ -130,35 +130,35 @@ Light * ModelLoader::createLight()
 	std::vector<int> indexData;
 
 	//use cube as light model
-	vertexData = { Vertex(0.5f, 0.5f, 0.5f,	//front top right
+	vertexData = { Vertex(0.2f, 0.2f, 0.2f,	//front top right
 					0, 0, 1, 1,
 					0, 0,
 					1, 1, 1),
-					Vertex(-0.5f, 0.5f, 0.5f,	//front top left
+					Vertex(-0.2f, 0.2f, 0.2f,	//front top left
 						0, 0, 1, 1,
 						0, 0,
 						-1, 1, 1),
-					Vertex(-0.5f, -0.5f, 0.5f,	//front bottom left
+					Vertex(-0.2f, -0.2f, 0.2f,	//front bottom left
 						0, 0, 1, 1,
 						0, 0,
 						-1, -1, 1),
-					Vertex(0.5f, -0.5f, 0.5f,	//front bottom right
+					Vertex(0.2f, -0.2f, 0.2f,	//front bottom right
 						0, 0, 1, 1,
 						0, 0,
 						1, -1, 1),
-					Vertex(0.5f, 0.5f, -0.5f,	//back top right
+					Vertex(0.2f, 0.2f, -0.2f,	//back top right
 						0, 0, 1, 1,
 						0, 0,
 						1, 1, -1),
-					Vertex(-0.5f, 0.5f, -0.5f,	//back top left
+					Vertex(-0.2f, 0.2f, -0.2f,	//back top left
 						0, 0, 1, 1,
 						0, 0,
 						-1, 1, -1),
-					Vertex(-0.5f, -0.5f, -0.5f,//back bottom left
+					Vertex(-0.2f, -0.2f, -0.2f,//back bottom left
 						0, 0, 1, 1,
 						0, 0,
 						-1, -1, -1),
-					Vertex(0.5f, -0.5f, -0.5f,	//back bottom right
+					Vertex(0.2f, -0.2f, -0.2f,	//back bottom right
 						0, 0, 1, 1,
 						0, 0,
 						1, -1, -1),
