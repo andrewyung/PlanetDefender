@@ -25,6 +25,12 @@ bool Triangularization::isConvexVertex(Vertex v1, Vertex v2, Vertex v3)
 
 vector<Model> Triangularization::EarTriangularize(Model m)
 {
+	// If only triangle remaining
+	if (m.vertexData.size == 3)
+	{
+		return vector<Model> {m};
+	}
+
 	vector<Model> ears;
 	for (int i = 0; i < m.vertexData.size - 2; i++)
 	{
@@ -35,5 +41,8 @@ vector<Model> Triangularization::EarTriangularize(Model m)
 			// add model into ears vector
 		}
 	}
-	// repeat until triangle left?
+
+	vector<Model> nestedEars = EarTriangularize(m);
+	ears.insert(ears.end(), nestedEars.begin(), nestedEars.end());
+	return ears;
 }
