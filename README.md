@@ -8,7 +8,7 @@ Work in progress. So far uses glew, freeglut, glm and OBJ_Loader
 <img src="/gifs/lights.gif?raw=true">
 	Diffuse shading with multiple lights<br /><br />
 <img src="/gifs/earsplitting.gif?raw=true">
-	Ear cutting algorithm implementation for polygons<br /><br />
+	Ear cutting algorithm implementation for polygons. Polygon created in blender.<br /><br />
 
 ### Implementations:
 
