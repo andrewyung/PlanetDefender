@@ -3,13 +3,12 @@ Work in progress. So far uses glew, freeglut, glm and OBJ_Loader
 
 <img src="/gifs/camera.gif?raw=true">
 <img src="/gifs/instancing.gif?raw=true">
-	1 mil+ instances of triangle
+	1 mil+ instances of triangle<br /><br />
 
 <img src="/gifs/lights.gif?raw=true">
-	Diffuse shading with multiple lights
-
+	Diffuse shading with multiple lights<br /><br />
 <img src="/gifs/earsplitting.gif?raw=true">
-	Ear cutting algorithm implementation for polygons
+	Ear cutting algorithm implementation for polygons<br /><br />
 
 ### Implementations:
 
