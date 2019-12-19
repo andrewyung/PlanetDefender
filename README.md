@@ -22,11 +22,8 @@ Work in progress. So far uses glew, freeglut, glm and OBJ_Loader
 
 -Camera translation and rotation
 
--Diffuse shader
+-Shaders (Diffuse implemented)
 
+-Lighting
 
-### TODO:
-
--Implement model materials
-
--Determine and use library for delaunay triangularization
+-Polygon ear cutting algorithm
