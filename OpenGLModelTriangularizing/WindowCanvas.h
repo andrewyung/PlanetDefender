@@ -36,7 +36,9 @@ struct VAOInfo
 	int indexDataByteSize;
 	int nextAvailableVertexIndex;
 
-	glm::mat4 transformation = glm::mat4();
+	glm::mat4 rotation;
+	glm::mat4 scale;
+	glm::mat4 translation;
 };
 
 class WindowCanvas

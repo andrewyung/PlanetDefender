@@ -15,13 +15,16 @@ using namespace std;
 GLuint shaderID, shaderID1, shaderID2, diffuseShader;
 
 Model* model1 = ModelLoader::createPrimitive(ModelLoader::TRIANGLE);
-Model* model2 = ModelLoader::createPrimitive(ModelLoader::QUAD);
+//Model* model2 = ModelLoader::createPrimitive(ModelLoader::QUAD);
+Model* model2 = ModelLoader::loadModel("polygon.obj");
 
 Model* model6 = ModelLoader::createPrimitive(ModelLoader::CUBE);
 
 //using different shaders
 Model* model4 = ModelLoader::createPrimitive(ModelLoader::CUBE);
 Model* model5 = ModelLoader::createPrimitive(ModelLoader::CUBE);
+
+vector<Model> triangles;
 
 Model* loadedModel = ModelLoader::loadModel("airboat.obj");
 
@@ -48,8 +51,6 @@ void gameInitialization()
 	//models
 	WindowCanvas::addModel(*model1, false);
 
-	WindowCanvas::addModel(*model2, false);
-
 	model4->shader = shaderID1;
 	WindowCanvas::addModel(*model4, false);
 
@@ -71,7 +72,7 @@ void gameInitialization()
 			particleTransforms.push_back(glm::translate(glm::mat4(), glm::vec3(k * 1.5, i * 1.5f, 0)));
 		}
 	}
-	WindowCanvas::addParticles(*particles1, 2000 * 2000, particleTransforms);
+	//WindowCanvas::addParticles(*particles1, 2000 * 2000, particleTransforms);
 
 	particleTransforms.clear();
 	for (int i = 2; i < 2002; i++)
@@ -100,8 +101,6 @@ void gameInitialization()
 	WindowCanvas::addLight(*light3);
 
 	//model initial transformations
-	model2->scale(glm::vec3(2.0f, 2.0f, 2.0f));
-
 	model1->scale(glm::vec3(0.2f, 0.2f, 0.2f));
 	model1->translate(glm::vec3(2.0f, 2.0f, 0));
 
@@ -113,9 +112,19 @@ void gameInitialization()
 	model5->scale(glm::vec3(0.2f, 0.2f, 0.2f));
 	model5->translate(glm::vec3(0.0f, -2.0f, 0));
 
-	bool result = Triangularization::isConvexVertex(model2->vertexData[0], model2->vertexData[1], model2->vertexData[2]);
+	// Triangularize
 	
-	cout << "result is " << result << endl;
+	WindowCanvas::addModel(*model2, false);
+	model2->scale(glm::vec3(2.0f, 2.0f, 2.0f));
+	model2->setDrawing(false);
+
+	triangles = Triangularization::EarTriangularize(*model2);
+
+	for (int i = 0; i < triangles.size(); i++)
+	{
+		WindowCanvas::addModel(triangles[i], false);
+		triangles[i].translate(glm::vec3(0.0f, 1.5f, 0.0f));
+	}
 }
 
 //called repeatly as soon as possible
@@ -125,6 +134,11 @@ void gameLoop()
 	model1->rotate(60 * WindowCanvas::deltaCallbackTime, glm::vec3(1.0f, 0.0f, 1.0f));
 
 	model6->rotate(60 * WindowCanvas::deltaCallbackTime, glm::vec3(-1.0f, 0.0f, -1.0f));
+
+	for (int i = 0; i < triangles.size(); i++)
+	{
+		triangles[i].translate((float)WindowCanvas::deltaCallbackTime * glm::vec3(0.0f, i * 0.07f, 0.0f) * (sin((float)WindowCanvas::frames / 100.0f)), false);
+	}
 
 	/*
 	//std::cout << WindowCanvas::frames << std::endl;
