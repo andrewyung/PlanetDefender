@@ -75,7 +75,7 @@ void renderScene(void) {
 			shaderLoader.setVector4(currentVAO.shaderID, "lightPos", lightPositions.size(), glm::value_ptr(lightPositions[0]));
 			shaderLoader.setVector3(currentVAO.shaderID, "lightColor", lightPositions.size(), glm::value_ptr(lightColors[0]));
 
-			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", currentVAO.transformation);
+			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", (currentVAO.rotation * (currentVAO.scale * currentVAO.translation)));
 			shaderLoader.setInt(currentVAO.shaderID, "time", glutGet(GLUT_ELAPSED_TIME));
 
 			//std::cout << time << std::endl;
