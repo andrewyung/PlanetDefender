@@ -22,6 +22,7 @@
     <ProjectGuid>{D971DE2B-A6D8-4858-B965-9959147398C4}</ProjectGuid>
     <RootNamespace>OpenGLModelTriangularizing</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <ProjectName>PlanetDefender</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -149,9 +150,6 @@
     <None Include="shaders\DiffuseFrag.fs" />
     <None Include="shaders\DiffuseVert.vs" />
     <None Include="shaders\ExpandingOnNormal.vs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="MIConvexHull.xml" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="Models\airboat.obj">

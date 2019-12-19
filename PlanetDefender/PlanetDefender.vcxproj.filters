@@ -106,9 +106,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="MIConvexHull.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <Object Include="Models\airboat.obj">
       <Filter>Resource Files</Filter>
     </Object>
