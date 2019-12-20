@@ -125,14 +125,15 @@ void frameTimer(int value)
 //initalizes glut
 void WindowCanvas::initializeWindow(int argc, char **argv)
 {
-	int windowHeight = 800;
-	int windowWidth = 800;
+	int windowHeight = 900;
+	int windowWidth = 1600;
 
 	//create window
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutInitWindowPosition((GLUT_SCREEN_WIDTH / 2) - (windowWidth / 2), (GLUT_SCREEN_HEIGHT / 2) - (windowHeight / 2));
 	glutInitWindowSize(windowWidth, windowHeight);
+
 
 	glutCreateWindow("Some window");
 
