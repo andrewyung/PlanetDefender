@@ -66,6 +66,7 @@ void renderScene(void) {
 			{
 				glUseProgram(currentVAO.shaderID);
 			}
+
 			//MVP temp for vertex shaders that were used for testing
 			shaderLoader.setMat4x4(currentVAO.shaderID, "MVP", camera->getMVP());
 			shaderLoader.setMat4x4(currentVAO.shaderID, "model", camera->ModelMatrix);
@@ -80,6 +81,13 @@ void renderScene(void) {
 
 			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", (currentVAO.rotation * (currentVAO.scale * currentVAO.translation)));
 			shaderLoader.setInt(currentVAO.shaderID, "time", glutGet(GLUT_ELAPSED_TIME));
+
+			// Textures
+			if (currentVAO.textureCount != 0)
+			{
+				glActiveTexture(GL_TEXTURE0);
+				glBindTextures(GL_TEXTURE_2D, currentVAO.textureCount, currentVAO.texturesArray);
+			}
 
 			//std::cout << time << std::endl;
 			glBindVertexArray(currentVAO.vertexArrayID);
@@ -275,6 +283,7 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 
 	VAOInfo *info = new VAOInfo(VAO, VBO, EBO,								//id's
 		particles.shader,											//shader program
+		particles.textures,								//textures
 		particles.particleModel->indexData.size() * sizeof(int),		//index size of particle model
 		vertexArrayData.size() * sizeof(float),		//vertex size
 		particles.particleModel->vertexData.size());					//number of vertices of particle model
@@ -303,6 +312,7 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 	glBindBuffer(GL_ARRAY_BUFFER, transformVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::mat4) * instances, &particleTransformationsData[0], GL_STREAM_DRAW);
 
+	// Transformation is particle input
 	int pos = glGetAttribLocation(particles.shader, "particleTransformations");
 	std::cout << "should be 4... " << pos << std::endl;
 	int pos1 = pos + 0;
@@ -447,6 +457,7 @@ void WindowCanvas::addModel(Model &model, bool group)
 
 	VAOInfo *info = new VAOInfo(VAO, VBO, EBO,								//id's
 								model.shader,								//shader program
+								model.textures,								//textures
 								model.indexData.size() * sizeof(int),		//index size
 								vertexArrayData.size() * sizeof(float),		//vertex size
 								model.vertexData.size());					//number of vertices
@@ -457,7 +468,7 @@ void WindowCanvas::addModel(Model &model, bool group)
 	// > 1 when default buffer size isn't large enough
 	int bufferSizeMultiplier = ceil((vertexArrayData.size() * sizeof(float)) / (float) DEFAULT_BUFFER_SIZE);
 
-	std::cout << bufferSizeMultiplier << std::endl;
+	//std::cout << bufferSizeMultiplier << std::endl;
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, DEFAULT_BUFFER_SIZE * bufferSizeMultiplier, &vertexArrayData[0], GL_STATIC_DRAW);
 

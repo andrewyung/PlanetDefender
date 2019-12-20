@@ -14,7 +14,8 @@ public:
 	std::vector<Vertex> vertexData;
 	std::vector<int> indexData;
 
-	GLuint shader;
+	GLuint shader;	
+	std::vector<GLuint> textures{};
 
 	bool drawing() const { return vaoInfo->drawing; };
 

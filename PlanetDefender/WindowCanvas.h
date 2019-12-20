@@ -18,14 +18,23 @@ class Light;
 struct VAOInfo
 {
 	//maybe remove vboID as not used
-	VAOInfo(GLuint vaoID, GLuint vboID, GLuint eboID, GLuint shaderID, int indexDataSize, int vertexDataSize, int nextAvailableVertexIndex) :
-		vertexArrayID(vaoID), vertexBufferID(vboID), indexBufferID(eboID), shaderID(shaderID), indexDataByteSize(indexDataSize), vertexDataByteSize(vertexDataSize), nextAvailableVertexIndex(nextAvailableVertexIndex) {};
+	VAOInfo(GLuint vaoID, GLuint vboID, GLuint eboID, GLuint shaderID, std::vector<GLuint> textures, int indexDataSize, int vertexDataSize, int nextAvailableVertexIndex) :
+		vertexArrayID(vaoID), vertexBufferID(vboID), indexBufferID(eboID), shaderID(shaderID), indexDataByteSize(indexDataSize), vertexDataByteSize(vertexDataSize), nextAvailableVertexIndex(nextAvailableVertexIndex) 
+	{
+		textureCount = textures.size();
+		if (textureCount != 0)
+		{
+			texturesArray = &(textures[0]);
+		}
+	};
 
 	bool drawing = true;
 	GLuint vertexArrayID;
 	GLuint vertexBufferID;
 	GLuint indexBufferID;
 	GLuint shaderID;
+	unsigned int textureCount;
+	GLuint *texturesArray;
 
 	bool batched = false;
 	bool instanced = false;

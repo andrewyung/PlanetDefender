@@ -9,27 +9,15 @@
 #include "Particles.h"
 #include "Light.h"
 #include "Triangularization.h"
+#include "stb_image.h"
+#include "TextureLoader.h"
 
 using namespace std;
 
 GLuint shaderID, shaderID1, shaderID2, diffuseShader;
+GLuint greenTiledTexture;
 
-Model* model1 = ModelLoader::createPrimitive(ModelLoader::TRIANGLE);
-//Model* model2 = ModelLoader::createPrimitive(ModelLoader::QUAD);
-Model* model2 = ModelLoader::loadModel("polygon.obj");
-
-Model* model6 = ModelLoader::createPrimitive(ModelLoader::CUBE);
-
-//using different shaders
-Model* model4 = ModelLoader::createPrimitive(ModelLoader::CUBE);
-Model* model5 = ModelLoader::createPrimitive(ModelLoader::CUBE);
-
-vector<Model> triangles;
-
-Model* loadedModel = ModelLoader::loadModel("airboat.obj");
-
-Particles* particles1 = new Particles(ModelLoader::createPrimitive(ModelLoader::QUAD));
-Particles* particles2 = new Particles(ModelLoader::createPrimitive(ModelLoader::TRIANGLE));
+Model* model2 = ModelLoader::loadModel("Sphere.obj");
 
 Camera mainCamera;
 
@@ -48,97 +36,19 @@ void gameInitialization()
 	//translate camera to view test objects (since camera is at origin)
 	mainCamera.translate(glm::vec3(0, 0, -3), true);
 
-	//models
-	WindowCanvas::addModel(*model1, false);
-
-	model4->shader = shaderID1;
-	WindowCanvas::addModel(*model4, false);
-
-	model5->shader = shaderID2;
-	WindowCanvas::addModel(*model5, false);
-
-	WindowCanvas::addModel(*model6, false);
-
-	//check if setting shader after addModel works
-	loadedModel->shader = diffuseShader;
-	WindowCanvas::addModel(*loadedModel, false);
-
-	//particles
-	std::vector<glm::mat4> particleTransforms;
-	for (int i = 1; i < 2001; i++)
-	{
-		for (int k = 1; k < 2001; k++)
-		{
-			particleTransforms.push_back(glm::translate(glm::mat4(), glm::vec3(k * 1.5, i * 1.5f, 0)));
-		}
-	}
-	//WindowCanvas::addParticles(*particles1, 2000 * 2000, particleTransforms);
-
-	particleTransforms.clear();
-	for (int i = 2; i < 2002; i++)
-	{
-		for (int k = 1; k < 2001; k++)
-		{
-			particleTransforms.push_back(glm::translate(glm::mat4(), glm::vec3(k * -0.3f, i * -0.3f, 0)));
-		}
-	}
-	WindowCanvas::addParticles(*particles2, 2000 * 2000, particleTransforms);
-
-	//light
-	Light* light1 = ModelLoader::createLight();
-	Light* light2 = ModelLoader::createLight();
-	Light* light3 = ModelLoader::createLight();
-
-	light1->lightColor = glm::vec3(0, 1, 0);
-	light1->strength = 3;
-	WindowCanvas::addLight(*light1);
-
-	light2->lightColor = glm::vec3(0, 0, 1);
-	light2->strength = 5;
-	WindowCanvas::addLight(*light2);
-
-	light3->lightColor = glm::vec3(1, 0, 0);
-	WindowCanvas::addLight(*light3);
-
-	//model initial transformations
-	model1->scale(glm::vec3(0.2f, 0.2f, 0.2f));
-	model1->translate(glm::vec3(2.0f, 2.0f, 0));
-
-	model6->scale(glm::vec3(0.2f, 0.2f, 0.2f));
-	model6->translate(glm::vec3(0.0f, 2.0f, 0));
-
-	model4->scale(glm::vec3(0.2f, 0.2f, 0.2f));
-
-	model5->scale(glm::vec3(0.2f, 0.2f, 0.2f));
-	model5->translate(glm::vec3(0.0f, -2.0f, 0));
-
 	// Triangularize
-	
+	model2->textures.push_back(greenTiledTexture);
+	model2->shader = diffuseShader;
+
 	WindowCanvas::addModel(*model2, false);
-	model2->scale(glm::vec3(2.0f, 2.0f, 2.0f));
-	model2->setDrawing(false);
 
-	triangles = Triangularization::EarTriangularize(*model2);
+	// Texture
 
-	for (int i = 0; i < triangles.size(); i++)
-	{
-		WindowCanvas::addModel(triangles[i], false);
-		triangles[i].translate(glm::vec3(0.0f, 1.5f, 0.0f));
-	}
 }
 
 //called repeatly as soon as possible
 void gameLoop()
 {
-	model1->translate((float) WindowCanvas::deltaCallbackTime * glm::vec3(0.3f, 0.3f, 0) * (float) sin((float) WindowCanvas::frames / 10.0f) * 3.0f, false);
-	model1->rotate(60 * WindowCanvas::deltaCallbackTime, glm::vec3(1.0f, 0.0f, 1.0f));
-
-	model6->rotate(60 * WindowCanvas::deltaCallbackTime, glm::vec3(-1.0f, 0.0f, -1.0f));
-
-	for (int i = 0; i < triangles.size(); i++)
-	{
-		triangles[i].translate((float)WindowCanvas::deltaCallbackTime * glm::vec3(0.0f, i * 0.07f, 0.0f) * (sin((float)WindowCanvas::frames / 100.0f)), false);
-	}
 
 	/*
 	//std::cout << WindowCanvas::frames << std::endl;
@@ -315,8 +225,8 @@ void loadShaders()
 		GLuint particleShaderID = shader.load(defaultParticleVertex.c_str(), defaultFragment.c_str());
 		WindowCanvas::setDefaultParticleShader(particleShaderID);
 
-		std::string diffuseShaderVertex = fileOp.readFile("shaders/DiffuseVert.vs");
-		std::string diffueShaderFragment = fileOp.readFile("shaders/DiffuseFrag.fs");
+		std::string diffuseShaderVertex = fileOp.readFile("shaders/DiffuseTextureVert.vs");
+		std::string diffueShaderFragment = fileOp.readFile("shaders/DiffuseTextureFrag.fs");
 		diffuseShader = shader.load(diffuseShaderVertex.c_str(), diffueShaderFragment.c_str());
 	}
 	catch (std::invalid_argument& e)
@@ -327,7 +237,10 @@ void loadShaders()
 	}
 }
 
-
+void loadTextures()
+{
+	greenTiledTexture = TextureLoader::load("C:\/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/GreenTiled.jpg");
+}
 
 int main(int argc, char **argv)
 {
@@ -336,6 +249,7 @@ int main(int argc, char **argv)
 
 	WindowCanvas::initializeWindow(argc, argv);
 	
+	loadTextures();
 	loadShaders();
 	
 	//add models and assign shaders to models if desired otherwise default shader is used.

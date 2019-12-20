@@ -15,7 +15,8 @@ public:
 	Model* particleModel;
 	std::vector<glm::mat4> particleOffsets;
 
-	GLuint shader;
+	GLuint shader;	
+	std::vector<GLuint> textures{};
 
 	bool drawing() const { return vaoInfo->drawing; };
 

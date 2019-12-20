@@ -124,6 +124,8 @@
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
+    <ClCompile Include="stb_image.cpp" />
+    <ClCompile Include="TextureLoader.cpp" />
     <ClCompile Include="Triangularization.cpp" />
     <ClCompile Include="WindowCanvas.cpp" />
   </ItemGroup>
@@ -136,6 +138,8 @@
     <ClInclude Include="OBJ_Loader.h" />
     <ClInclude Include="Particles.h" />
     <ClInclude Include="ShaderLoader.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="Triangularization.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WindowCanvas.h" />
@@ -148,16 +152,20 @@
     <None Include="shaders\DefaultParticleVertex.vs" />
     <None Include="shaders\DefaultVertex.vs" />
     <None Include="shaders\DiffuseFrag.fs" />
+    <None Include="shaders\DiffuseTextureFrag.fs" />
+    <None Include="shaders\DiffuseTextureVert.vs" />
     <None Include="shaders\DiffuseVert.vs" />
     <None Include="shaders\ExpandingOnNormal.vs" />
   </ItemGroup>
   <ItemGroup>
-    <Object Include="Models\airboat.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    <Object Include="Models\Sphere.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Object>
-    <Object Include="Models\polygon.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Textures\GreenTiled.jpg">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Image>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
