@@ -1,7 +1,16 @@
 # Planet Defender
-Defend your planet from alien attackers. We do want their bodily nutrients to be absorbed into the planet however.
+Defend your planet from alien attackers.
 
-Work in progress. 
-Game created from https://github.com/andrewyung/OpenglTriangularization
+Work in progress.
 
 Uses stb_image.h from https://github.com/nothings/stb/blob/master/stb_image.h
+
+## Additional implementations
+- Texturing
+
+## TODO
+- Various shaders
+- Skybox
+- Collision (Ray and spherical)
+- Game logic
+- Particle effects
