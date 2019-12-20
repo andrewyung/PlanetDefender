@@ -294,7 +294,7 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 	glEnableVertexAttribArray(1);
 
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(7 * sizeof(float)));
-	glDisableVertexAttribArray(2);
+	glEnableVertexAttribArray(2);
 
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_TRUE, 12 * sizeof(float), (void*)(9 * sizeof(float)));
 	glEnableVertexAttribArray(3);
@@ -469,7 +469,7 @@ void WindowCanvas::addModel(Model &model, bool group)
 	glEnableVertexAttribArray(1);
 
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(7 * sizeof(float)));
-	glDisableVertexAttribArray(2);
+	glEnableVertexAttribArray(2);
 
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_TRUE, 12 * sizeof(float), (void*)(9 * sizeof(float)));
 	glEnableVertexAttribArray(3);

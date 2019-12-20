@@ -8,12 +8,12 @@ public:
 
 	Vertex(	float x, float y, float z, 
 			float r, float g, float b, float a,
-			float UVx, float UVy, 
+			float xUV, float yUV, 
 			float xNormal, float yNormal, float zNormal)
 
 		:	x(x), y(y), z(z), 
 			r(r), g(g), b(b), a(a), 
-			xUV(UVx), yUV(UVy),
+			xUV(xUV), yUV(yUV),
 			xNormal(xNormal), yNormal(yNormal), zNormal(zNormal) {};
 	//~Vertex();
 
@@ -23,7 +23,7 @@ public:
 		this->yNormal = yNormal;
 		this->zNormal = zNormal;
 	}
-	void setUVCoordinate(float UVx, float UVy)
+	void setUVCoordinate(float xUV, float yUV)
 	{
 		this->xUV = xUV;
 		this->yUV = yUV;
