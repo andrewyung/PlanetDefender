@@ -15,12 +15,12 @@ Model* ModelLoader::createPrimitive(PrimitiveTypes type)
 	case QUAD:
 		vertexData = {	Vertex(	0.5f, 0.5f, 0,	//top right position
 								1, 1, 1 ,1,		//color
-								0, 0,			//uv
+								1, 1,			//uv
 								0, 0, 1),		//normal
 
 						Vertex(	0.5f, -0.5f, 0,	//top left position
 								1, 1, 1 ,1,		
-								0, 0,			
+								0, 1,			
 								0, 0, 1),				
 
 						Vertex(	-0.5f, -0.5f, 0,//bottom left position
@@ -30,7 +30,7 @@ Model* ModelLoader::createPrimitive(PrimitiveTypes type)
 
 						Vertex(	-0.5f, 0.5f, 0,//bottom right position
 								1, 1, 1 ,1,		
-								0, 0,			
+								1, 0,			
 								0, 0, 1),		
 		};
 
