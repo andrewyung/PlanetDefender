@@ -29,10 +29,7 @@ public:
 			}
 			else
 			{
-				vaoInfo->scale[0][0] = scale[0];
-				vaoInfo->scale[1][1] = scale[1];
-				vaoInfo->scale[2][2] = scale[2];
-				vaoInfo->scale[3][3] = 1;
+				vaoInfo->scale = glm::scale(glm::mat4(), scale);
 			}
 		}
 	}
@@ -41,22 +38,29 @@ public:
 	{
 		if (vaoInfo != nullptr)
 		{
-			if (!localSpace)
+			if (localSpace)
 			{
-				vaoInfo->translation = glm::translate(glm::mat4(), translateVector) * vaoInfo->translation;
+				vaoInfo->translation = vaoInfo->translation * glm::translate(glm::mat4(), glm::mat3(vaoInfo->rotation) * translateVector);
 			}
 			else
 			{
-				vaoInfo->translation = glm::translate(vaoInfo->translation, translateVector);
+				vaoInfo->translation = glm::translate(glm::mat4(), translateVector) * vaoInfo->translation;
 			}
 		}
 	}
 
-	void rotate(float angle, glm::vec3 axis)
+	void rotate(float angle, glm::vec3 axis, bool localSpace = true)
 	{
 		if (vaoInfo != nullptr)
 		{
-			vaoInfo->rotation = glm::rotate(vaoInfo->rotation, glm::radians(angle), axis);
+			if (localSpace)
+			{
+				vaoInfo->rotation = vaoInfo->rotation * glm::rotate(glm::mat4(), glm::radians(angle), axis);
+			}
+			else
+			{
+				vaoInfo->rotation = glm::rotate(glm::mat4(), glm::radians(angle), axis) * vaoInfo->rotation;
+			}
 		}
 	}
 
