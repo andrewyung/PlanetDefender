@@ -1,7 +1,7 @@
 # Planet Defender
 Defend your planet from alien attackers.
 Work in progress.
-<img src="/gifs/SpaceScene.png?raw=true">
+<img src="/gifs/SpaceScene.PNG?raw=true">
 
 Uses stb_image.h from https://github.com/nothings/stb/blob/master/stb_image.h
 
