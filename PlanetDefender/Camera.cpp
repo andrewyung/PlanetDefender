@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Camera.h"
-#include<iostream>
+#include <iostream>
 #include <glm/gtx/string_cast.hpp>
 
 glm::mat4 Camera::getMVP()
@@ -16,53 +16,41 @@ void Camera::printMVP()
 	std::cout << "MODEL: " << glm::to_string(ModelMatrix) << std::endl;
 }
 
-// translate in local space
-void Camera::translate(glm::vec3 translation)
-{
-	printMVP();
-	Camera::ModelMatrix = Camera::ModelMatrix * glm::translate(glm::mat4(), translation);
-}
 // default to local space but allow option for world space
-void Camera::translate(glm::vec3 translation, bool worldSpace)
+void Camera::translate(glm::vec3 translation, bool localspace)
 {
-	if (worldSpace)
+	if (localspace)
 	{
-		Camera::ModelMatrix = glm::translate(glm::mat4(), translation) * Camera::ModelMatrix;
+		Camera::ViewMatrix = glm::translate(glm::mat4(), translation) * Camera::ViewMatrix;
+
 	}
 	else
 	{
-		translate(translation);
+		Camera::ViewMatrix = Camera::ViewMatrix * glm::translate(glm::mat4(), translation);
 	}
 }
 
-//rotation in local space
-void Camera::rotate(glm::vec3 rotation)
+void Camera::rotate(glm::vec3 rotation, bool localspace)
 {
-	Camera::ModelMatrix =	Camera::ModelMatrix *
-							glm::rotate(glm::mat4(), glm::radians(rotation.x), glm::vec3(0, 1, 0)) *
-							glm::rotate(glm::mat4(), glm::radians(rotation.y), glm::vec3(1, 0, 0)) *  
-							glm::rotate(glm::mat4(), glm::radians(rotation.z), glm::vec3(0, 0, 1));
-}
-
-void Camera::rotate(glm::vec3 rotation, bool worldSpace)
-{
-	if (worldSpace)
+	if (localspace)
 	{
-		Camera::ModelMatrix =	glm::rotate(glm::mat4(), glm::radians(rotation.x), glm::vec3(0, 1, 0)) *
+		Camera::ViewMatrix =	glm::rotate(glm::mat4(), glm::radians(rotation.x), glm::vec3(0, 1, 0)) *
 								glm::rotate(glm::mat4(), glm::radians(rotation.y), glm::vec3(1, 0, 0)) *
 								glm::rotate(glm::mat4(), glm::radians(rotation.z), glm::vec3(0, 0, 1)) *
-								Camera::ModelMatrix;
+								Camera::ViewMatrix;
 	}
 	else
 	{
-		rotate(rotation);
+		Camera::ViewMatrix =	glm::rotate(Camera::ViewMatrix, glm::radians(rotation.x), glm::vec3(0, 1, 0)) *
+								glm::rotate(Camera::ViewMatrix, glm::radians(rotation.y), glm::vec3(1, 0, 0)) *
+								glm::rotate(Camera::ViewMatrix, glm::radians(rotation.z), glm::vec3(0, 0, 1));
 	}
 }
 
 Camera::Camera()
 {
 	//fov (radians), aspect ratio, near clip, far clip
-	ProjectionMatrix = glm::perspective(glm::radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
+	ProjectionMatrix = glm::perspective(glm::radians(90.0f), (float)1600 / (float)900, 0.1f, 100.0f);
 }
 
 

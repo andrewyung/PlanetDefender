@@ -13,13 +13,9 @@ public:
 
 	glm::mat4 getMVP();
 
-	void translate(glm::vec3 translation);
+	void translate(glm::vec3 translation, bool localSpace = true);
 
-	void translate(glm::vec3 translation, bool worldSpace);
-
-	void rotate(glm::vec3 rotation);
-
-	void rotate(glm::vec3 rotation, bool worldSpace);
+	void rotate(glm::vec3 rotation, bool localSpace = true);
 
 	Camera();
 	~Camera();
