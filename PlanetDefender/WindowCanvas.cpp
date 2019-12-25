@@ -1,9 +1,11 @@
 #pragma once
 
+#include "FileOperations.h"
 #include "WindowCanvas.h"
 #include "Model.h"
 #include "Particles.h"
 #include "Light.h"
+#include "ModelLoader.h"
 
 GLuint WindowCanvas::defaultShader;
 GLuint WindowCanvas::defaultParticleShader;
@@ -57,53 +59,74 @@ void renderScene(void) {
 	{
 		glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
 
-		VAOInfo currentVAO = *vertexArrayIDs[i];
+		VAOInfo *currentVAO = vertexArrayIDs[i];
+		if (currentVAO->depthMask)
+		{
+			glDepthMask(GL_TRUE);
+		}
+		else
+		{
+			glDepthMask(GL_FALSE);
+		}
 
-		if (currentVAO.drawing)//is vao is set to be rendered
+		if (currentVAO->drawing)//is vao is set to be rendered
 		{
 			//if current shader isn't the one vao is to use
-			if (currentShader != currentVAO.shaderID)
+			if (currentShader != currentVAO->shaderID)
 			{
-				glUseProgram(currentVAO.shaderID);
+				glUseProgram(currentVAO->shaderID);
 			}
 
 			//MVP temp for vertex shaders that were used for testing
-			shaderLoader.setMat4x4(currentVAO.shaderID, "MVP", camera->getMVP());
-			shaderLoader.setMat4x4(currentVAO.shaderID, "model", camera->ModelMatrix);
-			shaderLoader.setMat4x4(currentVAO.shaderID, "view", camera->ViewMatrix);
-			shaderLoader.setMat4x4(currentVAO.shaderID, "projection", camera->ProjectionMatrix);
-			
-			if (lightPositions.size() > 0)
+			shaderLoader.setMat4x4(currentVAO->shaderID, "MVP", camera->getMVP());
+			shaderLoader.setMat4x4(currentVAO->shaderID, "model", camera->ModelMatrix);
+			if (currentVAO->renderType == VAOInfo::Type::SKYBOX)
 			{
-				shaderLoader.setVector4(currentVAO.shaderID, "lightPos", lightPositions.size(), glm::value_ptr(lightPositions[0]));
-				shaderLoader.setVector3(currentVAO.shaderID, "lightColor", lightPositions.size(), glm::value_ptr(lightColors[0]));
-			}
-
-			shaderLoader.setMat4x4(currentVAO.shaderID, "transform", (currentVAO.rotation * (currentVAO.scale * currentVAO.translation)));
-			shaderLoader.setInt(currentVAO.shaderID, "time", glutGet(GLUT_ELAPSED_TIME));
-
-			// Textures
-			if (currentVAO.textureCount != 0)
-			{
-				glActiveTexture(GL_TEXTURE0);
-				glBindTextures(GL_TEXTURE_2D, currentVAO.textureCount, currentVAO.texturesArray);
-			}
-
-			//std::cout << time << std::endl;
-			glBindVertexArray(currentVAO.vertexArrayID);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO.indexBufferID);
-			//std::cout << "running - model added : vb" << currentVAO.vertexDataByteSize << " : ib" << currentVAO.indexDataByteSize << std::endl;
-
-			if (currentVAO.instanced)//this vao is to be instanced
-			{
-				glDrawElementsInstanced(GL_TRIANGLES, currentVAO.indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0, currentVAO.instances);
+				// Removes translation of transformation
+				shaderLoader.setMat4x4(currentVAO->shaderID, "view", glm::mat4(glm::mat3(camera->ViewMatrix)));
 			}
 			else
 			{
-				glDrawElements(GL_TRIANGLES, currentVAO.indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0);
+				shaderLoader.setMat4x4(currentVAO->shaderID, "view", camera->ViewMatrix);
+			}
+			shaderLoader.setMat4x4(currentVAO->shaderID, "projection", camera->ProjectionMatrix);
+			
+			if (lightPositions.size() > 0)
+			{
+				shaderLoader.setVector4(currentVAO->shaderID, "lightPos", lightPositions.size(), glm::value_ptr(lightPositions[0]));
+				shaderLoader.setVector3(currentVAO->shaderID, "lightColor", lightPositions.size(), glm::value_ptr(lightColors[0]));
+			}
+
+			shaderLoader.setMat4x4(currentVAO->shaderID, "transform", (currentVAO->translation * currentVAO->rotation * currentVAO->scale));
+			shaderLoader.setInt(currentVAO->shaderID, "time", glutGet(GLUT_ELAPSED_TIME));
+
+			// Textures
+			if (currentVAO->textures.size() != 0)
+			{
+				for (int i = 0; i < currentVAO->textures.size(); i++)
+				{
+					glActiveTexture(GL_TEXTURE0 + i);
+					glBindTexture(GL_TEXTURE_2D, currentVAO->textures[i]);
+				}
+			}
+
+			//std::cout << time << std::endl;
+			glBindVertexArray(currentVAO->vertexArrayID);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO->indexBufferID);
+			//std::cout << "running - model added : vb" << currentVAO.vertexDataByteSize << " : ib" << currentVAO.indexDataByteSize << std::endl;
+
+
+			if (currentVAO->instanced)//this vao is to be instanced
+			{
+				glDrawElementsInstanced(GL_TRIANGLES, currentVAO->indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0, currentVAO->instances);
+			}
+			else
+			{
+				glDrawElements(GL_TRIANGLES, currentVAO->indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0);
 			}
 		}
 	}
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glutSwapBuffers();
 
@@ -290,6 +313,7 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 		particles.particleModel->vertexData.size());					//number of vertices of particle model
 	info->instanced = true;
 	info->instances = instances;
+	info->renderType = VAOInfo::Type::PARTICLE;
 
 	glBindVertexArray(VAO);
 
@@ -349,7 +373,7 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 //Called externally to add models to be rendered. 
 //Allows for grouping of models so that multiple objects can be done with a single draw (such as static models that share the same shader)
 //TODO: instancing
-void WindowCanvas::addModel(Model &model, bool group)
+void WindowCanvas::addModel(Model &model, bool group, VAOInfo::Type renderType, bool depthMask)
 {
 	if (model.shader == 0)
 	{
@@ -396,6 +420,10 @@ void WindowCanvas::addModel(Model &model, bool group)
 			if (model.shader == vertexArrayIDs[i]->shaderID && !vertexArrayIDs[i]->instanced && vertexArrayIDs[i]->batched)
 			{
 				VAOInfo *currentVAOInfo = vertexArrayIDs[i];
+				currentVAOInfo->renderType = renderType;
+				currentVAOInfo->depthMask = depthMask;
+				currentVAOInfo->textures = model.textures;
+
 				glBindVertexArray(currentVAOInfo->vertexArrayID);
 
 				int currentBufferSize;
@@ -463,6 +491,8 @@ void WindowCanvas::addModel(Model &model, bool group)
 								vertexArrayData.size() * sizeof(float),		//vertex size
 								model.vertexData.size());					//number of vertices
 	info->batched = group;
+	info->renderType = renderType;
+	info->depthMask = depthMask;
 
 	glBindVertexArray(VAO);
 
@@ -503,6 +533,19 @@ void WindowCanvas::addModel(Model &model, bool group)
 	std::cout << "model created" << std::endl;
 }
 
+void WindowCanvas::addSkybox(GLuint skyboxTextures)
+{
+	FileOperations fileOp;
+
+	GLuint skyboxShader = ShaderLoader::load("shaders/SkyboxVert.vs", "shaders/SkyboxFrag.fs");
+
+	Model *skybox = ModelLoader::createPrimitive(ModelLoader::SKYBOX_CUBE);
+	skybox->shader = skyboxShader;
+	skybox->textures.push_back(skyboxTextures);
+
+	addModel(*skybox, false, VAOInfo::Type::SKYBOX, false);
+}
+
 void WindowCanvas::setDefaultShader(GLuint shader)
 {
 	defaultShader = shader;
@@ -531,10 +574,5 @@ glm::mat4 WindowCanvas::getCurrentCameraModelMatrix()
 		return glm::mat4();
 	}
 	return camera->ModelMatrix;
-}
-
-WindowCanvas::~WindowCanvas()
-{
-
 }
 

@@ -156,6 +156,8 @@
     <None Include="shaders\DiffuseTextureVert.vs" />
     <None Include="shaders\DiffuseVert.vs" />
     <None Include="shaders\ExpandingOnNormal.vs" />
+    <None Include="shaders\SkyboxFrag.fs" />
+    <None Include="shaders\SkyboxVert.vs" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="Models\Sphere.obj">
@@ -164,6 +166,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\GreenTiled.jpg">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Image>
+    <Image Include="Textures\skyboxAlias.jpg">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Image>
   </ItemGroup>

@@ -22,7 +22,7 @@ std::string FileOperations::readFile(const char *filePath)
 	}
 	catch (std::ifstream::failure e)
 	{
-		std::cout << "File failed to read" << std::endl;
+		std::cout << "File " << filePath << " failed to read" << std::endl;
 	}
 	return fileContent;
 }

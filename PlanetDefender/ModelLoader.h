@@ -9,7 +9,8 @@ public:
 	enum PrimitiveTypes {
 		QUAD,
 		TRIANGLE,
-		CUBE
+		CUBE,
+		SKYBOX_CUBE
 		//add more later
 	};
 

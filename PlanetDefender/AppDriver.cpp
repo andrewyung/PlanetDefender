@@ -14,10 +14,12 @@
 
 using namespace std;
 
-GLuint shaderID, shaderID1, shaderID2, diffuseShader;
-GLuint greenTiledTexture;
+GLuint diffuseShader;
+GLuint greenTiledTexture, skyboxTextureAlias;
 
-Model* model2 = ModelLoader::loadModel("Sphere.obj");
+Model* planet = ModelLoader::loadModel("Sphere.obj");
+
+Model* test = ModelLoader::createPrimitive(ModelLoader::QUAD);
 
 Camera mainCamera;
 
@@ -25,31 +27,33 @@ int currentControlledLightIndex = 0; //used to switch between lights to move aro
 
 bool leftMouseDown = false;
 bool rightMouseDown = false;
-int lastMouseX;
-int lastMouseY;
+int lastMouseX, lastMouseY;
 
 //called once at the beginning
 void gameInitialization()
 {
+	WindowCanvas::addSkybox(skyboxTextureAlias);
+
 	//camera
 	WindowCanvas::setCamera(mainCamera);
 	//translate camera to view test objects (since camera is at origin)
 	mainCamera.translate(glm::vec3(0, 0, -3), true);
 
 	// Triangularize
-	model2->textures.push_back(greenTiledTexture);
-	model2->shader = diffuseShader;
+	planet->textures.push_back(greenTiledTexture);
+	planet->shader = diffuseShader;
 
-	WindowCanvas::addModel(*model2, false);
+	WindowCanvas::addModel(*planet, false);
 
-	// Texture
-
+	WindowCanvas::addModel(*test, false);
 }
 
 //called repeatly as soon as possible
 void gameLoop()
 {
+	test->rotate(WindowCanvas::deltaCallbackTime * 90, glm::vec3(1.0f, 0.0f, 0.0f), false);
 
+	test->translate(glm::vec3(0, WindowCanvas::deltaCallbackTime * 5, 0), false);
 	/*
 	//std::cout << WindowCanvas::frames << std::endl;
 	if (WindowCanvas::frames > 200)
@@ -202,32 +206,18 @@ void keyboardCallback(unsigned char key, int x, int y)
 
 void loadShaders()
 {
-	FileOperations fileOp;
-
 	//load shaders
 	try
 	{
-		std::string defaultVertex = fileOp.readFile("shaders/DefaultVertex.vs");
-		std::string defaultFragment = fileOp.readFile("shaders/DefaultFragment.fs");
-		ShaderLoader shader;
-		shaderID = shader.load(defaultVertex.c_str(), defaultFragment.c_str());
+		GLuint shaderID = ShaderLoader::load("shaders/DefaultVertex.vs", "shaders/DefaultFragment.fs");
 		//set a shader for models to use if not set
 		WindowCanvas::setDefaultShader(shaderID);
 
-		std::string changingVertex = fileOp.readFile("shaders/ChangingVertex.vs");
-		std::string greenFragment = fileOp.readFile("shaders/GreenFragment.fs");
-		shaderID1 = shader.load(changingVertex.c_str(), greenFragment.c_str());
-
-		std::string expandingNormalsVertex = fileOp.readFile("shaders/ExpandingOnNormal.vs");
-		shaderID2 = shader.load(expandingNormalsVertex.c_str(), defaultFragment.c_str());
-
-		std::string defaultParticleVertex = fileOp.readFile("shaders/DefaultParticleVertex.vs");
-		GLuint particleShaderID = shader.load(defaultParticleVertex.c_str(), defaultFragment.c_str());
+		GLuint particleShaderID = ShaderLoader::load("shaders/DefaultParticleVertex.vs", "shaders/DefaultFragment.fs");
 		WindowCanvas::setDefaultParticleShader(particleShaderID);
 
-		std::string diffuseShaderVertex = fileOp.readFile("shaders/DiffuseTextureVert.vs");
-		std::string diffueShaderFragment = fileOp.readFile("shaders/DiffuseTextureFrag.fs");
-		diffuseShader = shader.load(diffuseShaderVertex.c_str(), diffueShaderFragment.c_str());
+
+		diffuseShader = ShaderLoader::load("shaders/DiffuseTextureVert.vs", "shaders/DiffuseTextureFrag.fs");
 	}
 	catch (std::invalid_argument& e)
 	{
@@ -239,7 +229,8 @@ void loadShaders()
 
 void loadTextures()
 {
-	greenTiledTexture = TextureLoader::load("C:\/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/GreenTiled.jpg");
+	greenTiledTexture = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/GreenTiled.jpg");
+	skyboxTextureAlias = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/skyboxAlias.jpg");
 }
 
 int main(int argc, char **argv)

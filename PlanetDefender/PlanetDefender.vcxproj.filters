@@ -30,9 +30,6 @@
     <ClCompile Include="FileOperations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderLoader.cpp">
-      <Filter>Source Files\utilities</Filter>
-    </ClCompile>
     <ClCompile Include="AppDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,8 +42,11 @@
     <ClCompile Include="stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="TextureLoader.cpp">
-      <Filter>Source Files\utilities</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,6 +122,12 @@
     <None Include="shaders\DiffuseTextureFrag.fs">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="shaders\SkyboxVert.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\SkyboxFrag.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Object Include="Models\Sphere.obj">
@@ -130,6 +136,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\GreenTiled.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Textures\skyboxAlias.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

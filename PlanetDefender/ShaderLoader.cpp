@@ -1,14 +1,25 @@
 #include "ShaderLoader.h"
+#include "FileOperations.h"
 
-GLuint ShaderLoader::load(const GLchar* vertexString, const GLchar* fragmentString)
+#include <iostream>
+#include <string>
+
+GLuint ShaderLoader::load(char* vertexFilepath, char* fragmentFilepath)
 {
+	FileOperations fileOp;
+
+	std::string vertexString = fileOp.readFile(vertexFilepath);
+	std::string fragmentString = fileOp.readFile(fragmentFilepath);
+	const GLchar* vertexGLchar = vertexString.c_str();
+	const GLchar* fragmentGLchar = fragmentString.c_str();
+
 	GLuint vertexShader, fragmentShader;
 	int success;
 	char infoLog[512];
 
 	//assign vertexShader from vertexString
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexString, NULL);
+	glShaderSource(vertexShader, 1, &vertexGLchar, NULL);
 	glCompileShader(vertexShader);
 
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
@@ -18,13 +29,13 @@ GLuint ShaderLoader::load(const GLchar* vertexString, const GLchar* fragmentStri
 	
 		glDeleteShader(vertexShader);
 
-		std::string errorMessage = "Shader vertexString compilation error\n"; 
+		std::string errorMessage = "Shader vertexString compilation error\n";
 		errorMessage += infoLog;
 		throw std::invalid_argument(errorMessage);
 	};
 
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentString, NULL);
+	glShaderSource(fragmentShader, 1, &fragmentGLchar, NULL);
 	glCompileShader(fragmentShader);
 
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
