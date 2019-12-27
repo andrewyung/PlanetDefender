@@ -163,13 +163,10 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 	glewInit();
 }
 
-int currentFrame;
 //wraps the game loop with anything that needs to be done before and/or after
 void gameLoopWrapper()
 {
-	int deltaFrame = WindowCanvas::frames - currentFrame;
-
-	WindowCanvas::deltaCallbackTime = (glutGet(GLUT_ELAPSED_TIME) - lastCallbackTime) * 0.001f;
+	WindowCanvas::deltaCallbackTime = (glutGet(GLUT_ELAPSED_TIME) - lastCallbackTime) * 0.001f;//
 	
 	if (WindowCanvas::deltaCallbackTime != 0)//can be increased to control frequency of external gmae loop call
 	{
@@ -177,8 +174,6 @@ void gameLoopWrapper()
 
 		externalGameLoop();
 	}
-
-	currentFrame = WindowCanvas::frames;
 }
 
 //register callbacks and starts glut main loop
