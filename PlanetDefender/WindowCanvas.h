@@ -18,6 +18,7 @@ class Light;
 
 struct VAOInfo
 {
+public:
 	enum Type
 	{
 		MODEL,
@@ -36,6 +37,8 @@ struct VAOInfo
 	GLuint indexBufferID;
 	GLuint shaderID;
 	std::vector<GLuint> textures;
+
+	bool transformUpdated = false;
 
 	bool batched = false;
 	bool instanced = false;

@@ -31,6 +31,7 @@ public:
 			{
 				vaoInfo->scale = glm::scale(glm::mat4(), scale);
 			}
+			vaoInfo->transformUpdated = true;
 		}
 	}
 
@@ -46,6 +47,7 @@ public:
 			{
 				vaoInfo->translation = glm::translate(glm::mat4(), translateVector) * vaoInfo->translation;
 			}
+			vaoInfo->transformUpdated = true;
 		}
 	}
 
@@ -61,6 +63,7 @@ public:
 			{
 				vaoInfo->rotation = glm::rotate(glm::mat4(), glm::radians(angle), axis) * vaoInfo->rotation;
 			}
+			vaoInfo->transformUpdated = true;
 		}
 	}
 

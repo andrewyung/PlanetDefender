@@ -163,9 +163,24 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 	glewInit();
 }
 
+// AABB collision with spheres and rays. This only checks models that has had transformation modified in the last frame (indicated by transformUpdated in VAOInfo)
+void collisionCheck()
+{
+	for (int i = 0; i < vertexArrayIDs.size(); i++)
+	{
+		VAOInfo* vaoInfo = vertexArrayIDs[i];
+		if (vaoInfo->drawing && vaoInfo->transformUpdated)
+		{
+
+		}
+	}
+}
+
 //wraps the game loop with anything that needs to be done before and/or after
 void gameLoopWrapper()
 {
+	collisionCheck();
+
 	WindowCanvas::deltaCallbackTime = (glutGet(GLUT_ELAPSED_TIME) - lastCallbackTime) * 0.001f;//
 	
 	if (WindowCanvas::deltaCallbackTime != 0)//can be increased to control frequency of external gmae loop call
