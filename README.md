@@ -11,6 +11,6 @@ Uses stb_image.h from https://github.com/nothings/stb/blob/master/stb_image.h
 
 ## TODO
 - Various shaders
-- Collision (Ray and spherical)
+- Collision detection and resolution http://www.peroxide.dk/papers/collision/collision.pdf
 - Game logic
 - Particle effects
