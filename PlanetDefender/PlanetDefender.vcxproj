@@ -122,6 +122,7 @@
     <ClCompile Include="AppDriver.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FileOperations.cpp" />
+    <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="stb_image.cpp" />
@@ -130,8 +131,10 @@
     <ClCompile Include="WindowCanvas.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppDriver.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="FileOperations.h" />
+    <ClInclude Include="GameScene.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />

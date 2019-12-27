@@ -2,7 +2,8 @@
 class AppDriver
 {
 public:
-	AppDriver();
-	~AppDriver();
+	static bool leftMouseDown;
+	static bool rightMouseDown;
+	static int lastMouseX, lastMouseY;
 };
 

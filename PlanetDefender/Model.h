@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "Vertex.h"
 #include "WindowCanvas.h"
@@ -10,6 +11,8 @@ class Model
 public:
 	Model(std::vector<Vertex> &vertexData, std::vector<int> &indexData) :
 		vertexData(vertexData), indexData(indexData) {};
+
+	std::string name;
 
 	std::vector<Vertex> vertexData;
 	std::vector<int> indexData;
@@ -109,6 +112,11 @@ protected:
 	void setVAOInfo(VAOInfo &index)
 	{
 		this->vaoInfo = &index;
+		// Set the name of this model to the pointer location of vaoInfo if not already named
+		if (vaoInfo != nullptr && name.size() == 0)
+		{
+			name = reinterpret_cast<const char*>(&vaoInfo);
+		}
 	}
 
 	friend class WindowCanvas;

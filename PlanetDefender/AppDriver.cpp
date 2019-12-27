@@ -3,6 +3,7 @@
 #include <iostream>
 #include <filesystem>
 
+#include "GameScene.h"
 #include "WindowCanvas.h"
 #include "ModelLoader.h"
 #include "FileOperations.h"
@@ -14,14 +15,7 @@
 
 using namespace std;
 
-GLuint diffuseShader;
-GLuint greenTiledTexture, skyboxTextureAlias;
-
-Model* planet = ModelLoader::loadModel("Sphere.obj");
-
-Model* test = ModelLoader::createPrimitive(ModelLoader::QUAD);
-
-Camera mainCamera;
+GameScene *scene = new GameScene();
 
 int currentControlledLightIndex = 0; //used to switch between lights to move around
 
@@ -32,28 +26,35 @@ int lastMouseX, lastMouseY;
 //called once at the beginning
 void gameInitialization()
 {
-	WindowCanvas::addSkybox(skyboxTextureAlias);
+	scene->loadTextures();
+	scene->loadShaders();
+
+	WindowCanvas::addSkybox(scene->skyboxTextureAlias);
+
+	scene->planet = ModelLoader::loadModel("Sphere.obj");
+
+	scene->test = ModelLoader::createPrimitive(ModelLoader::QUAD);
 
 	//camera
-	WindowCanvas::setCamera(mainCamera);
+	WindowCanvas::setCamera(scene->mainCamera);
 	//translate camera to view test objects (since camera is at origin)
-	mainCamera.translate(glm::vec3(0, 0, -3), true);
+	scene->mainCamera.translate(glm::vec3(0, 0, -3), true);
 
 	// Triangularize
-	planet->textures.push_back(greenTiledTexture);
-	planet->shader = diffuseShader;
+	scene->planet->textures.push_back(scene->greenTiledTexture);
+	scene->planet->shader = scene->diffuseShader;
 
-	WindowCanvas::addModel(*planet, false);
+	WindowCanvas::addModel(*(scene->planet), false);
 
-	WindowCanvas::addModel(*test, false);
+	WindowCanvas::addModel(*(scene->test), false);
 }
 
 //called repeatly as soon as possible
 void gameLoop()
 {
-	test->rotate(WindowCanvas::deltaCallbackTime * 90, glm::vec3(1.0f, 0.0f, 0.0f), false);
+	scene->test->rotate(WindowCanvas::deltaCallbackTime * 90, glm::vec3(1.0f, 0.0f, 0.0f), false);
 
-	test->translate(glm::vec3(0, WindowCanvas::deltaCallbackTime * 5, 0), false);
+	scene->test->translate(glm::vec3(0, WindowCanvas::deltaCallbackTime * 5, 0), false);
 	/*
 	//std::cout << WindowCanvas::frames << std::endl;
 	if (WindowCanvas::frames > 200)
@@ -76,12 +77,12 @@ void mouseCallback(int button, int state, int x, int y)
 		if (button == 3)
 		{
 			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, -0.1, 0));
-			mainCamera.translate(glm::vec3(0, 0, 0.1), true);
+			scene->mainCamera.translate(glm::vec3(0, 0, 0.1), true);
 		}
 		else
 		{
 			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, 0.1, 0));
-			mainCamera.translate(glm::vec3(0, 0, -0.1), true);
+			scene->mainCamera.translate(glm::vec3(0, 0, -0.1), true);
 		}
 	}
 	else if (button == 0)
@@ -116,12 +117,12 @@ void mouseMotionCallback(int x, int y)
 {
 	if (leftMouseDown)
 	{
-		mainCamera.translate(glm::vec3(x - lastMouseX, lastMouseY - y, 0) * WindowCanvas::deltaCallbackTime, true);
+		scene->mainCamera.translate(glm::vec3(x - lastMouseX, lastMouseY - y, 0) * WindowCanvas::deltaCallbackTime, true);
 	}
 	if (rightMouseDown)
 	{
-		mainCamera.rotate(glm::vec3(x - lastMouseX, 0, 0), true);
-		mainCamera.rotate(glm::vec3(0, y - lastMouseY, 0), true);
+		scene->mainCamera.rotate(glm::vec3(x - lastMouseX, 0, 0), true);
+		scene->mainCamera.rotate(glm::vec3(0, y - lastMouseY, 0), true);
 	}
 	if (leftMouseDown || rightMouseDown)
 	{
@@ -136,36 +137,36 @@ void keyboardCallback(unsigned char key, int x, int y)
 	//rotate doesnt currently work
 	if (key == 's')
 	{
-		mainCamera.rotate(glm::vec3(0, 5, 0));
+		scene->mainCamera.rotate(glm::vec3(0, 5, 0));
 		std::cout << WindowCanvas::deltaCallbackTime << " : " << (float)WindowCanvas::frames << std::endl;
 
 	}
 	else if (key == 'w')
 	{
-		mainCamera.rotate(glm::vec3(0, -5, 0));
+		scene->mainCamera.rotate(glm::vec3(0, -5, 0));
 	}
 	
 	if (key == 'd')
 	{
-		mainCamera.rotate(glm::vec3(5, 0, 0));
+		scene->mainCamera.rotate(glm::vec3(5, 0, 0));
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 
 	}
 	else if (key == 'a')
 	{
-		mainCamera.rotate(glm::vec3(-5, 0, 0));
+		scene->mainCamera.rotate(glm::vec3(-5, 0, 0));
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 	}
 
 	if (key == 'q')
 	{
-		mainCamera.rotate(glm::vec3(0, 0, -5));
+		scene->mainCamera.rotate(glm::vec3(0, 0, -5));
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 
 	}
 	else if (key == 'e')
 	{
-		mainCamera.rotate(glm::vec3(0, 0, 5));
+		scene->mainCamera.rotate(glm::vec3(0, 0, 5));
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 	}
 
@@ -204,44 +205,12 @@ void keyboardCallback(unsigned char key, int x, int y)
 	}
 }
 
-void loadShaders()
-{
-	//load shaders
-	try
-	{
-		GLuint shaderID = ShaderLoader::load("shaders/DefaultVertex.vs", "shaders/DefaultFragment.fs");
-		//set a shader for models to use if not set
-		WindowCanvas::setDefaultShader(shaderID);
-
-		GLuint particleShaderID = ShaderLoader::load("shaders/DefaultParticleVertex.vs", "shaders/DefaultFragment.fs");
-		WindowCanvas::setDefaultParticleShader(particleShaderID);
-
-
-		diffuseShader = ShaderLoader::load("shaders/DiffuseTextureVert.vs", "shaders/DiffuseTextureFrag.fs");
-	}
-	catch (std::invalid_argument& e)
-	{
-		std::cout << "Could not set default shader : " << e.what() << std::endl;
-
-		system("pause");
-	}
-}
-
-void loadTextures()
-{
-	greenTiledTexture = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/GreenTiled.jpg");
-	skyboxTextureAlias = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/skyboxAlias.jpg");
-}
-
 int main(int argc, char **argv)
 {
 
 	WindowCanvas canvas;
 
 	WindowCanvas::initializeWindow(argc, argv);
-	
-	loadTextures();
-	loadShaders();
 	
 	//add models and assign shaders to models if desired otherwise default shader is used.
 	//model1->shader = shaderID1;
