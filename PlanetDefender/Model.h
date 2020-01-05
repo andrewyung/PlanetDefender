@@ -17,6 +17,8 @@ public:
 	std::vector<Vertex> vertexData;
 	std::vector<int> indexData;
 
+	ColliderProperties colliderProp;
+
 	GLuint shader;	
 	std::vector<GLuint> textures{};
 

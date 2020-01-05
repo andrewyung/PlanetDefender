@@ -169,7 +169,7 @@ void collisionCheck()
 	for (int i = 0; i < vertexArrayIDs.size(); i++)
 	{
 		VAOInfo* vaoInfo = vertexArrayIDs[i];
-		if (vaoInfo->drawing && vaoInfo->transformUpdated)
+		if (vaoInfo->drawing && vaoInfo->transformUpdated && vaoInfo->colliderProp.size() > 0)
 		{
 
 		}

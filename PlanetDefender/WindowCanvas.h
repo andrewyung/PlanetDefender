@@ -11,6 +11,7 @@
 
 #include "ShaderLoader.h"
 #include "Camera.h"
+#include "ColliderProperties.h"
 
 class Model;
 class Particles;
@@ -46,9 +47,12 @@ public:
 	Type renderType = MODEL;
 	int instances = 1;
 
+	std::vector<ColliderProperties> colliderProp;
+
 	//in bytes
 	int vertexDataByteSize;
 	int indexDataByteSize;
+	// Used to keep track and group static VAOs 
 	int nextAvailableVertexIndex;
 
 	glm::mat4 rotation;

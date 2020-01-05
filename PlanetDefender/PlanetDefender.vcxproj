@@ -133,6 +133,8 @@
   <ItemGroup>
     <ClInclude Include="AppDriver.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ColliderProperties.h" />
+    <ClInclude Include="EllipsoidCollider.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Light.h" />

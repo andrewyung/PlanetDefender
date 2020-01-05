@@ -98,6 +98,12 @@
     <ClInclude Include="AppDriver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ColliderProperties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EllipsoidCollider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
