@@ -44,7 +44,7 @@ void gameInitialization()
 	scene->planet->textures.push_back(scene->greenTiledTexture);
 	scene->planet->shader = scene->diffuseShader;
 
-	scene->planet->addColliderProperty(EllipsoidCollider());
+	scene->planet->addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
 
 	WindowCanvas::addModel(*(scene->planet), false);
 	scene->planet->addVelocity(glm::vec3(0, 0.1, 0));
@@ -55,9 +55,9 @@ void gameInitialization()
 //called repeatly as soon as possible
 void gameLoop()
 {
-	scene->test->rotate(WindowCanvas::deltaCallbackTime * 90, glm::vec3(1.0f, 0.0f, 0.0f), false);
+	//scene->test->rotate(WindowCanvas::deltaCallbackTime * 90, glm::vec3(1.0f, 0.0f, 0.0f), false);
 
-	scene->test->translate(glm::vec3(0, WindowCanvas::deltaCallbackTime * 5, 0), false);
+	//scene->test->translate(glm::vec3(0, WindowCanvas::deltaCallbackTime * 5, 0), false);
 	/*
 	//std::cout << WindowCanvas::frames << std::endl;
 	if (WindowCanvas::frames > 200)

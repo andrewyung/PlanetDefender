@@ -96,7 +96,7 @@ public:
 		this->vaoInfo->drawing = toBeDrawn;
 	}
 
-	void addColliderProperty(ColliderProperties prop)
+	void addColliderProperty(std::shared_ptr<ColliderProperties> prop)
 	{
 		colliderProperties.push_back(prop);
 	}
@@ -104,7 +104,7 @@ public:
 	{
 		colliderProperties.erase(colliderProperties.begin() + index);
 	}
-	ColliderProperties getColliderProperty(int index)
+	std::shared_ptr<ColliderProperties> getColliderProperty(int index)
 	{
 		return colliderProperties[index];
 	}
@@ -132,7 +132,7 @@ protected:
 	GLsizeiptr indexDataOffset = -1;
 	VAOInfo *vaoInfo;
 
-	std::vector<ColliderProperties> colliderProperties;
+	std::vector<std::shared_ptr<ColliderProperties>> colliderProperties;
 
 	void setVertexBufferAndArrayData(GLsizeiptr vertexDataOffset, GLsizeiptr indexDataOffset)
 	{

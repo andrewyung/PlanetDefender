@@ -47,7 +47,7 @@ public:
 	Type renderType = MODEL;
 	int instances = 1;
 
-	std::vector<ColliderProperties> colliderProp;
+	std::vector<std::shared_ptr<ColliderProperties>> colliderProp;
 
 	//in bytes
 	int vertexDataByteSize;
