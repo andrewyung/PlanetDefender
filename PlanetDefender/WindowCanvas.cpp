@@ -6,6 +6,7 @@
 #include "Particles.h"
 #include "Light.h"
 #include "ModelLoader.h"
+#include "EllipsoidCollider.h"
 
 GLuint WindowCanvas::defaultShader;
 GLuint WindowCanvas::defaultParticleShader;
@@ -166,12 +167,24 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 // AABB collision with spheres and rays. This only checks models that has had transformation modified in the last frame (indicated by transformUpdated in VAOInfo)
 void collisionCheck()
 {
+	// For each VAO
 	for (int i = 0; i < vertexArrayIDs.size(); i++)
 	{
 		VAOInfo* vaoInfo = vertexArrayIDs[i];
 		// Has velocity and collider
 		if (vaoInfo->velocity.length != 0 && vaoInfo->colliderProp.size() > 0)
 		{
+			// For each collider property
+			for (int colliderPropIndex = 0; colliderPropIndex < vaoInfo->colliderProp.size(); colliderPropIndex++)
+			{
+				if (auto properties = std::dynamic_pointer_cast<EllipsoidCollider>(vaoInfo->colliderProp[colliderPropIndex]))
+				{
+					glm::vec3 ellipsoidSpace = glm::inverse(properties->dimensions);
+					
+					
+				}
+			}
+
 			// When no collision then move as expected
 			vaoInfo->translation = glm::translate(vaoInfo->translation, vaoInfo->velocity * WindowCanvas::deltaCallbackTime);
 		}
