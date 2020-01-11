@@ -12,6 +12,7 @@
 #include "Triangularization.h"
 #include "stb_image.h"
 #include "TextureLoader.h"
+#include "EllipsoidCollider.h"
 
 using namespace std;
 
@@ -40,11 +41,13 @@ void gameInitialization()
 	//translate camera to view test objects (since camera is at origin)
 	scene->mainCamera.translate(glm::vec3(0, 0, -3), true);
 
-	// Triangularize
 	scene->planet->textures.push_back(scene->greenTiledTexture);
 	scene->planet->shader = scene->diffuseShader;
 
+	scene->planet->addColliderProperty(EllipsoidCollider());
+
 	WindowCanvas::addModel(*(scene->planet), false);
+	scene->planet->addVelocity(glm::vec3(0, 0.1, 0));
 
 	WindowCanvas::addModel(*(scene->test), false);
 }

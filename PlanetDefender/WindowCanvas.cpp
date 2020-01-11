@@ -169,9 +169,11 @@ void collisionCheck()
 	for (int i = 0; i < vertexArrayIDs.size(); i++)
 	{
 		VAOInfo* vaoInfo = vertexArrayIDs[i];
-		if (vaoInfo->drawing && vaoInfo->transformUpdated && vaoInfo->colliderProp.size() > 0)
+		// Has velocity and collider
+		if (vaoInfo->velocity.length != 0 && vaoInfo->colliderProp.size() > 0)
 		{
-
+			// When no collision then move as expected
+			vaoInfo->translation = glm::translate(vaoInfo->translation, vaoInfo->velocity * WindowCanvas::deltaCallbackTime);
 		}
 	}
 }
@@ -179,9 +181,9 @@ void collisionCheck()
 //wraps the game loop with anything that needs to be done before and/or after
 void gameLoopWrapper()
 {
-	collisionCheck();
-
 	WindowCanvas::deltaCallbackTime = (glutGet(GLUT_ELAPSED_TIME) - lastCallbackTime) * 0.001f;//
+
+	collisionCheck();
 	
 	if (WindowCanvas::deltaCallbackTime != 0)//can be increased to control frequency of external gmae loop call
 	{
@@ -434,6 +436,8 @@ void WindowCanvas::addModel(Model &model, bool group, VAOInfo::Type renderType, 
 				currentVAOInfo->depthMask = depthMask;
 				currentVAOInfo->textures = model.textures;
 
+				currentVAOInfo->colliderProp.insert(currentVAOInfo->colliderProp.end(), model.colliderProperties.begin(), model.colliderProperties.end());
+
 				glBindVertexArray(currentVAOInfo->vertexArrayID);
 
 				int currentBufferSize;
@@ -503,6 +507,8 @@ void WindowCanvas::addModel(Model &model, bool group, VAOInfo::Type renderType, 
 	info->batched = group;
 	info->renderType = renderType;
 	info->depthMask = depthMask;
+
+	info->colliderProp.insert(info->colliderProp.end(), model.colliderProperties.begin(), model.colliderProperties.end());
 
 	glBindVertexArray(VAO);
 

@@ -16,9 +16,7 @@ public:
 
 	std::vector<Vertex> vertexData;
 	std::vector<int> indexData;
-
-	ColliderProperties colliderProp;
-
+	
 	GLuint shader;	
 	std::vector<GLuint> textures{};
 
@@ -36,7 +34,6 @@ public:
 			{
 				vaoInfo->scale = glm::scale(glm::mat4(), scale);
 			}
-			vaoInfo->transformUpdated = true;
 		}
 	}
 
@@ -52,8 +49,26 @@ public:
 			{
 				vaoInfo->translation = glm::translate(glm::mat4(), translateVector) * vaoInfo->translation;
 			}
-			vaoInfo->transformUpdated = true;
 		}
+	}
+
+	void addVelocity(glm::vec3 veloVector, bool localSpace = true)
+	{
+		if (vaoInfo != nullptr)
+		{
+			if (localSpace)
+			{
+				vaoInfo->velocity += glm::vec3(vaoInfo->rotation * glm::vec4(veloVector, 0));
+			}
+			else
+			{
+				vaoInfo->velocity = veloVector;
+			}
+		}
+	}
+	glm::vec3 getVelocity()
+	{
+		return vaoInfo->velocity;
 	}
 
 	void rotate(float angle, glm::vec3 axis, bool localSpace = true)
@@ -68,7 +83,6 @@ public:
 			{
 				vaoInfo->rotation = glm::rotate(glm::mat4(), glm::radians(angle), axis) * vaoInfo->rotation;
 			}
-			vaoInfo->transformUpdated = true;
 		}
 	}
 
@@ -80,6 +94,19 @@ public:
 			return;
 		}
 		this->vaoInfo->drawing = toBeDrawn;
+	}
+
+	void addColliderProperty(ColliderProperties prop)
+	{
+		colliderProperties.push_back(prop);
+	}
+	void removeColliderProperty(int index)
+	{
+		colliderProperties.erase(colliderProperties.begin() + index);
+	}
+	ColliderProperties getColliderProperty(int index)
+	{
+		return colliderProperties[index];
 	}
 
 	std::vector<float> getCenter()
@@ -104,6 +131,8 @@ protected:
 	GLsizeiptr vertexDataOffset = -1;
 	GLsizeiptr indexDataOffset = -1;
 	VAOInfo *vaoInfo;
+
+	std::vector<ColliderProperties> colliderProperties;
 
 	void setVertexBufferAndArrayData(GLsizeiptr vertexDataOffset, GLsizeiptr indexDataOffset)
 	{

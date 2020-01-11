@@ -39,7 +39,7 @@ public:
 	GLuint shaderID;
 	std::vector<GLuint> textures;
 
-	bool transformUpdated = false;
+	glm::vec3 velocity = glm::vec3();
 
 	bool batched = false;
 	bool instanced = false;
