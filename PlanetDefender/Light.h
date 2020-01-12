@@ -9,14 +9,14 @@ class Light : public Model
 {
 public:
 	glm::vec3 lightColor = glm::vec3();
-	float strength = 1;
+	float intensity = 1;
 
 	Light(std::vector<Vertex> &vertexData, std::vector<int> &indexData, glm::vec3 color, float strength) : Model(vertexData, indexData)
 	{
 		calculateCentroid();
 
 		lightColor = color;
-		this->strength = strength;
+		intensity = strength;
 	}
 	Light(std::vector<Vertex> &vertexData, std::vector<int> &indexData) : Model(vertexData, indexData)
 	{
@@ -27,7 +27,7 @@ public:
 	glm::vec4 getLightPosition()
 	{
 		//could possible use w for extra data
-		return glm::vec4(glm::vec3(WindowCanvas::getCurrentCameraModelMatrix() * (Model::vaoInfo->rotation * (Model::vaoInfo->scale * Model::vaoInfo->translation)) * glm::vec4(lightPosition, 1)), strength);
+		return glm::vec4(glm::vec3(WindowCanvas::getCurrentCameraModelMatrix() * (Model::vaoInfo->rotation * (Model::vaoInfo->scale * Model::vaoInfo->translation)) * glm::vec4(lightPosition, 1)), intensity);
 	}
 
 private:
