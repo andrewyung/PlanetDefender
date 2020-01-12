@@ -179,7 +179,8 @@ void collisionCheck()
 			{
 				if (auto properties = std::dynamic_pointer_cast<EllipsoidCollider>(vaoInfo->colliderProp[colliderPropIndex]))
 				{
-					glm::vec3 ellipsoidSpace = glm::inverse(properties->dimensions);
+					glm::mat4 transformation = vaoInfo->translation * vaoInfo->rotation * vaoInfo->scale * glm::scale(glm::mat4(), properties->dimensions); // include dimension!!!!
+					glm::mat4 ellipsoidSpace = glm::inverse(transformation);
 					
 					
 				}
