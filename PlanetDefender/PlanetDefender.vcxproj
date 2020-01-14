@@ -160,6 +160,8 @@
     <None Include="shaders\DefaultParticleVertex.vs" />
     <None Include="shaders\DefaultVertex.vs" />
     <None Include="shaders\DiffuseFrag.fs" />
+    <None Include="shaders\DiffuseNormalFrag.fs" />
+    <None Include="shaders\DiffuseNormalVert.vs" />
     <None Include="shaders\DiffuseTextureFrag.fs" />
     <None Include="shaders\DiffuseTextureVert.vs" />
     <None Include="shaders\DiffuseVert.vs" />

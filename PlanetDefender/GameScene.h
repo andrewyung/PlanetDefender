@@ -27,10 +27,11 @@ public:
 	std::vector<Shader> sceneShaders;
 	std::vector<Model> sceneModels;
 
-	GLuint diffuseShader, sunShader;
-	GLuint greenTiledTexture, skyboxTextureAlias;
+	GLuint diffuseShader, sunShader, diffuseNormalShader;
+	GLuint greenTiledTexture, skyboxTextureAlias, earthTexture, earthNormalTexture;
 
 	Model* planet;
+	Model* planetGreen;
 
 	Model* test;
 

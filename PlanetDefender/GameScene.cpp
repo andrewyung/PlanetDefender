@@ -11,6 +11,8 @@ void GameScene::loadTextures()
 {
 	greenTiledTexture = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/GreenTiled.jpg");
 	skyboxTextureAlias = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/skyboxAlias.jpg");
+	earthTexture = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/2k_earth_daymap.jpg");
+	earthNormalTexture = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/2k_earth_normal_map.jpg");
 }
 
 
@@ -29,6 +31,8 @@ void GameScene::loadShaders()
 		diffuseShader = ShaderLoader::load("shaders/DiffuseTextureVert.vs", "shaders/DiffuseTextureFrag.fs");
 
 		sunShader = ShaderLoader::load("shaders/ColorVertex.vs", "shaders/ColorFragment.fs");
+
+		diffuseNormalShader = ShaderLoader::load("shaders/DiffuseNormalVert.vs", "shaders/DiffuseNormalFrag.fs");
 	}
 	catch (std::invalid_argument& e)
 	{

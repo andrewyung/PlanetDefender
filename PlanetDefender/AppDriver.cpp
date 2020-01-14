@@ -33,6 +33,7 @@ void gameInitialization()
 	WindowCanvas::addSkybox(scene->skyboxTextureAlias);
 
 	scene->planet = ModelLoader::loadModel("Sphere.obj");
+	scene->planetGreen = ModelLoader::loadModel("Sphere.obj");
 
 	scene->test = ModelLoader::createPrimitive(ModelLoader::QUAD);
 
@@ -42,33 +43,40 @@ void gameInitialization()
 	//camera
 	WindowCanvas::setCamera(scene->mainCamera);
 	//translate camera to view test objects (since camera is at origin)
-	scene->mainCamera.translate(glm::vec3(0, 0, -3), true);
+	scene->mainCamera.translate(glm::vec3(2, 0, -4), true);
 
 
-	scene->sunLight->lightColor = glm::vec3(255/255, 255/255, 102/255);
-	scene->sunLight->intensity = 2;
+	scene->sunLight->lightColor = glm::vec3(255/255, 255/255, 255/255);
+	scene->sunLight->intensity = 1;
 
 	scene->sunModel->shader = scene->sunShader;
-	ShaderLoader::setVector4(scene->sunShader, "flat_color", glm::vec4(255, 255/255, 102/255, 1));
+	ShaderLoader::setVector4(scene->sunShader, "flat_color", glm::vec4(255, 255 / 255, 255 / 255, 0.3));
 
+	// Planet
+	scene->planetGreen->textures.push_back(scene->greenTiledTexture);
+	scene->planetGreen->shader = scene->diffuseShader;
 
-	scene->planet->textures.push_back(scene->greenTiledTexture);
-	scene->planet->shader = scene->diffuseShader;
+	scene->planetGreen->addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
+	WindowCanvas::addModel(*(scene->planetGreen), false);
+	scene->planetGreen->translate(glm::vec3(-6, 0, 0));
+
+	// Planet 
+	scene->planet->textures.push_back(scene->earthTexture);
+	scene->planet->textures.push_back(scene->earthNormalTexture);
+	scene->planet->shader = scene->diffuseNormalShader;
 	
 	scene->planet->addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
 
 	WindowCanvas::addModel(*(scene->planet), false);
 	scene->planet->addVelocity(glm::vec3(0, 0.1, 0));
 
-	//WindowCanvas::addModel(*(scene->test), false);
-
+	// Lights
 	WindowCanvas::addLight(*(scene->sunLight));
 	scene->sunLight->translate(glm::vec3(-2, 0, 0));
 	scene->sunLight->setDrawing(false);
 	WindowCanvas::addModel(*(scene->sunModel), false);
 	scene->sunModel->translate(glm::vec3(-2, 0, 0));
 	scene->sunModel->scale(glm::vec3(0.5, 0.5, 0.5));
-	ShaderLoader::setVector4(scene->sunShader, "flat_color", glm::vec4(255, 255 / 255, 102 / 255, 1));
 }
 
 //called repeatly as soon as possible

@@ -158,6 +158,12 @@
     <None Include="shaders\ColorVertex.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="shaders\DiffuseNormalVert.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\DiffuseNormalFrag.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Object Include="Models\Sphere.obj">
