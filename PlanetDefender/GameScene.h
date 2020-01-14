@@ -2,6 +2,7 @@
 
 #include "Model.h"
 #include "Camera.h"
+#include "Light.h"
 
 #include <vector>
 
@@ -26,12 +27,15 @@ public:
 	std::vector<Shader> sceneShaders;
 	std::vector<Model> sceneModels;
 
-	GLuint diffuseShader;
+	GLuint diffuseShader, sunShader;
 	GLuint greenTiledTexture, skyboxTextureAlias;
 
 	Model* planet;
 
 	Model* test;
+
+	Model* sunModel;
+	Light* sunLight;
 
 	Camera mainCamera;
 

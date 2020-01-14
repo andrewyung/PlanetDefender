@@ -121,6 +121,7 @@
   <ItemGroup>
     <ClCompile Include="AppDriver.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ColliderProperties.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
@@ -153,6 +154,8 @@
     <None Include="GreenFragment.fs" />
     <None Include="packages.config" />
     <None Include="shaders\ChangingVertex.vs" />
+    <None Include="shaders\ColorFragment.fs" />
+    <None Include="shaders\ColorVertex.vs" />
     <None Include="shaders\DefaultFragment.fs" />
     <None Include="shaders\DefaultParticleVertex.vs" />
     <None Include="shaders\DefaultVertex.vs" />
@@ -161,6 +164,8 @@
     <None Include="shaders\DiffuseTextureVert.vs" />
     <None Include="shaders\DiffuseVert.vs" />
     <None Include="shaders\ExpandingOnNormal.vs" />
+    <None Include="shaders\NormalColor.fs" />
+    <None Include="shaders\NormalColor.vs" />
     <None Include="shaders\SkyboxFrag.fs" />
     <None Include="shaders\SkyboxVert.vs" />
   </ItemGroup>

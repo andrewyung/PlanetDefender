@@ -51,6 +51,9 @@
     <ClCompile Include="GameScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ColliderProperties.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -141,6 +144,18 @@
       <Filter>Source Files\shaders</Filter>
     </None>
     <None Include="shaders\SkyboxFrag.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\NormalColor.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\NormalColor.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\ColorFragment.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\ColorVertex.vs">
       <Filter>Source Files\shaders</Filter>
     </None>
   </ItemGroup>

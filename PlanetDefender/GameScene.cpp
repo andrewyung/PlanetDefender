@@ -26,8 +26,9 @@ void GameScene::loadShaders()
 		GLuint particleShaderID = ShaderLoader::load("shaders/DefaultParticleVertex.vs", "shaders/DefaultFragment.fs");
 		WindowCanvas::setDefaultParticleShader(particleShaderID);
 
-
 		diffuseShader = ShaderLoader::load("shaders/DiffuseTextureVert.vs", "shaders/DiffuseTextureFrag.fs");
+
+		sunShader = ShaderLoader::load("shaders/ColorVertex.vs", "shaders/ColorFragment.fs");
 	}
 	catch (std::invalid_argument& e)
 	{

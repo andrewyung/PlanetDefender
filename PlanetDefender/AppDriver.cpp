@@ -36,25 +36,45 @@ void gameInitialization()
 
 	scene->test = ModelLoader::createPrimitive(ModelLoader::QUAD);
 
+	scene->sunModel = ModelLoader::loadModel("Sphere.obj");
+	scene->sunLight = ModelLoader::createLight();
+
 	//camera
 	WindowCanvas::setCamera(scene->mainCamera);
 	//translate camera to view test objects (since camera is at origin)
 	scene->mainCamera.translate(glm::vec3(0, 0, -3), true);
 
+
+	scene->sunLight->lightColor = glm::vec3(255/255, 255/255, 102/255);
+	scene->sunLight->intensity = 2;
+
+	scene->sunModel->shader = scene->sunShader;
+	ShaderLoader::setVector4(scene->sunShader, "flat_color", glm::vec4(255, 255/255, 102/255, 1));
+
+
 	scene->planet->textures.push_back(scene->greenTiledTexture);
 	scene->planet->shader = scene->diffuseShader;
-
+	
 	scene->planet->addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
 
 	WindowCanvas::addModel(*(scene->planet), false);
 	scene->planet->addVelocity(glm::vec3(0, 0.1, 0));
 
-	WindowCanvas::addModel(*(scene->test), false);
+	//WindowCanvas::addModel(*(scene->test), false);
+
+	WindowCanvas::addLight(*(scene->sunLight));
+	scene->sunLight->translate(glm::vec3(-2, 0, 0));
+	scene->sunLight->setDrawing(false);
+	WindowCanvas::addModel(*(scene->sunModel), false);
+	scene->sunModel->translate(glm::vec3(-2, 0, 0));
+	scene->sunModel->scale(glm::vec3(0.5, 0.5, 0.5));
+	ShaderLoader::setVector4(scene->sunShader, "flat_color", glm::vec4(255, 255 / 255, 102 / 255, 1));
 }
 
 //called repeatly as soon as possible
 void gameLoop()
 {
+	scene->planet->rotate(WindowCanvas::deltaCallbackTime * 15, glm::vec3(1.0f, 0.0f, 0.0f), false);
 	//scene->test->rotate(WindowCanvas::deltaCallbackTime * 90, glm::vec3(1.0f, 0.0f, 0.0f), false);
 
 	//scene->test->translate(glm::vec3(0, WindowCanvas::deltaCallbackTime * 5, 0), false);
