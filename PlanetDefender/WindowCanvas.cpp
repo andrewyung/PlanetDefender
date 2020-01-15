@@ -135,6 +135,14 @@ void renderScene(void) {
 	glBindVertexArray(0);
 }
 
+void glErrorCheck()
+{
+	GLenum err;
+	while ((err = glGetError())) {
+		std::cout << err;
+	}
+}
+
 //timer that queues for rendering at TARGET_FPS frames per second
 void frameTimer(int value)
 {
