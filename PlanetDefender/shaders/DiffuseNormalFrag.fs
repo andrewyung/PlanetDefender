@@ -1,4 +1,4 @@
-#version 330 core
+#version 420 core
 in vec4 v2fColor;
 in vec3 v2fWorldPos;
 in vec2 uvCoord;
@@ -8,8 +8,8 @@ out vec4 fragColor;
 #define MAX_LIGHTS 9
 uniform vec4 lightPos[MAX_LIGHTS];
 uniform vec3 lightColor[MAX_LIGHTS];
-uniform sampler2D mainTexture;
-uniform sampler2D normalTexture;
+layout(binding = 0) uniform sampler2D mainTexture;
+layout(binding = 1) uniform sampler2D normalTexture;
 
 void main()
 {
