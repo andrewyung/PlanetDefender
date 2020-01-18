@@ -3,6 +3,7 @@ layout (location = 0) in vec3 pos;
 layout (location = 1) in vec4 color;
 layout (location = 2) in vec2 uv;
 layout (location = 3) in vec3 normal;
+layout (location = 4) in vec3 tangent;
 
 uniform mat4 transform;
 uniform int time;
@@ -15,6 +16,7 @@ out vec4 v2fColor;
 out vec3 v2fWorldPos;
 out vec2 uvCoord;
 out vec3 v2fNormal;
+out vec3 v2fTangent;
 
 void main()
 {
@@ -22,5 +24,7 @@ void main()
 	v2fColor = color;
 	uvCoord = uv;
 	v2fWorldPos = vec3(model * transform * vec4(pos, 1.0f));
-	v2fNormal = mat3(model * transform) * normal;
+
+	v2fNormal = normalize(vec3(model * transform * vec4(normal, 0.0)));
+	v2fTangent = normalize(vec3(model * transform * vec4(tangent, 0.0)));
 }
