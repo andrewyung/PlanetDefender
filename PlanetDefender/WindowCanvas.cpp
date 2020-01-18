@@ -225,7 +225,8 @@ void WindowCanvas::start(void (*gameLoopCallback)(),
 						void(*mouseMotionCallback)(int x, int y))
 {
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_MULTISAMPLE);
+	glEnable(GL_MULTISAMPLE); 
+	//glEnable(GL_FRAMEBUFFER_SRGB); //Gamma color
 
 	gameInitializeCallback();
 	externalGameLoop = gameLoopCallback;

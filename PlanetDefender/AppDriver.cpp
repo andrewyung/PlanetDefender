@@ -64,7 +64,7 @@ void gameInitialization()
 	scene->planet->textures.push_back(scene->earthTexture);
 	scene->planet->textures.push_back(scene->earthNormalTexture);
 	scene->planet->shader = scene->diffuseNormalShader;
-	ShaderLoader::setVector4(scene->planet->shader, "ambientLight", 0.2f * glm::vec4(204/255, 221/255, 255/255, 1));
+	ShaderLoader::setVector4(scene->planet->shader, "ambientLight", 0.1f * glm::vec4(204/255, 221/255, 255/255, 1));
 	
 	scene->planet->addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
 
