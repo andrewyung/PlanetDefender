@@ -429,13 +429,13 @@ Model * ModelLoader::loadModel(std::string objPath)
 
 				indexData.push_back(curMesh.Indices[j] + lastVertexSize);
 				// Solve tangents
-				if (!v1->tangentSolved()) v1->calculateTangent(glm::vec3(v2->x, v2->y, v2->z) - v1->getPoint());
+				if (!v1->tangentSolved()) v1->calculateTangent(glm::vec3(0, 1, 0));
 
 				indexData.push_back(curMesh.Indices[j + 1] + lastVertexSize);
-				if (!v2->tangentSolved()) v2->calculateTangent(glm::vec3(v3->x, v3->y, v3->z) - v2->getPoint());
+				if (!v2->tangentSolved()) v2->calculateTangent(glm::vec3(0, 1, 0));
 
 				indexData.push_back(curMesh.Indices[j + 2] + lastVertexSize);
-				if (!v3->tangentSolved()) v3->calculateTangent(glm::vec3(v1->x, v1->y, v1->z) - v3->getPoint());
+				if (!v3->tangentSolved()) v3->calculateTangent(glm::vec3(0, 1, 0));
 
 				file << "T" << j / 3 << ": " << curMesh.Indices[j] + lastVertexSize << ", " << curMesh.Indices[j + 1] + lastVertexSize << ", " << curMesh.Indices[j + 2] + lastVertexSize << "\n";
 			}
