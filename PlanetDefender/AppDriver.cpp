@@ -47,7 +47,7 @@ void gameInitialization()
 
 
 	scene->sunLight->lightColor = glm::vec3(255/255, 255/255, 255/255);
-	scene->sunLight->intensity = 1;
+	scene->sunLight->intensity = 1.0f;
 
 	scene->sunModel->shader = scene->sunShader;
 	ShaderLoader::setVector4(scene->sunShader, "flat_color", glm::vec4(255, 255 / 255, 255 / 255, 0.3));
@@ -58,31 +58,35 @@ void gameInitialization()
 
 	scene->planetGreen->addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
 	WindowCanvas::addModel(*(scene->planetGreen), false);
-	scene->planetGreen->translate(glm::vec3(-6, 0, 0));
+	scene->planetGreen->translate(glm::vec3(-4, 0, 0));
 
 	// Planet 
 	scene->planet->textures.push_back(scene->earthTexture);
 	scene->planet->textures.push_back(scene->earthNormalTexture);
 	scene->planet->shader = scene->diffuseNormalShader;
+	ShaderLoader::setFloat(scene->planet->shader, "ambientLight", 0.1f);
 	
 	scene->planet->addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
 
 	WindowCanvas::addModel(*(scene->planet), false);
-	scene->planet->addVelocity(glm::vec3(0, 0.1, 0));
+	//scene->planet->addVelocity(glm::vec3(0, 0.1, 0));
 
 	// Lights
 	WindowCanvas::addLight(*(scene->sunLight));
-	scene->sunLight->translate(glm::vec3(-2, 0, 0));
-	scene->sunLight->setDrawing(false);
+	scene->sunLight->translate(glm::vec3(-2.5f, 0, 2.5f));
+	scene->sunLight->setDrawing(true);
 	WindowCanvas::addModel(*(scene->sunModel), false);
 	scene->sunModel->translate(glm::vec3(-2, 0, 0));
-	scene->sunModel->scale(glm::vec3(0.5, 0.5, 0.5));
+	scene->sunModel->scale(glm::vec3(0.3, 0.3, 0.3));
+	scene->sunModel->setDrawing(false);
 }
 
 //called repeatly as soon as possible
 void gameLoop()
 {
-	scene->planet->rotate(WindowCanvas::deltaCallbackTime * 15, glm::vec3(1.0f, 0.0f, 0.0f), false);
+	scene->sunLight->rotate(WindowCanvas::deltaCallbackTime * 20, glm::vec3(0.0f, 1.0f, 0.0f), false);
+	scene->sunLight->translate(glm::vec3(0, 0, WindowCanvas::deltaCallbackTime * 0.8f));
+
 	//scene->test->rotate(WindowCanvas::deltaCallbackTime * 90, glm::vec3(1.0f, 0.0f, 0.0f), false);
 
 	//scene->test->translate(glm::vec3(0, WindowCanvas::deltaCallbackTime * 5, 0), false);
