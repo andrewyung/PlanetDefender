@@ -9,7 +9,7 @@ out vec4 fragColor;
 #define MAX_LIGHTS 9
 uniform vec4 lightPos[MAX_LIGHTS];
 uniform vec3 lightColor[MAX_LIGHTS];
-uniform float ambientLight;
+uniform vec4 ambientLight;
 layout(binding = 0) uniform sampler2D mainTexture;
 layout(binding = 1) uniform sampler2D normalTexture;
 
@@ -31,10 +31,10 @@ void main()
 	float attenuation;
 	for (int i = 0; i < MAX_LIGHTS; i++)
 	{
-        attenuation = 1.0f / (length((v2fWorldPos - lightPos[i].xyz)));
+        attenuation = 1.0f / pow((length((v2fWorldPos - lightPos[i].xyz))), 2);
 		float dotProd = max(dot(normMapVec, normalize((v2fWorldPos - lightPos[i].xyz))), 0.0);
 		color += lightPos[i].w * (dotProd * attenuation * vec4(lightColor[i].xyz, dotProd));
     }
 
-	fragColor = (texture(mainTexture, uvCoord) + color) * (color.w + ambientLight);
+	fragColor = (texture(mainTexture, uvCoord) + ambientLight + color) * (color.w + ambientLight.w);
 }
