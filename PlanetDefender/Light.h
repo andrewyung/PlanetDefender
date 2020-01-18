@@ -30,6 +30,36 @@ public:
 		return glm::vec4(glm::vec3(WindowCanvas::getCurrentCameraModelMatrix() * (Model::vaoInfo->rotation * (Model::vaoInfo->scale * Model::vaoInfo->translation)) * glm::vec4(lightPosition, 1)), intensity);
 	}
 
+	void scale(glm::vec3 scale, bool localScale = true)
+	{
+		Model::scale(scale, localScale);
+
+		intensity += glm::length(scale);
+	}
+
+	void translate(glm::vec3 translateVector, bool localSpace = true)
+	{
+		Model::scale(translateVector, localSpace);
+
+		updateLightPosition();
+	}
+	
+	void rotate(float angle, glm::vec3 axis, bool localSpace = true)
+	{
+		Model::rotate(angle, axis, localSpace);
+
+		updateLightPosition();
+	}
+
+
+	void updateLightPosition()
+	{
+		lightPosition.x = vaoInfo->translation[0][3];
+		lightPosition.y = vaoInfo->translation[1][3];
+		lightPosition.z = vaoInfo->translation[2][3];
+	}
+
+
 private:
 	glm::vec3 lightPosition = glm::vec3();
 

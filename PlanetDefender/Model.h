@@ -22,7 +22,7 @@ public:
 
 	bool drawing() const { return vaoInfo->drawing; };
 
-	void scale(glm::vec3 scale, bool localScale = true)
+	virtual void scale(glm::vec3 scale, bool localScale = true)
 	{
 		if (vaoInfo != nullptr)
 		{
@@ -37,7 +37,7 @@ public:
 		}
 	}
 
-	void translate(glm::vec3 translateVector, bool localSpace = true)
+	virtual void translate(glm::vec3 translateVector, bool localSpace = true)
 	{
 		if (vaoInfo != nullptr)
 		{
@@ -71,7 +71,7 @@ public:
 		return vaoInfo->velocity;
 	}
 
-	void rotate(float angle, glm::vec3 axis, bool localSpace = true)
+	virtual void rotate(float angle, glm::vec3 axis, bool localSpace = true)
 	{
 		if (vaoInfo != nullptr)
 		{
