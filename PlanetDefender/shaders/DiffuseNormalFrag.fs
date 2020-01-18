@@ -9,6 +9,7 @@ out vec4 fragColor;
 #define MAX_LIGHTS 9
 uniform vec4 lightPos[MAX_LIGHTS];
 uniform vec3 lightColor[MAX_LIGHTS];
+uniform float ambientLight;
 layout(binding = 0) uniform sampler2D mainTexture;
 layout(binding = 1) uniform sampler2D normalTexture;
 
@@ -23,17 +24,17 @@ void main()
     // tangent to world space matrix
     mat3 TBN = transpose(mat3(tangent, biTangent, normalize(v2fNormal)));
 
-    normMapVec =  normMapVec * TBN;
+    normMapVec = normMapVec * TBN;
     normMapVec = normalize(normMapVec);
         
-	vec4 color = vec4(0, 0, 0, 1);
+	vec4 color = vec4(0, 0, 0, 0);
 	float attenuation;
 	for (int i = 0; i < MAX_LIGHTS; i++)
 	{
-        attenuation = 1.0f / (length(v2fWorldPos - lightPos[i].xyz));
-		float dotProd = max(dot(normMapVec, normalize(v2fWorldPos - lightPos[i].xyz)), 0.0f);
-		color += lightPos[i].w * (dotProd * attenuation * vec4(lightColor[i].xyz, 1));
-	}
+        attenuation = 1.0f / (length((v2fWorldPos - lightPos[i].xyz)));
+		float dotProd = max(dot(normMapVec, normalize((v2fWorldPos - lightPos[i].xyz))), 0.0);
+		color += lightPos[i].w * (dotProd * attenuation * vec4(lightColor[i].xyz, dotProd));
+    }
 
-	fragColor = texture(mainTexture, uvCoord) + color;
+	fragColor = (texture(mainTexture, uvCoord) + color) * (color.w + ambientLight);
 }
