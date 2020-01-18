@@ -1,8 +1,24 @@
 #pragma once
 
+#include <iostream>
+#include <glm/gtx/string_cast.hpp>
+
 class Vertex
 {
+private:
+	bool _tangentSolved = false;
 public:
+	//3d vector
+	float x, y, z;
+	//color with alpha
+	float r, g, b, a;
+	//normals
+	float xNormal, yNormal, zNormal;
+	//texture coordinate
+	float xUV, yUV;
+
+	float xTangent, yTangent, zTangent;
+
 	Vertex(float x, float y, float z)
 		:	x(x), y(y), z(z) {};
 
@@ -36,15 +52,26 @@ public:
 		this->a = a;
 	}
 
-	//void normalize();
-	
-	//3d vector
-	float x, y, z;
-	//color with alpha
-	float r, g, b, a;
-	//normals
-	float xNormal, yNormal, zNormal;
-	//texture coordinate
-	float xUV, yUV;
+	void calculateTangent(glm::vec3 vector)
+	{
+		glm::vec3 normal = glm::vec3(xNormal, yNormal, zNormal);
+		glm::vec3 tangent = glm::cross(normal, glm::normalize(vector));
+
+		xTangent = tangent.x;
+		yTangent = tangent.y;
+		zTangent = tangent.z;
+
+		_tangentSolved = true;
+	}
+
+	bool tangentSolved()
+	{
+		return _tangentSolved;
+	}
+
+	glm::vec3 getPoint()
+	{
+		return glm::vec3(x, y, z);
+	}
 };
 

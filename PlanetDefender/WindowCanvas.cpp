@@ -187,10 +187,12 @@ void collisionCheck()
 			{
 				if (auto properties = std::dynamic_pointer_cast<EllipsoidCollider>(vaoInfo->colliderProp[colliderPropIndex]))
 				{
-					glm::mat4 transformation = vaoInfo->translation * vaoInfo->rotation * vaoInfo->scale * glm::scale(glm::mat4(), properties->dimensions); // include dimension!!!!
+					glm::mat4 transformation = vaoInfo->translation * vaoInfo->rotation * vaoInfo->scale * glm::scale(glm::mat4(), properties->getDimensions()); // include dimension!!!!
 					glm::mat4 ellipsoidSpace = glm::inverse(transformation);
 					
-					
+
+					// With ellipsoidSpace the ellipsoid is a unit circle at (0, 0, 0)
+					//glm::distance()
 				}
 			}
 
@@ -315,6 +317,11 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 		vertexArrayData.push_back(currentVertex.xNormal);
 		vertexArrayData.push_back(currentVertex.yNormal);
 		vertexArrayData.push_back(currentVertex.zNormal);
+
+		//tangent
+		vertexArrayData.push_back(currentVertex.xTangent);
+		vertexArrayData.push_back(currentVertex.yTangent);
+		vertexArrayData.push_back(currentVertex.zTangent);
 	}
 
 
@@ -355,17 +362,20 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 	glBufferData(GL_ARRAY_BUFFER, vertexArrayData.size() * sizeof(float), &vertexArrayData[0], GL_STATIC_DRAW);
 
 	//interpretation of data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 15 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 15 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(7 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 15 * sizeof(float), (void*)(7 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_TRUE, 12 * sizeof(float), (void*)(9 * sizeof(float)));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_TRUE, 15 * sizeof(float), (void*)(9 * sizeof(float)));
 	glEnableVertexAttribArray(3);
+
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_TRUE, 15 * sizeof(float), (void*)(12 * sizeof(float)));
+	glEnableVertexAttribArray(4);
 	
 	//vbo containing particle transformations
 	glBindBuffer(GL_ARRAY_BUFFER, transformVBO);
@@ -373,7 +383,7 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 
 	// Transformation is particle input
 	int pos = glGetAttribLocation(particles.shader, "particleTransformations");
-	std::cout << "should be 4... " << pos << std::endl;
+	std::cout << "should be 4 attributes... " << pos << std::endl;
 	int pos1 = pos + 0;
 	int pos2 = pos + 1;
 	int pos3 = pos + 2;
@@ -382,10 +392,10 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 	glEnableVertexAttribArray(pos2);
 	glEnableVertexAttribArray(pos3);
 	glEnableVertexAttribArray(pos4);
-	glVertexAttribPointer(pos1, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(0));
-	glVertexAttribPointer(pos2, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(sizeof(float) * 4));
-	glVertexAttribPointer(pos3, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(sizeof(float) * 8));
-	glVertexAttribPointer(pos4, 4, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(sizeof(float) * 12));
+	glVertexAttribPointer(pos1, 5, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(0));
+	glVertexAttribPointer(pos2, 5, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(sizeof(float) * 4));
+	glVertexAttribPointer(pos3, 5, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4 * 4, (void*)(sizeof(float) * 8));
+	glVertexAttribPointer(pos4, 5, GL_FLOAT, GL_TRUE, sizeof(GLfloat) * 4 * 4, (void*)(sizeof(float) * 12));
 	glVertexAttribDivisor(pos1, 1);
 	glVertexAttribDivisor(pos2, 1);
 	glVertexAttribDivisor(pos3, 1);
@@ -444,6 +454,11 @@ void WindowCanvas::addModel(Model &model, bool group, VAOInfo::Type renderType, 
 		vertexArrayData.push_back(currentVertex.xNormal);
 		vertexArrayData.push_back(currentVertex.yNormal);
 		vertexArrayData.push_back(currentVertex.zNormal);
+
+		//tangent
+		vertexArrayData.push_back(currentVertex.xTangent);
+		vertexArrayData.push_back(currentVertex.yTangent);
+		vertexArrayData.push_back(currentVertex.zTangent);
 	}
 
 	if (group)
@@ -503,6 +518,7 @@ void WindowCanvas::addModel(Model &model, bool group, VAOInfo::Type renderType, 
 				currentVAOInfo->indexDataByteSize += model.indexData.size() * sizeof(int);
 				currentVAOInfo->nextAvailableVertexIndex += model.vertexData.size();
 
+
 				//printVertexBufferContent(currentVAOInfo->vertexBufferID);
 				//printIndexBufferContent(currentVAOInfo.indexBufferID);
 
@@ -542,17 +558,20 @@ void WindowCanvas::addModel(Model &model, bool group, VAOInfo::Type renderType, 
 	glBufferData(GL_ARRAY_BUFFER, DEFAULT_BUFFER_SIZE * bufferSizeMultiplier, &vertexArrayData[0], GL_STATIC_DRAW);
 
 	//interpretation of data
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12 * sizeof(float), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 15 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 15 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 12 * sizeof(float), (void*)(7 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 15 * sizeof(float), (void*)(7 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_TRUE, 12 * sizeof(float), (void*)(9 * sizeof(float)));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_TRUE, 15 * sizeof(float), (void*)(9 * sizeof(float)));
 	glEnableVertexAttribArray(3);
+
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_TRUE, 15 * sizeof(float), (void*)(12 * sizeof(float)));
+	glEnableVertexAttribArray(4);
 
 	bufferSizeMultiplier = ceil((model.indexData.size() * sizeof(int)) / (float) DEFAULT_BUFFER_SIZE);
 
