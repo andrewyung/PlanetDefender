@@ -22,5 +22,5 @@ void main()
 	v2fColor = color;
 	uvCoord = uv;
 	v2fWorldPos = vec3(model * transform * vec4(pos, 1.0f));
-	v2fNormal = mat3(transpose(inverse(model * transform))) * normal;
+	v2fNormal = mat3(model * transform) * normal;
 }
