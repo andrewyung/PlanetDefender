@@ -16,6 +16,7 @@ void GameScene::loadTextures()
 	// Is not for planet and low res but more noticeable change in normals
 	//earthNormalTexture = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/normal_mapping_normal_map.png");
 	earthNormalTexture = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/earth_normalmap.png");
+	earthSpecularTexture = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/2k_earth_specular_map.png");
 }
 
 

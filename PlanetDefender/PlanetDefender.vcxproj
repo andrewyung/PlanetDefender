@@ -122,6 +122,7 @@
     <ClCompile Include="AppDriver.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ColliderProperties.cpp" />
+    <ClCompile Include="EllipsoidCollider.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="ModelLoader.cpp" />

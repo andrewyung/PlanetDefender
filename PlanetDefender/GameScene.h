@@ -28,7 +28,8 @@ public:
 	std::vector<Model> sceneModels;
 
 	GLuint diffuseShader, sunShader, diffuseNormalShader;
-	GLuint greenTiledTexture, skyboxTextureAlias, earthTexture, earthNormalTexture;
+	GLuint greenTiledTexture, skyboxTextureAlias;
+	GLuint earthTexture, earthNormalTexture, earthSpecularTexture;
 
 	Model* planet;
 	Model* planetGreen;
