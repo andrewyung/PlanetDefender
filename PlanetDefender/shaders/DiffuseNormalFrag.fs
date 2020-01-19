@@ -31,8 +31,8 @@ void main()
 	float attenuation;
 	for (int i = 0; i < MAX_LIGHTS; i++)
 	{
-        attenuation = 1.0f / pow((length((v2fWorldPos - lightPos[i].xyz))), 2);
-		float dotProd = max(dot(normMapVec, normalize((v2fWorldPos - lightPos[i].xyz))), 0.0);
+        attenuation = 1.0f / pow(length(lightPos[i].xyz - v2fWorldPos), 2);
+		float dotProd = abs(dot(normMapVec, normalize(lightPos[i].xyz - v2fWorldPos)));
 		color += lightPos[i].w * (dotProd * attenuation * vec4(lightColor[i].xyz, dotProd));
     }
 
