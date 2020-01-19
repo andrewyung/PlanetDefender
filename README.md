@@ -1,16 +1,15 @@
 # Planet Defender
 Defend your planet from alien attackers.
 Work in progress.
-<img src="/gifs/SpaceScene.PNG?raw=true">
+<img src="/gifs/ShaderScene.PNG?raw=true">
 
-Uses stb_image.h from https://github.com/nothings/stb/blob/master/stb_image.h
+Uses stb_image.h from https://github.com/nothings/stb/blob/master/stb_image.h for textures
 
 ## Additional implementations
 - Texturing
 - Skybox
 
 ## TODO
-- Various shaders
 - Collision detection and resolution http://www.peroxide.dk/papers/collision/collision.pdf
 - Game logic
 - Particle effects
