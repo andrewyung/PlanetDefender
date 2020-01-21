@@ -22,6 +22,13 @@ int WindowCanvas::frames = 0;
 float WindowCanvas::deltaCallbackTime = 0;
 int lastCallbackTime;
 
+GLuint WindowCanvas::postprocessFramebuffer;
+GLuint WindowCanvas::textureBuffers[textureBuffersCount];
+GLuint WindowCanvas::textureBuffersAttachment[textureBuffersCount];
+
+GLuint WindowCanvas::bloomFBO;
+bool WindowCanvas::bloom;
+
 void(*externalGameLoop)();
 
 //used for debugging buffers
@@ -39,8 +46,18 @@ void printVertexBufferContent(GLuint bufferID)
 	}
 }
 
+void applyBloom()
+{
+
+}
+
 //render call
 void renderScene(void) {
+
+	if (WindowCanvas::bloom)
+	{
+		glDrawBuffers(WindowCanvas::textureBuffersCount, WindowCanvas::textureBuffersAttachment);
+	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(0.5, 0.5, 0.5, 1);
@@ -133,6 +150,40 @@ void renderScene(void) {
 
 	//clear vao binds
 	glBindVertexArray(0);
+
+	if (WindowCanvas::bloom) applyBloom();
+}
+
+void WindowCanvas::createPostprocessFrameBuffer()
+{
+	glGenFramebuffers(1, &bloomFBO);
+
+	glGenFramebuffers(1, &postprocessFramebuffer);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, postprocessFramebuffer);
+
+	glGenTextures(textureBuffersCount, textureBuffers);
+
+	for (unsigned int i{ 0 }; i < 2; i++)
+	{
+		glBindTexture(GL_TEXTURE_2D, textureBuffers[i]);
+		glTexImage2D(
+			GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL
+		);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		// attach texture to framebuffer
+		glFramebufferTexture2D(
+			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textureBuffers[i], 0
+		);
+	}
+
+	for (int i{ 0 }; i < textureBuffersCount; i++)
+	{
+		textureBuffersAttachment[i] = GL_COLOR_ATTACHMENT0 + i;
+	}
 }
 
 void glErrorCheck()
@@ -154,20 +205,21 @@ void frameTimer(int value)
 	//std::cout << WindowCanvas::deltaFrameTime << std::endl;
 }
 
+WindowCanvas::WindowCanvas()
+{
+	bloom = false;
+}
+
 //initalizes glut
 void WindowCanvas::initializeWindow(int argc, char **argv)
 {
-	int windowHeight = 900;
-	int windowWidth = 1600;
-
 	//create window
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutInitWindowPosition((GLUT_SCREEN_WIDTH / 2) - (windowWidth / 2), (GLUT_SCREEN_HEIGHT / 2) - (windowHeight / 2));
 	glutInitWindowSize(windowWidth, windowHeight);
 
-
-	glutCreateWindow("Some window");
+	glutCreateWindow("Window");
 
 	glewInit();
 }
@@ -238,6 +290,8 @@ void WindowCanvas::start(void (*gameLoopCallback)(),
 	glutKeyboardFunc(keyboardCallback);
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(mouseMotionCallback);
+
+	createPostprocessFrameBuffer();
 
 	glutMainLoop();
 }

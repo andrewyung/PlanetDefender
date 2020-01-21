@@ -63,6 +63,8 @@ public:
 class WindowCanvas
 {
 public:
+	WindowCanvas();
+
 	static std::vector<Light*> lights;
 
 	static void initializeWindow(int argc, char ** argv);
@@ -78,11 +80,23 @@ public:
 	static void addLight(Light &mainLight);
 	static glm::mat4 getCurrentCameraModelMatrix();
 
+	static void createPostprocessFrameBuffer();
+
+	static const int textureBuffersCount = 2;
+	static GLuint postprocessFramebuffer;
+	static GLuint textureBuffers[];
+	static GLuint textureBuffersAttachment[];
+
 	static int frames;
 	static float deltaCallbackTime;
+
+	static GLuint bloomFBO;
+	static bool bloom;
 private:
 	static GLuint defaultShader;
 	static GLuint defaultParticleShader;
 
-	static VAOInfo *skyboxVAO;
+	static const int windowHeight = 900;
+	static const int windowWidth = 1600;
+
 };
