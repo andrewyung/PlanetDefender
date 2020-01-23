@@ -5,7 +5,6 @@ in vec2 uvCoord;
 in vec3 v2fNormal;
 in vec3 v2fTangent;
 in vec3 v2fView;
-out vec4 fragColor;
 
 #define MAX_LIGHTS 9
 uniform vec4 lightPos[MAX_LIGHTS];
@@ -15,6 +14,9 @@ uniform float shininess = 1;
 layout(binding = 0) uniform sampler2D mainTexture;
 layout(binding = 1) uniform sampler2D normalTexture;
 layout(binding = 2) uniform sampler2D specularMap;
+
+layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 brightColor;
 
 void main()
 {
@@ -56,4 +58,10 @@ void main()
    
     //fragColor = vec4(specular, 1);
 	fragColor = (texture(mainTexture, uvCoord) + ambientLight + color + vec4(specular, 1)) * (color.w + ambientLight.w);
+
+    float brightness = dot(fragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+    if(brightness > 1.0)
+        brightColor = vec4(fragColor.rgb, 1.0);
+    else
+        brightColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
