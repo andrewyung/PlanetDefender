@@ -24,7 +24,8 @@ public:
 	{
 		MODEL,
 		SKYBOX,
-		PARTICLE
+		PARTICLE,
+		POSTPROCESS
 	};
 
 	//maybe remove vboID as not used
@@ -63,8 +64,6 @@ public:
 class WindowCanvas
 {
 public:
-	WindowCanvas();
-
 	static std::vector<Light*> lights;
 
 	static void initializeWindow(int argc, char ** argv);
@@ -83,15 +82,19 @@ public:
 	static void createPostprocessFrameBuffer();
 
 	static const int textureBuffersCount = 2;
-	static GLuint postprocessFramebuffer;
-	static GLuint textureBuffers[];
-	static GLuint textureBuffersAttachment[];
+	static GLuint postprocessFBO;
+	static void drawPostprocessQuad();
 
 	static int frames;
 	static float deltaCallbackTime;
 
+	static GLuint bloomBuffersAttachment[];
+	static GLuint bloomTextures[textureBuffersCount];
 	static GLuint bloomFBO;
 	static bool bloom;
+
+	static Model* postprocessingQuad;
+
 private:
 	static GLuint defaultShader;
 	static GLuint defaultParticleShader;

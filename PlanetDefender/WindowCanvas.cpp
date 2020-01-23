@@ -22,14 +22,22 @@ int WindowCanvas::frames = 0;
 float WindowCanvas::deltaCallbackTime = 0;
 int lastCallbackTime;
 
-GLuint WindowCanvas::postprocessFramebuffer;
-GLuint WindowCanvas::textureBuffers[textureBuffersCount];
-GLuint WindowCanvas::textureBuffersAttachment[textureBuffersCount];
+GLuint WindowCanvas::postprocessFBO;
+GLuint WindowCanvas::bloomTextures[textureBuffersCount];
+GLuint WindowCanvas::bloomBuffersAttachment[textureBuffersCount];
 
 GLuint WindowCanvas::bloomFBO;
 bool WindowCanvas::bloom;
 
+Model* WindowCanvas::postprocessingQuad;
+
 void(*externalGameLoop)();
+
+void checkFramebuffer()
+{
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer not complete!" << std::endl;
+}
 
 //used for debugging buffers
 void printVertexBufferContent(GLuint bufferID)
@@ -48,7 +56,33 @@ void printVertexBufferContent(GLuint bufferID)
 
 void applyBloom()
 {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	checkFramebuffer();
+
+	WindowCanvas::drawPostprocessQuad();
+}
+
+void WindowCanvas::drawPostprocessQuad()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	VAOInfo* currentVAO = WindowCanvas::postprocessingQuad->vaoInfo;
+
+	glUseProgram(currentVAO->shaderID);
+
+	shaderLoader.setMat4x4(currentVAO->shaderID, "transform", (currentVAO->translation * currentVAO->rotation * currentVAO->scale));
+
+	for (int i = 0; i < textureBuffersCount; i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, bloomTextures[i]);
+	}
+
+	glBindVertexArray(currentVAO->vertexArrayID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO->indexBufferID);
+
+	glDrawElements(GL_TRIANGLES, currentVAO->indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0);
 }
 
 //render call
@@ -56,11 +90,17 @@ void renderScene(void) {
 
 	if (WindowCanvas::bloom)
 	{
-		glDrawBuffers(WindowCanvas::textureBuffersCount, WindowCanvas::textureBuffersAttachment);
+		glBindFramebuffer(GL_FRAMEBUFFER, WindowCanvas::postprocessFBO);
+	}
+	else
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.5, 0.5, 0.5, 1);
+	glEnable(GL_DEPTH_TEST);
+
+	glClearColor(0.0, 0.0, 0.0, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	//better way of doing this rather than getting all positions every render frame
 	std::vector <glm::vec4> lightPositions;
@@ -71,13 +111,14 @@ void renderScene(void) {
 		lightColors.push_back(WindowCanvas::lights[i]->lightColor);
 	}
 
-	GLint currentShader;
+	GLint currentShader{ 0 };
 	//go through all VAOs that need to be rendered
 	for (int i = 0; i < vertexArrayIDs.size(); i++)
 	{
 		glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
 
 		VAOInfo *currentVAO = vertexArrayIDs[i];
+		// Skip post processing models
 		if (currentVAO->depthMask)
 		{
 			glDepthMask(GL_TRUE);
@@ -127,6 +168,7 @@ void renderScene(void) {
 					glBindTexture(GL_TEXTURE_2D, currentVAO->textures[i]);
 				}
 			}
+			glEnable(GL_TEXTURE_2D);
 
 			//std::cout << time << std::endl;
 			glBindVertexArray(currentVAO->vertexArrayID);
@@ -144,46 +186,72 @@ void renderScene(void) {
 			}
 		}
 	}
-	glBindTexture(GL_TEXTURE_2D, 0);
+
+	if (WindowCanvas::bloom)
+	{
+		glDrawBuffers(WindowCanvas::textureBuffersCount, WindowCanvas::bloomBuffersAttachment);
+
+		applyBloom();
+	}
 
 	glutSwapBuffers();
 
 	//clear vao binds
 	glBindVertexArray(0);
-
-	if (WindowCanvas::bloom) applyBloom();
 }
 
 void WindowCanvas::createPostprocessFrameBuffer()
 {
-	glGenFramebuffers(1, &bloomFBO);
+	//glGenFramebuffers(1, &bloomFBO); // FBO for screen quad
+	glGenFramebuffers(1, &postprocessFBO); // FBO for rendering all objects on
 
-	glGenFramebuffers(1, &postprocessFramebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, postprocessFBO);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, postprocessFramebuffer);
-
-	glGenTextures(textureBuffersCount, textureBuffers);
+	glGenTextures(textureBuffersCount, bloomTextures);
 
 	for (unsigned int i{ 0 }; i < 2; i++)
 	{
-		glBindTexture(GL_TEXTURE_2D, textureBuffers[i]);
-		glTexImage2D(
-			GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL
-		);
+		glBindTexture(GL_TEXTURE_2D, bloomTextures[i]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
 		// attach texture to framebuffer
 		glFramebufferTexture2D(
-			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textureBuffers[i], 0
+			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, bloomTextures[i], 0
 		);
 	}
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	for (int i{ 0 }; i < textureBuffersCount; i++)
 	{
-		textureBuffersAttachment[i] = GL_COLOR_ATTACHMENT0 + i;
+		bloomBuffersAttachment[i] = GL_COLOR_ATTACHMENT0 + i;
 	}
+
+	unsigned int rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowWidth, windowHeight);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	glDrawBuffers(WindowCanvas::textureBuffersCount, WindowCanvas::bloomBuffersAttachment);
+
+	checkFramebuffer();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	GLuint postprocessingShader = ShaderLoader::load("shaders/PostprocessVert.vs", "shaders/PostprocessFrag.fs");
+
+	postprocessingQuad = ModelLoader::createPrimitive(ModelLoader::QUAD);
+	postprocessingQuad->shader = postprocessingShader;
+	addModel(*postprocessingQuad, false);
+	postprocessingQuad->vaoInfo->renderType = VAOInfo::POSTPROCESS;
+	postprocessingQuad->rotate(-90, glm::vec3(0, 0, 1));
+	postprocessingQuad->rotate(180, glm::vec3(0, 1, 0));
+	postprocessingQuad->setDrawing(false);
 }
 
 void glErrorCheck()
@@ -205,11 +273,6 @@ void frameTimer(int value)
 	//std::cout << WindowCanvas::deltaFrameTime << std::endl;
 }
 
-WindowCanvas::WindowCanvas()
-{
-	bloom = false;
-}
-
 //initalizes glut
 void WindowCanvas::initializeWindow(int argc, char **argv)
 {
@@ -222,6 +285,8 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 	glutCreateWindow("Window");
 
 	glewInit();
+
+	createPostprocessFrameBuffer();
 }
 
 // AABB collision with spheres and rays. This only checks models that has had transformation modified in the last frame (indicated by transformUpdated in VAOInfo)
@@ -290,8 +355,6 @@ void WindowCanvas::start(void (*gameLoopCallback)(),
 	glutKeyboardFunc(keyboardCallback);
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(mouseMotionCallback);
-
-	createPostprocessFrameBuffer();
 
 	glutMainLoop();
 }

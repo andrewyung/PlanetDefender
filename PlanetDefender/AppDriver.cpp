@@ -47,7 +47,7 @@ void gameInitialization()
 
 
 	scene->sunLight->lightColor = glm::vec3(255/255, 255/255, 255/255);
-	scene->sunLight->intensity = 0.4f;
+	scene->sunLight->intensity = 1.4f;
 
 	scene->sunModel->shader = scene->sunShader;
 	ShaderLoader::setVector4(scene->sunShader, "flat_color", glm::vec4(255, 255 / 255, 255 / 255, 0.3));
@@ -81,6 +81,8 @@ void gameInitialization()
 	scene->sunModel->translate(glm::vec3(-2, 0, 0));
 	scene->sunModel->scale(glm::vec3(0.3, 0.3, 0.3));
 	scene->sunModel->setDrawing(false);
+
+	WindowCanvas::bloom = true;
 }
 
 //called repeatly as soon as possible
