@@ -30,7 +30,8 @@ public:
 		:	x(x), y(y), z(z), 
 			r(r), g(g), b(b), a(a), 
 			xUV(xUV), yUV(yUV),
-			xNormal(xNormal), yNormal(yNormal), zNormal(zNormal) {};
+			xNormal(xNormal), yNormal(yNormal), zNormal(zNormal),
+			xTangent(0), yTangent(0), zTangent(0) {};
 	//~Vertex();
 
 	void setNormals(float xNormal, float yNormal, float zNormal)
