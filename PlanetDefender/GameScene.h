@@ -27,7 +27,7 @@ public:
 	std::vector<Shader> sceneShaders;
 	std::vector<Model> sceneModels;
 
-	GLuint diffuseShader, sunShader, diffuseNormalShader;
+	GLuint diffuseShader, sunShader, diffuseNormalShader, lightShader;
 	GLuint greenTiledTexture, skyboxTextureAlias;
 	GLuint earthTexture, earthNormalTexture, earthSpecularTexture;
 

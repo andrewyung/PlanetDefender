@@ -39,6 +39,7 @@ void gameInitialization()
 
 	scene->sunModel = ModelLoader::loadModel("Sphere.obj");
 	scene->sunLight = ModelLoader::createLight();
+	scene->sunLight->shader = scene->lightShader;
 
 	//camera
 	WindowCanvas::setCamera(scene->mainCamera);
@@ -46,8 +47,9 @@ void gameInitialization()
 	scene->mainCamera.translate(glm::vec3(2, 0, -4), true);
 
 
-	scene->sunLight->lightColor = glm::vec3(255/255, 255/255, 255/255);
-	scene->sunLight->intensity = 1.4f;
+	ShaderLoader::setVector4(scene->sunLight->shader, "lightColor", glm::vec4(0.4f, 0.8f, 1, 1));
+	scene->sunLight->lightColor = glm::vec3(102/255, 212/255, 255/255);
+	scene->sunLight->intensity = 0.5f;
 
 	scene->sunModel->shader = scene->sunShader;
 	ShaderLoader::setVector4(scene->sunShader, "flat_color", glm::vec4(255, 255 / 255, 255 / 255, 0.3));
@@ -66,7 +68,7 @@ void gameInitialization()
 	scene->planet->textures.push_back(scene->earthSpecularTexture);
 	scene->planet->shader = scene->diffuseNormalShader;
 	ShaderLoader::setVector4(scene->planet->shader, "ambientLight", 0.1f * glm::vec4(204/255, 221/255, 255/255, 1));
-	ShaderLoader::setFloat(scene->planet->shader, "shininess", 0.6f);
+	ShaderLoader::setFloat(scene->planet->shader, "shininess", 1.6f);
 	
 	scene->planet->addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
 

@@ -37,6 +37,8 @@ void GameScene::loadShaders()
 		sunShader = ShaderLoader::load("shaders/ColorVertex.vs", "shaders/ColorFragment.fs");
 
 		diffuseNormalShader = ShaderLoader::load("shaders/DiffuseNormalVert.vs", "shaders/DiffuseNormalFrag.fs");
+
+		lightShader = ShaderLoader::load("shaders/LightVert.vs", "shaders/LightFrag.fs");
 	}
 	catch (std::invalid_argument& e)
 	{
