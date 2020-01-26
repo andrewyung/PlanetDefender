@@ -51,7 +51,7 @@ void gameInitialization()
 
 
 	ShaderLoader::setVector4(sunLight.shader, "lightColor", glm::vec4(0.4f, 0.8f, 1, 1));
-	sunLight.lightColor = glm::vec3(255/255, 212/255, 255/255);
+	sunLight.lightColor = glm::vec3(100.0f/255.0f, 182.0f/255.0f, 255.0f/255.0f);
 	sunLight.intensity = 0.5f;
 
 	sunModel.shader = scene.sunShader;
