@@ -7,6 +7,12 @@ GameScene::GameScene()
 {
 }
 
+void GameScene::loadAll()
+{
+	loadTextures();
+	loadShaders();
+}
+
 void GameScene::loadTextures()
 {
 	greenTiledTexture = TextureLoader::load("C:/Users/Andrew/Documents/GitHub/PlanetDefender/PlanetDefender/Textures/GreenTiled.jpg");

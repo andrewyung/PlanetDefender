@@ -13,6 +13,8 @@
 #include "Camera.h"
 #include "ColliderProperties.h"
 
+#define BLOOM_TEX_COUNT 2
+
 class Model;
 class Particles;
 class Light;
@@ -28,7 +30,7 @@ public:
 		POSTPROCESS
 	};
 
-	//maybe remove vboID as not used
+	VAOInfo() = default;
 	VAOInfo(GLuint vaoID, GLuint vboID, GLuint eboID, GLuint shaderID, std::vector<GLuint> textures, int indexDataSize, int vertexDataSize, int nextAvailableVertexIndex) :
 		vertexArrayID(vaoID), vertexBufferID(vboID), indexBufferID(eboID), shaderID(shaderID), textures(textures), indexDataByteSize(indexDataSize), vertexDataByteSize(vertexDataSize), nextAvailableVertexIndex(nextAvailableVertexIndex) 
 	{};
@@ -64,36 +66,40 @@ public:
 class WindowCanvas
 {
 public:
-	static std::vector<Light*> lights;
+	WindowCanvas();
 
-	static void initializeWindow(int argc, char ** argv);
-	static void start(void(*gameLoopCallback)(), void(*gameInitializeCallback)(), void(*mouseCallback)(int button, int state, int x, int y), void(*keyboardCallback)(unsigned char key, int x, int y), void(*mouseMotionCallback)(int x, int y));
+	std::vector<Light*> lights;
 
-	static void addParticles(Particles &particles, int instances, std::vector<glm::mat4> particleTransformations);
-	static void addModel(Model &model, bool group, VAOInfo::Type renderType = VAOInfo::Type::MODEL, bool depthMask = true);
-	static void addSkybox(GLuint skyboxTextures);
+	void initializeWindow(int argc, char ** argv);
+	void start(void(*gameLoopCallback)(), void(*gameInitializeCallback)(), void(*mouseCallback)(int button, int state, int x, int y), void(*keyboardCallback)(unsigned char key, int x, int y), void(*mouseMotionCallback)(int x, int y));
+
+	void addParticles(Particles &particles, int instances, std::vector<glm::mat4> particleTransformations);
+	void addModel(Model &model, bool group, VAOInfo::Type renderType = VAOInfo::Type::MODEL, bool depthMask = true);
+	void addSkybox(GLuint skyboxTextures);
 
 	static void setDefaultShader(GLuint shader); 
 	static void setDefaultParticleShader(GLuint shader);
-	static void setCamera(Camera &camera);
-	static void addLight(Light &mainLight);
+	void setCamera(Camera &camera);
+	void addLight(Light &mainLight);
 	static glm::mat4 getCurrentCameraModelMatrix();
 
-	static void createPostprocessFrameBuffer();
+	void createPostprocessFrameBuffer();
+	void WindowCanvas::createBloomFrameBuffer();
 
-	static const int textureBuffersCount = 2;
-	static GLuint postprocessFBO;
-	static void drawPostprocessQuad();
+	static void renderCall();
+
+	GLuint postprocessFBO;
+	void drawPostprocessQuad();
 
 	static int frames;
 	static float deltaCallbackTime;
 
-	static GLuint bloomBuffersAttachment[];
-	static GLuint bloomTextures[textureBuffersCount];
-	static GLuint bloomFBO;
-	static bool bloom;
+	GLuint bloomBuffersAttachment[BLOOM_TEX_COUNT];
+	GLuint bloomTextures[BLOOM_TEX_COUNT];
+	GLuint bloomFBO;
+	bool bloom;
 
-	static Model* postprocessingQuad;
+	std::unique_ptr<Model> postprocessingQuad;
 
 private:
 	static GLuint defaultShader;
@@ -101,5 +107,10 @@ private:
 
 	static const int windowHeight = 900;
 	static const int windowWidth = 1600;
+
+	void applyBloom();
+	void renderScene();
+
+	static WindowCanvas* instance;
 
 };

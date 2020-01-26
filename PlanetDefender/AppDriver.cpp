@@ -16,7 +16,8 @@
 
 using namespace std;
 
-GameScene *scene = new GameScene();
+GameScene scene;
+WindowCanvas canvas;
 
 int currentControlledLightIndex = 0; //used to switch between lights to move around
 
@@ -24,74 +25,78 @@ bool leftMouseDown = false;
 bool rightMouseDown = false;
 int lastMouseX, lastMouseY;
 
+Model planet = ModelLoader::loadModel("Sphere.obj");
+Model planetGreen = ModelLoader::loadModel("Sphere.obj");
+
+Model test = ModelLoader::createPrimitive(ModelLoader::QUAD);
+
+Model sunModel = ModelLoader::loadModel("Sphere.obj");
+Light sunLight = ModelLoader::createLight();
+
+Camera mainCamera;
+
 //called once at the beginning
 void gameInitialization()
 {
-	scene->loadTextures();
-	scene->loadShaders();
+	scene.loadAll();
 
-	WindowCanvas::addSkybox(scene->skyboxTextureAlias);
+	canvas.addSkybox(scene.skyboxTextureAlias);
 
-	scene->planet = ModelLoader::loadModel("Sphere.obj");
-	scene->planetGreen = ModelLoader::loadModel("Sphere.obj");
-
-	scene->test = ModelLoader::createPrimitive(ModelLoader::QUAD);
-
-	scene->sunModel = ModelLoader::loadModel("Sphere.obj");
-	scene->sunLight = ModelLoader::createLight();
-	scene->sunLight->shader = scene->lightShader;
+	sunLight.shader = scene.lightShader;
 
 	//camera
-	WindowCanvas::setCamera(scene->mainCamera);
+	canvas.setCamera(mainCamera);
 	//translate camera to view test objects (since camera is at origin)
-	scene->mainCamera.translate(glm::vec3(2, 0, -4), true);
+	mainCamera.translate(glm::vec3(0, 0, -4), true);
 
 
-	ShaderLoader::setVector4(scene->sunLight->shader, "lightColor", glm::vec4(0.4f, 0.8f, 1, 1));
-	scene->sunLight->lightColor = glm::vec3(102/255, 212/255, 255/255);
-	scene->sunLight->intensity = 0.5f;
+	ShaderLoader::setVector4(sunLight.shader, "lightColor", glm::vec4(0.4f, 0.8f, 1, 1));
+	sunLight.lightColor = glm::vec3(255/255, 212/255, 255/255);
+	sunLight.intensity = 0.5f;
 
-	scene->sunModel->shader = scene->sunShader;
-	ShaderLoader::setVector4(scene->sunShader, "flat_color", glm::vec4(255, 255 / 255, 255 / 255, 0.3));
+	sunModel.shader = scene.sunShader;
+	ShaderLoader::setVector4(scene.sunShader, "flat_color", glm::vec4(255, 255 / 255, 255 / 255, 0.3));
 
 	// Planet
-	scene->planetGreen->textures.push_back(scene->greenTiledTexture);
-	scene->planetGreen->shader = scene->diffuseShader;
+	planetGreen.textures.push_back(scene.greenTiledTexture);
+	planetGreen.shader = scene.diffuseShader;
 
-	scene->planetGreen->addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
-	WindowCanvas::addModel(*(scene->planetGreen), false);
-	scene->planetGreen->translate(glm::vec3(-4, 0, 0));
+	planetGreen.addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
+	canvas.addModel(planetGreen, false);
+	planetGreen.translate(glm::vec3(-4, 0, 0));
 
 	// Planet 
-	scene->planet->textures.push_back(scene->earthTexture);
-	scene->planet->textures.push_back(scene->earthNormalTexture);
-	scene->planet->textures.push_back(scene->earthSpecularTexture);
-	scene->planet->shader = scene->diffuseNormalShader;
-	ShaderLoader::setVector4(scene->planet->shader, "ambientLight", 0.1f * glm::vec4(204/255, 221/255, 255/255, 1));
-	ShaderLoader::setFloat(scene->planet->shader, "shininess", 1.6f);
+	planet.textures.push_back(scene.earthTexture);
+	planet.textures.push_back(scene.earthNormalTexture);
+	planet.textures.push_back(scene.earthSpecularTexture);
+	planet.shader = scene.diffuseNormalShader;
+	ShaderLoader::setVector4(planet.shader, "ambientLight", 0.05f * glm::vec4(204/255, 221/255, 255/255, 1));
+	ShaderLoader::setFloat(planet.shader, "shininess", 1.6f);
 	
-	scene->planet->addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
+	planet.addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
 
-	WindowCanvas::addModel(*(scene->planet), false);
-	//scene->planet->addVelocity(glm::vec3(0, 0.1, 0));
+	canvas.addModel(planet, false);
+	planetGreen.addVelocity(glm::vec3(0.02, 0.03, 0));
 
 	// Lights
-	WindowCanvas::addLight(*(scene->sunLight));
-	scene->sunLight->translate(glm::vec3(-2.5f, 0, 2.5f));
-	scene->sunLight->setDrawing(true);
-	WindowCanvas::addModel(*(scene->sunModel), false);
-	scene->sunModel->translate(glm::vec3(-2, 0, 0));
-	scene->sunModel->scale(glm::vec3(0.3, 0.3, 0.3));
-	scene->sunModel->setDrawing(false);
+	canvas.addLight(sunLight);
+	sunLight.translate(glm::vec3(-1, 0, 0));
+	sunLight.setDrawing(true);
+	canvas.addModel(sunModel, false);
+	sunModel.translate(glm::vec3(-2, 0, 0));
+	sunModel.scale(glm::vec3(0.3, 0.3, 0.3));
+	sunModel.setDrawing(false);
 
-	WindowCanvas::bloom = true;
+	//canvas.addModel(test, false);
+
+	canvas.bloom = false;
 }
 
 //called repeatly as soon as possible
 void gameLoop()
 {
-	scene->sunLight->rotate(WindowCanvas::deltaCallbackTime * 20, glm::vec3(0.0f, 1.0f, 0.0f), false);
-	scene->sunLight->translate(glm::vec3(0, 0, WindowCanvas::deltaCallbackTime * 0.8f));
+	sunLight.rotate(WindowCanvas::deltaCallbackTime * 30, glm::vec3(0.0f, 1.0f, 0.0f), false);
+	sunLight.translate(glm::vec3(0, 0, WindowCanvas::deltaCallbackTime * 0.8f));
 
 	//scene->test->rotate(WindowCanvas::deltaCallbackTime * 90, glm::vec3(1.0f, 0.0f, 0.0f), false);
 
@@ -118,12 +123,12 @@ void mouseCallback(int button, int state, int x, int y)
 		if (button == 3)
 		{
 			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, -0.1, 0));
-			scene->mainCamera.translate(glm::vec3(0, 0, 0.1), true);
+			mainCamera.translate(glm::vec3(0, 0, 0.1), true);
 		}
 		else
 		{
 			//mainCamera.ModelMatrix = glm::translate(mainCamera.ModelMatrix, glm::vec3(0, 0.1, 0));
-			scene->mainCamera.translate(glm::vec3(0, 0, -0.1), true);
+			mainCamera.translate(glm::vec3(0, 0, -0.1), true);
 		}
 	}
 	else if (button == 0)
@@ -158,12 +163,12 @@ void mouseMotionCallback(int x, int y)
 {
 	if (leftMouseDown)
 	{
-		scene->mainCamera.translate(glm::vec3(x - lastMouseX, lastMouseY - y, 0) * WindowCanvas::deltaCallbackTime, true);
+		mainCamera.translate(glm::vec3(x - lastMouseX, lastMouseY - y, 0) * WindowCanvas::deltaCallbackTime, true);
 	}
 	if (rightMouseDown)
 	{
-		scene->mainCamera.rotate(glm::vec3(x - lastMouseX, 0, 0), true);
-		scene->mainCamera.rotate(glm::vec3(0, y - lastMouseY, 0), true);
+		mainCamera.rotate(glm::vec3(x - lastMouseX, 0, 0), true);
+		mainCamera.rotate(glm::vec3(0, y - lastMouseY, 0), true);
 	}
 	if (leftMouseDown || rightMouseDown)
 	{
@@ -178,68 +183,68 @@ void keyboardCallback(unsigned char key, int x, int y)
 	//rotate doesnt currently work
 	if (key == 's')
 	{
-		scene->mainCamera.rotate(glm::vec3(0, 5, 0));
+		mainCamera.rotate(glm::vec3(0, 5, 0));
 		std::cout << WindowCanvas::deltaCallbackTime << " : " << (float)WindowCanvas::frames << std::endl;
 
 	}
 	else if (key == 'w')
 	{
-		scene->mainCamera.rotate(glm::vec3(0, -5, 0));
+		mainCamera.rotate(glm::vec3(0, -5, 0));
 	}
 	
 	if (key == 'd')
 	{
-		scene->mainCamera.rotate(glm::vec3(5, 0, 0));
+		mainCamera.rotate(glm::vec3(5, 0, 0));
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 
 	}
 	else if (key == 'a')
 	{
-		scene->mainCamera.rotate(glm::vec3(-5, 0, 0));
+		mainCamera.rotate(glm::vec3(-5, 0, 0));
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 	}
 
 	if (key == 'q')
 	{
-		scene->mainCamera.rotate(glm::vec3(0, 0, -5));
+		mainCamera.rotate(glm::vec3(0, 0, -5));
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 
 	}
 	else if (key == 'e')
 	{
-		scene->mainCamera.rotate(glm::vec3(0, 0, 5));
+		mainCamera.rotate(glm::vec3(0, 0, 5));
 		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
 	}
 
 	//light movement
 	if (key == 'i')
 	{
-		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, -0.3f));
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, -0.3f));
 	}
 	else if(key == 'k')
 	{
-		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, 0.3f));
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, 0.3f));
 	}
 	else if (key == 'j')
 	{
-		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(-0.3f, 0, 0));
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(-0.3f, 0, 0));
 	}
 	else if (key == 'l')
 	{
-		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(0.3f, 0, 0));
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0.3f, 0, 0));
 	}
 	else if (key == 'p')
 	{
-		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(0, 0.3f, 0));
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0.3f, 0));
 	}
 	else if (key == ';')
 	{
-		WindowCanvas::lights[currentControlledLightIndex]->translate(glm::vec3(0, -0.3f, 0));
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, -0.3f, 0));
 	}
 	else if (key == 'o')
 	{
 		currentControlledLightIndex++;
-		if (currentControlledLightIndex >= WindowCanvas::lights.size())
+		if (currentControlledLightIndex >= canvas.lights.size())
 		{
 			currentControlledLightIndex = 0;
 		}
@@ -248,16 +253,13 @@ void keyboardCallback(unsigned char key, int x, int y)
 
 int main(int argc, char **argv)
 {
-
-	WindowCanvas canvas;
-
-	WindowCanvas::initializeWindow(argc, argv);
+	canvas.initializeWindow(argc, argv);
 	
 	//add models and assign shaders to models if desired otherwise default shader is used.
 	//model1->shader = shaderID1;
 	//std::cout << "Model data : " << "indices - " << model1->indexData.size() << " : " << "vertices - " << model1->vertexData.size() << std::endl;
 
-	WindowCanvas::start(gameLoop, gameInitialization, mouseCallback, keyboardCallback, mouseMotionCallback);
+	canvas.start(gameLoop, gameInitialization, mouseCallback, keyboardCallback, mouseMotionCallback);
 
 	return 0;
 }

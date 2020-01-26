@@ -23,24 +23,16 @@ class GameScene
 public:
 	GameScene();
 
-	std::vector<Texture> sceneTextures;
-	std::vector<Shader> sceneShaders;
-	std::vector<Model> sceneModels;
-
 	GLuint diffuseShader, sunShader, diffuseNormalShader, lightShader;
 	GLuint greenTiledTexture, skyboxTextureAlias;
 	GLuint earthTexture, earthNormalTexture, earthSpecularTexture;
 
-	Model* planet;
-	Model* planetGreen;
 
-	Model* test;
+	std::vector<Texture> sceneTextures;
+	std::vector<Shader> sceneShaders;
+	std::vector<Model> sceneModels;
 
-	Model* sunModel;
-	Light* sunLight;
-
-	Camera mainCamera;
-
+	void loadAll();
 	void loadTextures();
 	void loadShaders();
 };

@@ -8,6 +8,8 @@
 #include "ModelLoader.h"
 #include "EllipsoidCollider.h"
 
+WindowCanvas* WindowCanvas::instance;
+
 GLuint WindowCanvas::defaultShader;
 GLuint WindowCanvas::defaultParticleShader;
 Camera *camera;
@@ -15,21 +17,11 @@ Camera *camera;
 const int TARGET_FPS = 60;
 const int DEFAULT_BUFFER_SIZE = 16;
 
-std::vector<Light*> WindowCanvas::lights;
-std::vector<VAOInfo*> vertexArrayIDs;
-ShaderLoader shaderLoader;
+std::vector<std::shared_ptr<VAOInfo>> vertexArrayIDs;
 int WindowCanvas::frames = 0;
 float WindowCanvas::deltaCallbackTime = 0;
+ShaderLoader shaderLoader;
 int lastCallbackTime;
-
-GLuint WindowCanvas::postprocessFBO;
-GLuint WindowCanvas::bloomTextures[textureBuffersCount];
-GLuint WindowCanvas::bloomBuffersAttachment[textureBuffersCount];
-
-GLuint WindowCanvas::bloomFBO;
-bool WindowCanvas::bloom;
-
-Model* WindowCanvas::postprocessingQuad;
 
 void(*externalGameLoop)();
 
@@ -54,26 +46,26 @@ void printVertexBufferContent(GLuint bufferID)
 	}
 }
 
-void applyBloom()
+void WindowCanvas::applyBloom()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	checkFramebuffer();
 
-	WindowCanvas::drawPostprocessQuad();
+	drawPostprocessQuad();
 }
 
 void WindowCanvas::drawPostprocessQuad()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	VAOInfo* currentVAO = WindowCanvas::postprocessingQuad->vaoInfo;
+	std::shared_ptr<VAOInfo> currentVAO = postprocessingQuad->vaoInfo;
 
 	glUseProgram(currentVAO->shaderID);
 
 	shaderLoader.setMat4x4(currentVAO->shaderID, "transform", (currentVAO->translation * currentVAO->rotation * currentVAO->scale));
 
-	for (int i = 0; i < textureBuffersCount; i++)
+	for (int i{ 0 }; i < BLOOM_TEX_COUNT; i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, bloomTextures[i]);
@@ -85,12 +77,17 @@ void WindowCanvas::drawPostprocessQuad()
 	glDrawElements(GL_TRIANGLES, currentVAO->indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0);
 }
 
-//render call
-void renderScene(void) {
+void WindowCanvas::renderCall()
+{
+	instance->renderScene();
+}
 
-	if (WindowCanvas::bloom)
+//render call
+void WindowCanvas::renderScene() 
+{
+	if (bloom)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, WindowCanvas::postprocessFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, postprocessFBO);
 	}
 	else
 	{
@@ -105,10 +102,10 @@ void renderScene(void) {
 	//better way of doing this rather than getting all positions every render frame
 	std::vector <glm::vec4> lightPositions;
 	std::vector <glm::vec3> lightColors;
-	for (int i = 0; i < WindowCanvas::lights.size(); i++)
+	for (int i = 0; i < lights.size(); i++)
 	{
-		lightPositions.push_back(WindowCanvas::lights[i]->getLightPosition());
-		lightColors.push_back(WindowCanvas::lights[i]->lightColor);
+		lightPositions.push_back(lights[i]->getLightPosition());
+		lightColors.push_back(lights[i]->lightColor);
 	}
 
 	GLint currentShader{ 0 };
@@ -117,7 +114,7 @@ void renderScene(void) {
 	{
 		glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
 
-		VAOInfo *currentVAO = vertexArrayIDs[i];
+		std::shared_ptr<VAOInfo> currentVAO = vertexArrayIDs[i];
 		// Skip post processing models
 		if (currentVAO->depthMask)
 		{
@@ -187,9 +184,9 @@ void renderScene(void) {
 		}
 	}
 
-	if (WindowCanvas::bloom)
+	if (bloom)
 	{
-		glDrawBuffers(WindowCanvas::textureBuffersCount, WindowCanvas::bloomBuffersAttachment);
+		glDrawBuffers(BLOOM_TEX_COUNT, bloomBuffersAttachment);
 
 		applyBloom();
 	}
@@ -200,6 +197,12 @@ void renderScene(void) {
 	glBindVertexArray(0);
 }
 
+void WindowCanvas::createBloomFrameBuffer()
+{
+	glGenFramebuffers(1, &bloomFBO);
+
+}
+
 void WindowCanvas::createPostprocessFrameBuffer()
 {
 	//glGenFramebuffers(1, &bloomFBO); // FBO for screen quad
@@ -207,7 +210,7 @@ void WindowCanvas::createPostprocessFrameBuffer()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, postprocessFBO);
 
-	glGenTextures(textureBuffersCount, bloomTextures);
+	glGenTextures(BLOOM_TEX_COUNT, bloomTextures);
 
 	for (unsigned int i{ 0 }; i < 2; i++)
 	{
@@ -224,7 +227,7 @@ void WindowCanvas::createPostprocessFrameBuffer()
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	for (int i{ 0 }; i < textureBuffersCount; i++)
+	for (int i{ 0 }; i < BLOOM_TEX_COUNT; i++)
 	{
 		bloomBuffersAttachment[i] = GL_COLOR_ATTACHMENT0 + i;
 	}
@@ -237,21 +240,21 @@ void WindowCanvas::createPostprocessFrameBuffer()
 
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
-	glDrawBuffers(WindowCanvas::textureBuffersCount, WindowCanvas::bloomBuffersAttachment);
+	glDrawBuffers(BLOOM_TEX_COUNT, bloomBuffersAttachment);
 
 	checkFramebuffer();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	GLuint postprocessingShader = ShaderLoader::load("shaders/PostprocessVert.vs", "shaders/PostprocessFrag.fs");
+	GLuint postprocessingShader = ShaderLoader::load("shaders/BloomVert.vs", "shaders/BloomFrag.fs");
 
-	postprocessingQuad = ModelLoader::createPrimitive(ModelLoader::QUAD);
+	postprocessingQuad = std::make_unique<Model>(ModelLoader::createPrimitive(ModelLoader::QUAD));
 	postprocessingQuad->shader = postprocessingShader;
 	addModel(*postprocessingQuad, false);
-	postprocessingQuad->vaoInfo->renderType = VAOInfo::POSTPROCESS;
 	postprocessingQuad->rotate(-90, glm::vec3(0, 0, 1));
 	postprocessingQuad->rotate(180, glm::vec3(0, 1, 0));
 	postprocessingQuad->setDrawing(false);
+	postprocessingQuad->getVAOInfo()->renderType = VAOInfo::POSTPROCESS;
 }
 
 void glErrorCheck()
@@ -273,6 +276,11 @@ void frameTimer(int value)
 	//std::cout << WindowCanvas::deltaFrameTime << std::endl;
 }
 
+WindowCanvas::WindowCanvas()
+{
+	instance = this;
+}
+
 //initalizes glut
 void WindowCanvas::initializeWindow(int argc, char **argv)
 {
@@ -286,7 +294,7 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 
 	glewInit();
 
-	createPostprocessFrameBuffer();
+	//createPostprocessFrameBuffer();
 }
 
 // AABB collision with spheres and rays. This only checks models that has had transformation modified in the last frame (indicated by transformUpdated in VAOInfo)
@@ -295,7 +303,7 @@ void collisionCheck()
 	// For each VAO
 	for (int i = 0; i < vertexArrayIDs.size(); i++)
 	{
-		VAOInfo* vaoInfo = vertexArrayIDs[i];
+		std::shared_ptr<VAOInfo> vaoInfo = vertexArrayIDs[i];
 		// Has velocity and collider
 		if (vaoInfo->velocity.length != 0 && vaoInfo->colliderProp.size() > 0)
 		{
@@ -351,7 +359,7 @@ void WindowCanvas::start(void (*gameLoopCallback)(),
 	// register callbacks
 	glutTimerFunc(0, frameTimer, 0);
 	glutIdleFunc(gameLoopWrapper);
-	glutDisplayFunc(renderScene);
+	glutDisplayFunc(renderCall);
 	glutKeyboardFunc(keyboardCallback);
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(mouseMotionCallback);
@@ -464,12 +472,12 @@ void WindowCanvas::addParticles(Particles &particles, int instances, std::vector
 	glGenBuffers(1, &EBO);
 	glGenBuffers(1, &transformVBO);
 
-	VAOInfo *info = new VAOInfo(VAO, VBO, EBO,								//id's
-		particles.shader,											//shader program
-		particles.textures,								//textures
-		particles.particleModel->indexData.size() * sizeof(int),		//index size of particle model
-		vertexArrayData.size() * sizeof(float),		//vertex size
-		particles.particleModel->vertexData.size());					//number of vertices of particle model
+	std::shared_ptr<VAOInfo> info = std::make_shared<VAOInfo>(VAO, VBO, EBO,											//id's
+															particles.shader,											//shader program
+															particles.textures,											//textures
+															particles.particleModel->indexData.size() * sizeof(int),	//index size of particle model
+															vertexArrayData.size() * sizeof(float),						//vertex size
+															particles.particleModel->vertexData.size());				//number of vertices of particle model
 	info->instanced = true;
 	info->instances = instances;
 	info->renderType = VAOInfo::Type::PARTICLE;
@@ -586,7 +594,7 @@ void WindowCanvas::addModel(Model &model, bool group, VAOInfo::Type renderType, 
 			//uses same shader, include in existing vao
 			if (model.shader == vertexArrayIDs[i]->shaderID && !vertexArrayIDs[i]->instanced && vertexArrayIDs[i]->batched)
 			{
-				VAOInfo *currentVAOInfo = vertexArrayIDs[i];
+				std::shared_ptr<VAOInfo> currentVAOInfo = vertexArrayIDs[i];
 				currentVAOInfo->renderType = renderType;
 				currentVAOInfo->depthMask = depthMask;
 				currentVAOInfo->textures = model.textures;
@@ -629,7 +637,7 @@ void WindowCanvas::addModel(Model &model, bool group, VAOInfo::Type renderType, 
 
 				//update where the data for model begins in the buffers
 				model.setVertexBufferAndArrayData(currentVAOInfo->vertexDataByteSize, currentVAOInfo->indexDataByteSize);
-				model.setVAOInfo(*currentVAOInfo);
+				model.setVAOInfo(currentVAOInfo);
 
 				//update size of buffers
 				currentVAOInfo->vertexDataByteSize += vertexArrayData.size() * sizeof(float);
@@ -654,12 +662,12 @@ void WindowCanvas::addModel(Model &model, bool group, VAOInfo::Type renderType, 
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 
-	VAOInfo *info = new VAOInfo(VAO, VBO, EBO,								//id's
-								model.shader,								//shader program
-								model.textures,								//textures
-								model.indexData.size() * sizeof(int),		//index size
-								vertexArrayData.size() * sizeof(float),		//vertex size
-								model.vertexData.size());					//number of vertices
+	std::shared_ptr<VAOInfo> info = std::make_shared<VAOInfo>(VAO, VBO, EBO,								//id's
+																model.shader,								//shader program
+																model.textures,								//textures
+																model.indexData.size() * sizeof(int),		//index size
+																vertexArrayData.size() * sizeof(float),		//vertex size
+																model.vertexData.size());					//number of vertices
 	info->batched = group;
 	info->renderType = renderType;
 	info->depthMask = depthMask;
@@ -698,7 +706,7 @@ void WindowCanvas::addModel(Model &model, bool group, VAOInfo::Type renderType, 
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, DEFAULT_BUFFER_SIZE * bufferSizeMultiplier, &model.indexData[0], GL_STATIC_DRAW);
 
 	//this model uses the vao that was pushed into the vao list right above
-	model.setVAOInfo(*info);
+	model.setVAOInfo(info);
 	//only object in buffer, so no offset
 	model.setVertexBufferAndArrayData(0, 0);
 
@@ -714,11 +722,11 @@ void WindowCanvas::addSkybox(GLuint skyboxTextures)
 
 	GLuint skyboxShader = ShaderLoader::load("shaders/SkyboxVert.vs", "shaders/SkyboxFrag.fs");
 
-	Model *skybox = ModelLoader::createPrimitive(ModelLoader::SKYBOX_CUBE);
-	skybox->shader = skyboxShader;
-	skybox->textures.push_back(skyboxTextures);
+	Model skybox = ModelLoader::createPrimitive(ModelLoader::SKYBOX_CUBE);
+	skybox.shader = skyboxShader;
+	skybox.textures.push_back(skyboxTextures);
 
-	addModel(*skybox, false, VAOInfo::Type::SKYBOX, false);
+	addModel(skybox, false, VAOInfo::Type::SKYBOX, false);
 }
 
 void WindowCanvas::setDefaultShader(GLuint shader)

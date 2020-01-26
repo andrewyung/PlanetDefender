@@ -33,27 +33,27 @@ vector<Model> Triangularization::EarTriangularize(Model m)
 		if (Triangularization::isConvexVertex(m.vertexData[i], m.vertexData[i + 1], m.vertexData[i + 2]))
 		{
 			// split ear
-			Model *ear = ModelLoader::createPrimitive(ModelLoader::TRIANGLE);
-			ear->vertexData[0].x = m.vertexData[i].x;
-			ear->vertexData[0].y = m.vertexData[i].y;
-			ear->vertexData[0].z = m.vertexData[i].z;
-			ear->vertexData[0].setColor(1, 0, 0, 1);
+			Model ear = ModelLoader::createPrimitive(ModelLoader::TRIANGLE);
+			ear.vertexData[0].x = m.vertexData[i].x;
+			ear.vertexData[0].y = m.vertexData[i].y;
+			ear.vertexData[0].z = m.vertexData[i].z;
+			ear.vertexData[0].setColor(1, 0, 0, 1);
 
-			ear->vertexData[1].x = m.vertexData[i + 1].x;
-			ear->vertexData[1].y = m.vertexData[i + 1].y;
-			ear->vertexData[1].z = m.vertexData[i + 1].z;
-			ear->vertexData[1].setColor(1, 0, 0, 1);
+			ear.vertexData[1].x = m.vertexData[i + 1].x;
+			ear.vertexData[1].y = m.vertexData[i + 1].y;
+			ear.vertexData[1].z = m.vertexData[i + 1].z;
+			ear.vertexData[1].setColor(1, 0, 0, 1);
 
-			ear->vertexData[2].x = m.vertexData[i + 2].x;
-			ear->vertexData[2].y = m.vertexData[i + 2].y;
-			ear->vertexData[2].z = m.vertexData[i + 2].z;
-			ear->vertexData[2].setColor(1, 0, 0, 1);
+			ear.vertexData[2].x = m.vertexData[i + 2].x;
+			ear.vertexData[2].y = m.vertexData[i + 2].y;
+			ear.vertexData[2].z = m.vertexData[i + 2].z;
+			ear.vertexData[2].setColor(1, 0, 0, 1);
 
 			// erase convex vertex from model
 			m.vertexData.erase(m.vertexData.begin() + (i + 1));
 			i++;
 
-			ears.push_back(*ear);
+			ears.push_back(ear);
 		}
 	}
 	return ears;

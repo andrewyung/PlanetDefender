@@ -5,7 +5,7 @@
 // OBJ_Loader - .obj Loader
 #include "OBJ_Loader.h"
 
-Model* ModelLoader::createPrimitive(PrimitiveTypes type)
+Model ModelLoader::createPrimitive(PrimitiveTypes type)
 {
 	std::vector<Vertex> vertexData;
 	std::vector<int> indexData;
@@ -298,12 +298,12 @@ Model* ModelLoader::createPrimitive(PrimitiveTypes type)
 		break;
 	}
 
-	Model* model = new Model(vertexData, indexData);
+	Model model(vertexData, indexData);
 
 	return model;
 }
 
-Light * ModelLoader::createLight()
+Light ModelLoader::createLight()
 {
 	std::vector<Vertex> vertexData;
 	std::vector<int> indexData;
@@ -362,12 +362,12 @@ Light * ModelLoader::createLight()
 		7, 5, 4
 	};
 
-	Light *light = new Light(vertexData, indexData);
+	Light light(vertexData, indexData);
 
 	return light;
 }
 
-Model * ModelLoader::loadModel(std::string objPath)
+Model ModelLoader::loadModel(std::string objPath)
 {
 	objPath = "Models/" + objPath;
 	std::vector<Vertex> vertexData;
@@ -475,12 +475,10 @@ Model * ModelLoader::loadModel(std::string objPath)
 
 		// Close File
 		file.close();
-
-		return nullptr;
 	}
 
-	Model* model = new Model(vertexData, indexData);
-	std::cout << "Loaded obj file... size : " << (model->vertexData).size() << " : indices : " << (model->indexData).size() << std::endl;
+	Model model(vertexData, indexData);
+	std::cout << "Loaded obj file... size : " << (model.vertexData).size() << " : indices : " << (model.indexData).size() << std::endl;
 
 	return model;
 }

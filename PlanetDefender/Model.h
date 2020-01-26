@@ -9,7 +9,7 @@
 class Model
 {
 public:
-	Model(std::vector<Vertex> &vertexData, std::vector<int> &indexData) :
+	Model(std::vector<Vertex> vertexData, std::vector<int> indexData) :
 		vertexData(vertexData), indexData(indexData) {};
 
 	std::string name;
@@ -24,46 +24,43 @@ public:
 
 	virtual void scale(glm::vec3 scale, bool localScale = true)
 	{
-		if (vaoInfo != nullptr)
+		if (vaoInfo == nullptr) return;
+
+		if (localScale)
 		{
-			if (localScale)
-			{
-				vaoInfo->scale = glm::scale(vaoInfo->scale, scale);
-			}
-			else
-			{
-				vaoInfo->scale = glm::scale(glm::mat4(), scale);
-			}
+			vaoInfo->scale = glm::scale(vaoInfo->scale, scale);
+		}
+		else
+		{
+			vaoInfo->scale = glm::scale(glm::mat4(), scale);
 		}
 	}
 
 	virtual void translate(glm::vec3 translateVector, bool localSpace = true)
 	{
-		if (vaoInfo != nullptr)
+		if (vaoInfo == nullptr) return;
+
+		if (localSpace)
 		{
-			if (localSpace)
-			{
-				vaoInfo->translation = vaoInfo->translation * glm::translate(glm::mat4(), glm::mat3(vaoInfo->rotation) * translateVector);
-			}
-			else
-			{
-				vaoInfo->translation = glm::translate(glm::mat4(), translateVector) * vaoInfo->translation;
-			}
+			vaoInfo->translation = vaoInfo->translation * glm::translate(glm::mat4(), glm::mat3(vaoInfo->rotation) * translateVector);
+		}
+		else
+		{
+			vaoInfo->translation = glm::translate(glm::mat4(), translateVector) * vaoInfo->translation;
 		}
 	}
 
 	void addVelocity(glm::vec3 veloVector, bool localSpace = true)
 	{
-		if (vaoInfo != nullptr)
+		if (vaoInfo == nullptr) return;
+
+		if (localSpace)
 		{
-			if (localSpace)
-			{
-				vaoInfo->velocity += glm::vec3(vaoInfo->rotation * glm::vec4(veloVector, 0));
-			}
-			else
-			{
-				vaoInfo->velocity = veloVector;
-			}
+			vaoInfo->velocity += glm::vec3(vaoInfo->rotation * glm::vec4(veloVector, 0));
+		}
+		else
+		{
+			vaoInfo->velocity = veloVector;
 		}
 	}
 	glm::vec3 getVelocity()
@@ -73,27 +70,23 @@ public:
 
 	virtual void rotate(float angle, glm::vec3 axis, bool localSpace = true)
 	{
-		if (vaoInfo != nullptr)
+		if (vaoInfo == nullptr) return;
+
+		if (localSpace)
 		{
-			if (localSpace)
-			{
-				vaoInfo->rotation = vaoInfo->rotation * glm::rotate(glm::mat4(), glm::radians(angle), axis);
-			}
-			else
-			{
-				vaoInfo->rotation = glm::rotate(glm::mat4(), glm::radians(angle), axis) * vaoInfo->rotation;
-			}
+			vaoInfo->rotation = vaoInfo->rotation * glm::rotate(glm::mat4(), glm::radians(angle), axis);
+		}
+		else
+		{
+			vaoInfo->rotation = glm::rotate(glm::mat4(), glm::radians(angle), axis) * vaoInfo->rotation;
 		}
 	}
 
 	void setDrawing(bool toBeDrawn)
 	{
-		if (vaoInfo == nullptr)
-		{
-			std::cout << "Model has not been added" << std::endl;
-			return;
-		}
-		this->vaoInfo->drawing = toBeDrawn;
+		if (vaoInfo == nullptr) return;
+
+		vaoInfo->drawing = toBeDrawn;
 	}
 
 	void addColliderProperty(std::shared_ptr<ColliderProperties> prop)
@@ -126,11 +119,16 @@ public:
 		return center;
 	}
 
+	std::shared_ptr<VAOInfo> getVAOInfo()
+	{
+		return vaoInfo;
+	}
+
 protected:
 	//Information used by WindowCanvas to manage Model
 	GLsizeiptr vertexDataOffset = -1;
 	GLsizeiptr indexDataOffset = -1;
-	VAOInfo *vaoInfo;
+	std::shared_ptr<VAOInfo> vaoInfo;
 
 	std::vector<std::shared_ptr<ColliderProperties>> colliderProperties;
 
@@ -140,14 +138,9 @@ protected:
 		this->indexDataOffset = indexDataOffset;
 	}
 
-	void setVAOInfo(VAOInfo &index)
+	void setVAOInfo(std::shared_ptr<VAOInfo> index)
 	{
-		this->vaoInfo = &index;
-		// Set the name of this model to the pointer location of vaoInfo if not already named
-		if (vaoInfo != nullptr && name.size() == 0)
-		{
-			name = reinterpret_cast<const char*>(&vaoInfo);
-		}
+		vaoInfo = index;
 	}
 
 	friend class WindowCanvas;

@@ -14,11 +14,11 @@ public:
 		//add more later
 	};
 
-	static Model* createPrimitive(PrimitiveTypes type);
+	static Model createPrimitive(PrimitiveTypes type);
 
-	static Light * createLight();
+	static Light createLight();
 
-	static Model* loadModel(std::string objPath);
+	static Model loadModel(std::string objPath);
 
 	~ModelLoader();
 };
