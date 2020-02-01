@@ -13,8 +13,7 @@
 #include "Camera.h"
 #include "ColliderProperties.h"
 
-const int BLOOM_TEX_COUNT = 1;
-const int PRE_PROCESS_TEX_COUNT = BLOOM_TEX_COUNT + 1;
+#define BLOOM_TEX_COUNT 2
 
 class Model;
 class Particles;
@@ -89,17 +88,15 @@ public:
 
 	static void renderCall();
 
-	GLuint preprocessFBO;
-	GLuint preprocessTextures[PRE_PROCESS_TEX_COUNT];
-	GLuint preprocessBuffersAttachment[PRE_PROCESS_TEX_COUNT];
-
+	GLuint postprocessFBO;
 	void drawPostprocessQuad();
 
 	static int frames;
 	static float deltaCallbackTime;
 
-	GLuint bloomTexture;
-	GLuint bloomFBO[2];
+	GLuint bloomBuffersAttachment[BLOOM_TEX_COUNT];
+	GLuint bloomTextures[BLOOM_TEX_COUNT];
+	GLuint bloomFBO;
 	bool bloom;
 
 	std::unique_ptr<Model> postprocessingQuad;
@@ -116,5 +113,4 @@ private:
 
 	static WindowCanvas* instance;
 
-	GLuint preprocessShader, postprocessShader, bloomShader;
 };

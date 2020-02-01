@@ -71,7 +71,7 @@ void gameInitialization()
 	planet.textures.push_back(scene.earthSpecularTexture);
 	planet.shader = scene.diffuseNormalShader;
 	ShaderLoader::setVector4(planet.shader, "ambientLight", 0.05f * glm::vec4(204/255, 221/255, 255/255, 1));
-	ShaderLoader::setFloat(planet.shader, "shininess", 1.0f);
+	ShaderLoader::setFloat(planet.shader, "shininess", 1.6f);
 	
 	planet.addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
 
@@ -80,8 +80,7 @@ void gameInitialization()
 
 	// Lights
 	canvas.addLight(sunLight);
-	sunLight.translate(glm::vec3(-1.2f, 0.4f, 0));
-	sunLight.scale(glm::vec3(0.2f, 0.2f, 0.2f));
+	sunLight.translate(glm::vec3(-1, 0, 0));
 	sunLight.setDrawing(true);
 	canvas.addModel(sunModel, false);
 	sunModel.translate(glm::vec3(-2, 0, 0));
@@ -96,7 +95,7 @@ void gameInitialization()
 //called repeatly as soon as possible
 void gameLoop()
 {
-	sunLight.rotate(WindowCanvas::deltaCallbackTime * 28, glm::vec3(0.0f, 1.0f, 0.0f), false);
+	sunLight.rotate(WindowCanvas::deltaCallbackTime * 30, glm::vec3(0.0f, 1.0f, 0.0f), false);
 	sunLight.translate(glm::vec3(0, 0, WindowCanvas::deltaCallbackTime * 0.8f));
 
 	//scene->test->rotate(WindowCanvas::deltaCallbackTime * 90, glm::vec3(1.0f, 0.0f, 0.0f), false);
@@ -181,10 +180,74 @@ void mouseMotionCallback(int x, int y)
 
 void keyboardCallback(unsigned char key, int x, int y)
 {
-	//light movement
-	if (key == 'b')
+	//rotate doesnt currently work
+	if (key == 's')
 	{
-		canvas.bloom = !canvas.bloom;
+		mainCamera.rotate(glm::vec3(0, 5, 0));
+		std::cout << WindowCanvas::deltaCallbackTime << " : " << (float)WindowCanvas::frames << std::endl;
+
+	}
+	else if (key == 'w')
+	{
+		mainCamera.rotate(glm::vec3(0, -5, 0));
+	}
+	
+	if (key == 'd')
+	{
+		mainCamera.rotate(glm::vec3(5, 0, 0));
+		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
+
+	}
+	else if (key == 'a')
+	{
+		mainCamera.rotate(glm::vec3(-5, 0, 0));
+		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
+	}
+
+	if (key == 'q')
+	{
+		mainCamera.rotate(glm::vec3(0, 0, -5));
+		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
+
+	}
+	else if (key == 'e')
+	{
+		mainCamera.rotate(glm::vec3(0, 0, 5));
+		//std::cout << WindowCanvas::deltaFrameTime << " : " << (float)WindowCanvas::frames << std::endl;
+	}
+
+	//light movement
+	if (key == 'i')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, -0.3f));
+	}
+	else if(key == 'k')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0, 0.3f));
+	}
+	else if (key == 'j')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(-0.3f, 0, 0));
+	}
+	else if (key == 'l')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0.3f, 0, 0));
+	}
+	else if (key == 'p')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, 0.3f, 0));
+	}
+	else if (key == ';')
+	{
+		canvas.lights[currentControlledLightIndex]->translate(glm::vec3(0, -0.3f, 0));
+	}
+	else if (key == 'o')
+	{
+		currentControlledLightIndex++;
+		if (currentControlledLightIndex >= canvas.lights.size())
+		{
+			currentControlledLightIndex = 0;
+		}
 	}
 }
 

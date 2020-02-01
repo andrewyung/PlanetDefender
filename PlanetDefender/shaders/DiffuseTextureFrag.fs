@@ -3,14 +3,12 @@ in vec4 v2fColor;
 in vec3 v2fWorldPos;
 in vec2 uvCoord;
 in vec3 v2fNormal;
+out vec4 fragColor;
 
 #define MAX_LIGHTS 9
 uniform vec4 lightPos[MAX_LIGHTS];
 uniform vec3 lightColor[MAX_LIGHTS];
 uniform sampler2D mainTexture;
-
-layout (location = 0) out vec4 fragColor;
-layout (location = 1) out vec4 brightColor;
 
 void main()
 {
@@ -24,5 +22,4 @@ void main()
 	}
 
 	fragColor = texture(mainTexture, uvCoord) + color;
-    brightColor = vec4(0,0,0,1);
 }
