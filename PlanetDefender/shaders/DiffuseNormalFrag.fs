@@ -49,13 +49,14 @@ void main()
         if (dot(normMapVec, -normalize(lightDir)) > 0)
         {
             specular += pow(max(dot(viewDir, reflectDir), 0.0), 32) * specularMap.xyz * lightColor[i].xyz * shininess;
-        }
 
-        attenuation = 1.0f / pow(length(lightDir), 2);
-		float dotProd = abs(dot(normMapVec, normalize(lightDir)));
-		color += lightPos[i].w * (dotProd * attenuation * vec4(lightColor[i].xyz, dotProd));
+            attenuation = 1.0f / pow(length(lightDir), 2);
+		    float dotProd = abs(dot(normMapVec, normalize(lightDir)));
+		    color += lightPos[i].w * (dotProd * attenuation * vec4(lightColor[i].xyz, dotProd));
+        }
     }
    
+    //fragColor = vec4(color.w, color.w, color.w, 1);
     //fragColor = vec4(specular, 1);
 	fragColor = (texture(mainTexture, uvCoord) + ambientLight + color + vec4(specular, 1)) * (color.w + ambientLight.w);
 
