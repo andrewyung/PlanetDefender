@@ -25,6 +25,8 @@ int lastCallbackTime;
 
 void(*externalGameLoop)();
 
+void glErrorCheck();
+
 void checkFramebuffer()
 {
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -48,15 +50,37 @@ void printVertexBufferContent(GLuint bufferID)
 
 void WindowCanvas::applyBloom()
 {
+	/*
+	postprocessingQuad->shader = bloomShader;
+	bool horizontal = true, first_iteration = true;
+	int amount = 0;
+	for (unsigned int i = 0; i < amount; i++)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, bloomFBO[horizontal]);
+		ShaderLoader::setInt(postprocessingQuad->shader, "horizontal", horizontal);
+		glActiveTexture(GL_TEXTURE0 + 1);
+		glBindTexture(
+			GL_TEXTURE_2D, first_iteration ? preprocessTextures[1] : bloomTexture
+		);
+
+		drawPostprocessQuad();
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+		horizontal = !horizontal;
+		if (first_iteration)
+			first_iteration = false;
+	}*/
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	checkFramebuffer();
-
+	postprocessingQuad->shader = postprocessShader;
 	drawPostprocessQuad();
 }
 
 void WindowCanvas::drawPostprocessQuad()
 {
+	glClearColor(0.0, 0.0, 0.0, 1);
+	glDisable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	std::shared_ptr<VAOInfo> currentVAO = postprocessingQuad->vaoInfo;
@@ -64,12 +88,19 @@ void WindowCanvas::drawPostprocessQuad()
 	glUseProgram(currentVAO->shaderID);
 
 	shaderLoader.setMat4x4(currentVAO->shaderID, "transform", (currentVAO->translation * currentVAO->rotation * currentVAO->scale));
-
-	for (int i{ 0 }; i < BLOOM_TEX_COUNT; i++)
+	/*
+	if (bloom)
+	{
+		glActiveTexture(GL_TEXTURE0 + 1);
+		glBindTexture(GL_TEXTURE_2D, bloomTexture);
+	}*/
+	for (int i{ 0 }; i < PRE_PROCESS_TEX_COUNT; i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, bloomTextures[i]);
+
+		glBindTexture(GL_TEXTURE_2D, preprocessTextures[i]);
 	}
+	glEnable(GL_TEXTURE_2D);
 
 	glBindVertexArray(currentVAO->vertexArrayID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO->indexBufferID);
@@ -87,7 +118,7 @@ void WindowCanvas::renderScene()
 {
 	if (bloom)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, postprocessFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, preprocessFBO);
 	}
 	else
 	{
@@ -186,7 +217,7 @@ void WindowCanvas::renderScene()
 
 	if (bloom)
 	{
-		glDrawBuffers(BLOOM_TEX_COUNT, bloomBuffersAttachment);
+		glDrawBuffers(PRE_PROCESS_TEX_COUNT, preprocessBuffersAttachment);
 
 		applyBloom();
 	}
@@ -199,22 +230,42 @@ void WindowCanvas::renderScene()
 
 void WindowCanvas::createBloomFrameBuffer()
 {
-	glGenFramebuffers(1, &bloomFBO);
+	glGenFramebuffers(2, bloomFBO);
 
+	glGenTextures(BLOOM_TEX_COUNT, &bloomTexture);
+
+	glBindTexture(GL_TEXTURE_2D, bloomTexture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	for (int i{ 0 }; i < 2; i++)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, bloomFBO[i]);
+
+		// attach texture to framebuffer
+		glFramebufferTexture2D(
+			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bloomTexture, 0
+		);
+	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void WindowCanvas::createPostprocessFrameBuffer()
 {
-	//glGenFramebuffers(1, &bloomFBO); // FBO for screen quad
-	glGenFramebuffers(1, &postprocessFBO); // FBO for rendering all objects on
+	// Pre process FBO
+	glGenFramebuffers(1, &preprocessFBO); // FBO for rendering all objects on
 
-	glBindFramebuffer(GL_FRAMEBUFFER, postprocessFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, preprocessFBO);
 
-	glGenTextures(BLOOM_TEX_COUNT, bloomTextures);
+	glGenTextures(PRE_PROCESS_TEX_COUNT, preprocessTextures);
 
-	for (unsigned int i{ 0 }; i < 2; i++)
+	for (unsigned int i{ 0 }; i < PRE_PROCESS_TEX_COUNT; i++)
 	{
-		glBindTexture(GL_TEXTURE_2D, bloomTextures[i]);
+		glBindTexture(GL_TEXTURE_2D, preprocessTextures[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -222,14 +273,15 @@ void WindowCanvas::createPostprocessFrameBuffer()
 
 		// attach texture to framebuffer
 		glFramebufferTexture2D(
-			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, bloomTextures[i], 0
+			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, preprocessTextures[i], 0
 		);
 	}
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	for (int i{ 0 }; i < BLOOM_TEX_COUNT; i++)
+	for (int i{ 0 }; i < PRE_PROCESS_TEX_COUNT; i++)
 	{
-		bloomBuffersAttachment[i] = GL_COLOR_ATTACHMENT0 + i;
+		preprocessBuffersAttachment[i] = GL_COLOR_ATTACHMENT0 + i;
 	}
 
 	unsigned int rbo;
@@ -240,21 +292,23 @@ void WindowCanvas::createPostprocessFrameBuffer()
 
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
-	glDrawBuffers(BLOOM_TEX_COUNT, bloomBuffersAttachment);
-
 	checkFramebuffer();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	GLuint postprocessingShader = ShaderLoader::load("shaders/BloomVert.vs", "shaders/BloomFrag.fs");
+	preprocessShader = ShaderLoader::load("shaders/PreprocessVert.vs", "shaders/PreprocessFrag.fs");
+	postprocessShader = ShaderLoader::load("shaders/PostprocessVert.vs", "shaders/PostprocessFrag.fs");
+	bloomShader = ShaderLoader::load("shaders/BloomVert.vs", "shaders/BloomFrag.fs");
 
 	postprocessingQuad = std::make_unique<Model>(ModelLoader::createPrimitive(ModelLoader::QUAD));
-	postprocessingQuad->shader = postprocessingShader;
+	postprocessingQuad->shader = preprocessShader;
 	addModel(*postprocessingQuad, false);
 	postprocessingQuad->rotate(-90, glm::vec3(0, 0, 1));
 	postprocessingQuad->rotate(180, glm::vec3(0, 1, 0));
 	postprocessingQuad->setDrawing(false);
 	postprocessingQuad->getVAOInfo()->renderType = VAOInfo::POSTPROCESS;
+
+	createBloomFrameBuffer();
 }
 
 void glErrorCheck()
@@ -294,7 +348,7 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 
 	glewInit();
 
-	//createPostprocessFrameBuffer();
+	createPostprocessFrameBuffer();
 }
 
 // AABB collision with spheres and rays. This only checks models that has had transformation modified in the last frame (indicated by transformUpdated in VAOInfo)
@@ -349,6 +403,7 @@ void WindowCanvas::start(void (*gameLoopCallback)(),
 						void(*keyboardCallback)(unsigned char key, int x, int y),
 						void(*mouseMotionCallback)(int x, int y))
 {
+
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE); 
 	//glEnable(GL_FRAMEBUFFER_SRGB); //Gamma color
