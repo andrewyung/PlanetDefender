@@ -71,7 +71,7 @@ void WindowCanvas::applyBloom()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	postprocessingQuad->getVAOInfo()->shaderID = postprocessShader;
-	drawPostprocessQuad(PRE_PROCESS_TEX_COUNT, preprocessTextures[0], bloomTexture[1]);
+	drawPostprocessQuad(PRE_PROCESS_TEX_COUNT, preprocessTextures[0], bloomTexture[0]);
 }
 
 void WindowCanvas::drawPostprocessQuad(GLuint texture, ...)
