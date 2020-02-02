@@ -7,5 +7,5 @@ layout(binding = 1) uniform sampler2D bloomTexture;
 
 void main()
 {
-    fragColor = texture(mainTexture, uvCoord);
+    fragColor = texture(bloomTexture, uvCoord) + texture(mainTexture, uvCoord);
 }

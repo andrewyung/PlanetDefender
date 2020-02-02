@@ -54,6 +54,9 @@
     <ClCompile Include="ColliderProperties.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EllipsoidCollider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -162,6 +165,30 @@
       <Filter>Source Files\shaders</Filter>
     </None>
     <None Include="shaders\DiffuseNormalFrag.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\PostprocessFrag.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\PostprocessVert.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\PreprocessVert.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\PreprocessFrag.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\BloomFrag.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\BloomVert.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\LightVert.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\LightFrag.fs">
       <Filter>Source Files\shaders</Filter>
     </None>
   </ItemGroup>

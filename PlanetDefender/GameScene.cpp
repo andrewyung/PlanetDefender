@@ -32,19 +32,25 @@ void GameScene::loadShaders()
 	try
 	{
 		GLuint shaderID = ShaderLoader::load("shaders/DefaultVertex.vs", "shaders/DefaultFragment.fs");
+		std::cout << "shader " << shaderID << std::endl;
 		//set a shader for models to use if not set
 		WindowCanvas::setDefaultShader(shaderID);
 
 		GLuint particleShaderID = ShaderLoader::load("shaders/DefaultParticleVertex.vs", "shaders/DefaultFragment.fs");
+		std::cout << "shader " << particleShaderID << std::endl;
 		WindowCanvas::setDefaultParticleShader(particleShaderID);
 
 		diffuseShader = ShaderLoader::load("shaders/DiffuseTextureVert.vs", "shaders/DiffuseTextureFrag.fs");
+		std::cout << "shader " << diffuseShader << std::endl;
 
 		sunShader = ShaderLoader::load("shaders/ColorVertex.vs", "shaders/ColorFragment.fs");
+		std::cout << "shader " << sunShader << std::endl;
 
 		diffuseNormalShader = ShaderLoader::load("shaders/DiffuseNormalVert.vs", "shaders/DiffuseNormalFrag.fs");
+		std::cout << "shader " << diffuseNormalShader << std::endl;
 
 		lightShader = ShaderLoader::load("shaders/LightVert.vs", "shaders/LightFrag.fs");
+		std::cout << "shader " << lightShader << std::endl;
 	}
 	catch (std::invalid_argument& e)
 	{

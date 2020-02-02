@@ -50,9 +50,9 @@ void gameInitialization()
 	mainCamera.translate(glm::vec3(0, 0, -4), true);
 
 
-	ShaderLoader::setVector4(sunLight.shader, "lightColor", glm::vec4(0.4f, 0.8f, 1, 1));
+	ShaderLoader::setVector4(sunLight.shader, "emit_color", glm::vec4(0.4f, 0.8f, 1, 1));
 	sunLight.lightColor = glm::vec3(100.0f/255.0f, 182.0f/255.0f, 255.0f/255.0f);
-	sunLight.intensity = 0.5f;
+	sunLight.intensity = 0.2f;
 
 	sunModel.shader = scene.sunShader;
 	ShaderLoader::setVector4(scene.sunShader, "flat_color", glm::vec4(255, 255 / 255, 255 / 255, 0.3));
@@ -79,18 +79,18 @@ void gameInitialization()
 	planetGreen.addVelocity(glm::vec3(0.02, 0.03, 0));
 
 	// Lights
-	canvas.addLight(sunLight);
-	sunLight.translate(glm::vec3(-1.2f, 0.4f, 0));
+	canvas.addLight(sunLight); 
+	sunLight.translate(glm::vec3(-1.8f, 0.4f, 0.0f));
 	sunLight.scale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sunLight.setDrawing(true);
-	canvas.addModel(sunModel, false);
+	//canvas.addModel(sunModel, false);
 	sunModel.translate(glm::vec3(-2, 0, 0));
 	sunModel.scale(glm::vec3(0.3, 0.3, 0.3));
 	sunModel.setDrawing(false);
 
 	//canvas.addModel(test, false);
 
-	canvas.bloom = false;
+	canvas.bloom = true;
 }
 
 //called repeatly as soon as possible
@@ -185,6 +185,7 @@ void keyboardCallback(unsigned char key, int x, int y)
 	if (key == 'b')
 	{
 		canvas.bloom = !canvas.bloom;
+		std::cout << "bloom: " << canvas.bloom << std::endl;
 	}
 }
 

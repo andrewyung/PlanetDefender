@@ -154,6 +154,8 @@
   <ItemGroup>
     <None Include="GreenFragment.fs" />
     <None Include="packages.config" />
+    <None Include="shaders\BloomFrag.fs" />
+    <None Include="shaders\BloomVert.vs" />
     <None Include="shaders\ChangingVertex.vs" />
     <None Include="shaders\ColorFragment.fs" />
     <None Include="shaders\ColorVertex.vs" />
@@ -167,8 +169,14 @@
     <None Include="shaders\DiffuseTextureVert.vs" />
     <None Include="shaders\DiffuseVert.vs" />
     <None Include="shaders\ExpandingOnNormal.vs" />
+    <None Include="shaders\LightFrag.fs" />
+    <None Include="shaders\LightVert.vs" />
     <None Include="shaders\NormalColor.fs" />
     <None Include="shaders\NormalColor.vs" />
+    <None Include="shaders\PostprocessFrag.fs" />
+    <None Include="shaders\PostprocessVert.vs" />
+    <None Include="shaders\PreprocessFrag.fs" />
+    <None Include="shaders\PreprocessVert.vs" />
     <None Include="shaders\SkyboxFrag.fs" />
     <None Include="shaders\SkyboxVert.vs" />
   </ItemGroup>

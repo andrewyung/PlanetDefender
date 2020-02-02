@@ -1,9 +1,8 @@
 #version 420 core
 in vec2 uvCoord;
+out vec4 fragColor;
 
-layout(binding = 1) uniform sampler2D brightTexture;
-
-layout (location = 0) out vec4 fragColor;
+layout(binding = 0) uniform sampler2D brightTexture;
 
 uniform bool horizontal;
 uniform float offset[3] = float[](0.0, 1.3846153846, 3.2307692308);

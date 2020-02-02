@@ -7,6 +7,7 @@
 #include "Light.h"
 #include "ModelLoader.h"
 #include "EllipsoidCollider.h"
+#include <stdarg.h>
 
 WindowCanvas* WindowCanvas::instance;
 
@@ -50,37 +51,32 @@ void printVertexBufferContent(GLuint bufferID)
 
 void WindowCanvas::applyBloom()
 {
-	/*
-	postprocessingQuad->shader = bloomShader;
+	postprocessingQuad->getVAOInfo()->shaderID = bloomShader;
 	bool horizontal = true, first_iteration = true;
-	int amount = 0;
+	int amount = 20;
 	for (unsigned int i = 0; i < amount; i++)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, bloomFBO[horizontal]);
-		ShaderLoader::setInt(postprocessingQuad->shader, "horizontal", horizontal);
-		glActiveTexture(GL_TEXTURE0 + 1);
-		glBindTexture(
-			GL_TEXTURE_2D, first_iteration ? preprocessTextures[1] : bloomTexture
-		);
+		ShaderLoader::setInt(postprocessingQuad->getVAOInfo()->shaderID, "horizontal", horizontal);
 
-		drawPostprocessQuad();
-		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+		drawPostprocessQuad(1, first_iteration ? preprocessTextures[1] : bloomTexture[!horizontal]);
+		glErrorCheck();
 
 		horizontal = !horizontal;
 		if (first_iteration)
 			first_iteration = false;
-	}*/
-	
+	}
+
+	glErrorCheck();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	postprocessingQuad->shader = postprocessShader;
-	drawPostprocessQuad();
+	postprocessingQuad->getVAOInfo()->shaderID = postprocessShader;
+	drawPostprocessQuad(PRE_PROCESS_TEX_COUNT, preprocessTextures[0], bloomTexture[1]);
 }
 
-void WindowCanvas::drawPostprocessQuad()
+void WindowCanvas::drawPostprocessQuad(GLuint texture, ...)
 {
 	glClearColor(0.0, 0.0, 0.0, 1);
-	glDisable(GL_DEPTH_TEST);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	std::shared_ptr<VAOInfo> currentVAO = postprocessingQuad->vaoInfo;
@@ -88,19 +84,18 @@ void WindowCanvas::drawPostprocessQuad()
 	glUseProgram(currentVAO->shaderID);
 
 	shaderLoader.setMat4x4(currentVAO->shaderID, "transform", (currentVAO->translation * currentVAO->rotation * currentVAO->scale));
-	/*
-	if (bloom)
-	{
-		glActiveTexture(GL_TEXTURE0 + 1);
-		glBindTexture(GL_TEXTURE_2D, bloomTexture);
-	}*/
-	for (int i{ 0 }; i < PRE_PROCESS_TEX_COUNT; i++)
+
+	va_list ap;
+	va_start(ap, texture);
+
+	for (int i{ 0 }; i < texture; i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i);
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, va_arg(ap, GLuint));
 
-		glBindTexture(GL_TEXTURE_2D, preprocessTextures[i]);
 	}
-	glEnable(GL_TEXTURE_2D);
+	va_end(ap);
 
 	glBindVertexArray(currentVAO->vertexArrayID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO->indexBufferID);
@@ -146,7 +141,11 @@ void WindowCanvas::renderScene()
 		glGetIntegerv(GL_CURRENT_PROGRAM, &currentShader);
 
 		std::shared_ptr<VAOInfo> currentVAO = vertexArrayIDs[i];
+
 		// Skip post processing models
+		if (currentVAO->renderType == VAOInfo::POSTPROCESS || !currentVAO->drawing) continue;
+
+
 		if (currentVAO->depthMask)
 		{
 			glDepthMask(GL_TRUE);
@@ -156,69 +155,67 @@ void WindowCanvas::renderScene()
 			glDepthMask(GL_FALSE);
 		}
 
-		if (currentVAO->drawing)//is vao is set to be rendered
+		//if current shader isn't the one vao is to use
+		if (currentShader != currentVAO->shaderID)
 		{
-			//if current shader isn't the one vao is to use
-			if (currentShader != currentVAO->shaderID)
-			{
-				glUseProgram(currentVAO->shaderID);
-			}
+			glUseProgram(currentVAO->shaderID);
+		}
 
-			//MVP temp for vertex shaders that were used for testing
-			shaderLoader.setMat4x4(currentVAO->shaderID, "MVP", camera->getMVP());
-			shaderLoader.setMat4x4(currentVAO->shaderID, "model", camera->ModelMatrix);
-			if (currentVAO->renderType == VAOInfo::Type::SKYBOX)
-			{
-				// Removes translation of transformation
-				shaderLoader.setMat4x4(currentVAO->shaderID, "view", glm::mat4(glm::mat3(camera->ViewMatrix)));
-			}
-			else
-			{
-				shaderLoader.setMat4x4(currentVAO->shaderID, "view", camera->ViewMatrix);
-			}
-			shaderLoader.setMat4x4(currentVAO->shaderID, "projection", camera->ProjectionMatrix);
-			
-			if (lightPositions.size() > 0)
-			{
-				shaderLoader.setVector4(currentVAO->shaderID, "lightPos", lightPositions.size(), glm::value_ptr(lightPositions[0]));
-				shaderLoader.setVector3(currentVAO->shaderID, "lightColor", lightPositions.size(), glm::value_ptr(lightColors[0]));
-			}
+		//MVP temp for vertex shaders that were used for testing
+		shaderLoader.setMat4x4(currentVAO->shaderID, "MVP", camera->getMVP());
+		shaderLoader.setMat4x4(currentVAO->shaderID, "model", camera->ModelMatrix);
 
-			shaderLoader.setMat4x4(currentVAO->shaderID, "transform", (currentVAO->translation * currentVAO->rotation * currentVAO->scale));
-			shaderLoader.setInt(currentVAO->shaderID, "time", glutGet(GLUT_ELAPSED_TIME));
+		if (currentVAO->renderType == VAOInfo::Type::SKYBOX)
+		{
+			// Removes translation of transformation
+			shaderLoader.setMat4x4(currentVAO->shaderID, "view", glm::mat4(glm::mat3(camera->ViewMatrix)));
+		}
+		else
+		{
+			shaderLoader.setMat4x4(currentVAO->shaderID, "view", camera->ViewMatrix);
+		}
+		shaderLoader.setMat4x4(currentVAO->shaderID, "projection", camera->ProjectionMatrix);
 
-			// Textures
-			if (currentVAO->textures.size() != 0)
+		if (lightPositions.size() > 0)
+		{
+			shaderLoader.setVector4(currentVAO->shaderID, "lightPos", lightPositions.size(), glm::value_ptr(lightPositions[0]));
+			shaderLoader.setVector3(currentVAO->shaderID, "lightColor", lightPositions.size(), glm::value_ptr(lightColors[0]));
+		}
+
+		shaderLoader.setMat4x4(currentVAO->shaderID, "transform", (currentVAO->translation * currentVAO->rotation * currentVAO->scale));
+		shaderLoader.setInt(currentVAO->shaderID, "time", glutGet(GLUT_ELAPSED_TIME));
+
+		// Textures
+		if (currentVAO->textures.size() != 0)
+		{
+			for (int i = 0; i < currentVAO->textures.size(); i++)
 			{
-				for (int i = 0; i < currentVAO->textures.size(); i++)
-				{
-					glActiveTexture(GL_TEXTURE0 + i);
-					glBindTexture(GL_TEXTURE_2D, currentVAO->textures[i]);
-				}
-			}
-			glEnable(GL_TEXTURE_2D);
-
-			//std::cout << time << std::endl;
-			glBindVertexArray(currentVAO->vertexArrayID);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO->indexBufferID);
-			//std::cout << "running - model added : vb" << currentVAO.vertexDataByteSize << " : ib" << currentVAO.indexDataByteSize << std::endl;
-
-
-			if (currentVAO->instanced)//this vao is to be instanced
-			{
-				glDrawElementsInstanced(GL_TRIANGLES, currentVAO->indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0, currentVAO->instances);
-			}
-			else
-			{
-				glDrawElements(GL_TRIANGLES, currentVAO->indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0);
+				glActiveTexture(GL_TEXTURE0 + i);
+				glEnable(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D, currentVAO->textures[i]);
 			}
 		}
+
+		//std::cout << time << std::endl;
+		glBindVertexArray(currentVAO->vertexArrayID);
+		//std::cout << currentVAO->renderType << " : " << currentVAO->textures.size() << " : " << currentVAO->shaderID << " : " << i << std::endl;
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, currentVAO->indexBufferID);	
+		//std::cout << "running - model added : vb" << currentVAO.vertexDataByteSize << " : ib" << currentVAO.indexDataByteSize << std::endl;
+
+		if (currentVAO->instanced)//this vao is to be instanced
+		{
+			glDrawElementsInstanced(GL_TRIANGLES, currentVAO->indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0, currentVAO->instances);
+		}
+		else
+		{
+			glDrawElements(GL_TRIANGLES, currentVAO->indexDataByteSize / sizeof(int), GL_UNSIGNED_INT, 0);
+		}
+
+		glBindVertexArray(0);
 	}
 
 	if (bloom)
 	{
-		glDrawBuffers(PRE_PROCESS_TEX_COUNT, preprocessBuffersAttachment);
-
 		applyBloom();
 	}
 
@@ -232,22 +229,25 @@ void WindowCanvas::createBloomFrameBuffer()
 {
 	glGenFramebuffers(2, bloomFBO);
 
-	glGenTextures(BLOOM_TEX_COUNT, &bloomTexture);
-
-	glBindTexture(GL_TEXTURE_2D, bloomTexture);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenTextures(BLOOM_TEX_COUNT, bloomTexture);
 
 	for (int i{ 0 }; i < 2; i++)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, bloomFBO[i]);
 
+		glBindTexture(GL_TEXTURE_2D, bloomTexture[i]);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 		// attach texture to framebuffer
 		glFramebufferTexture2D(
-			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bloomTexture, 0
+			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bloomTexture[i], 0
 		);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+		checkFramebuffer();
 	}
 
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -277,12 +277,13 @@ void WindowCanvas::createPostprocessFrameBuffer()
 		);
 	}
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-
 	for (int i{ 0 }; i < PRE_PROCESS_TEX_COUNT; i++)
 	{
 		preprocessBuffersAttachment[i] = GL_COLOR_ATTACHMENT0 + i;
 	}
+	glDrawBuffers(PRE_PROCESS_TEX_COUNT, preprocessBuffersAttachment);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	unsigned int rbo;
 	glGenRenderbuffers(1, &rbo);
@@ -303,9 +304,9 @@ void WindowCanvas::createPostprocessFrameBuffer()
 	postprocessingQuad = std::make_unique<Model>(ModelLoader::createPrimitive(ModelLoader::QUAD));
 	postprocessingQuad->shader = preprocessShader;
 	addModel(*postprocessingQuad, false);
+	postprocessingQuad->setDrawing(false);
 	postprocessingQuad->rotate(-90, glm::vec3(0, 0, 1));
 	postprocessingQuad->rotate(180, glm::vec3(0, 1, 0));
-	postprocessingQuad->setDrawing(false);
 	postprocessingQuad->getVAOInfo()->renderType = VAOInfo::POSTPROCESS;
 
 	createBloomFrameBuffer();
@@ -315,7 +316,7 @@ void glErrorCheck()
 {
 	GLenum err;
 	while ((err = glGetError())) {
-		std::cout << err;
+		std::cout << err << std::endl;
 	}
 }
 
@@ -340,6 +341,7 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 {
 	//create window
 	glutInit(&argc, argv);
+
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_MULTISAMPLE);
 	glutInitWindowPosition((GLUT_SCREEN_WIDTH / 2) - (windowWidth / 2), (GLUT_SCREEN_HEIGHT / 2) - (windowHeight / 2));
 	glutInitWindowSize(windowWidth, windowHeight);
@@ -347,6 +349,9 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 	glutCreateWindow("Window");
 
 	glewInit();
+
+	glutInitContextVersion(3, 1);
+	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
 
 	createPostprocessFrameBuffer();
 }
