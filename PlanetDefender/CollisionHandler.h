@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "WindowCanvas.h"
+#include "CollisionInfo.h"
 
 #include "EllipsoidCollider.h"
 #include "TriangleCollider.h"

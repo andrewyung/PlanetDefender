@@ -30,12 +30,14 @@ void CollisionHandler::CollisionFrame(std::vector<std::shared_ptr<VAOInfo>> vert
 						switch (collision_pair(vaoInfo->colliderProp[sourceColliderIndex]->type, dest_vaoInfo->colliderProp[destColliderIndex]->type))
 						{
 							case collision_pair(RAY, TRIANGLE):
-								rayToTriangleCollisionCheck(std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]), 
+								CollisionInfo colInfo = rayToTriangleCollisionCheck(std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]), 
 															std::static_pointer_cast<TriangleCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
+								
 								break;
 							case collision_pair(RAY, ELLIPSOID):
-								rayToEllipsoidCollisionCheck(std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
+								CollisionInfo colInfo = rayToEllipsoidCollisionCheck(std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
 															 std::static_pointer_cast<EllipsoidCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
+								
 								break;
 
 						}
@@ -46,24 +48,12 @@ void CollisionHandler::CollisionFrame(std::vector<std::shared_ptr<VAOInfo>> vert
 	}
 }
 
-void rayToTriangleCollisionCheck(std::shared_ptr<RayCollider> col1, std::shared_ptr<TriangleCollider> col2)
+CollisionInfo rayToTriangleCollisionCheck(std::shared_ptr<RayCollider> col1, std::shared_ptr<TriangleCollider> col2)
 {
+	return CollisionInfo();
 }
 
-void rayToEllipsoidCollisionCheck(std::shared_ptr<RayCollider> col1, std::shared_ptr<EllipsoidCollider> col2)
+CollisionInfo rayToEllipsoidCollisionCheck(std::shared_ptr<RayCollider> col1, std::shared_ptr<EllipsoidCollider> col2)
 {
-
-	if (auto properties = std::dynamic_pointer_cast<EllipsoidCollider>(vaoInfo->colliderProp[destColliderIndex]))
-	{
-		glm::mat4 transformation = vaoInfo->translation * vaoInfo->rotation * vaoInfo->scale * glm::scale(glm::mat4(), properties->getDimensions()); // include dimension!!!!
-		glm::mat4 ellipsoidSpace = glm::inverse(transformation);
-
-		// NOT IMPLEMENTED
-		// With ellipsoidSpace the ellipsoid is a unit circle at (0, 0, 0)
-		//glm::distance()
-	}
-	else if (auto properties = std::dynamic_pointer_cast<TriangleCollider>(vaoInfo->colliderProp[destColliderIndex]))
-	{
-
-	}
+	return CollisionInfo();
 }
