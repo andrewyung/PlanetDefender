@@ -7,6 +7,10 @@
 struct EllipsoidCollider : ColliderProperties
 {
 public:
+	EllipsoidCollider()
+	{
+		type = ELLIPSOID;
+	}
 	void setOrientation(glm::vec3 center, glm::vec3 dimensions);
 
 	glm::vec3 getDimensions()

@@ -7,8 +7,11 @@
 #include "Light.h"
 #include "ModelLoader.h"
 #include "EllipsoidCollider.h"
+#include "TriangleCollider.h"
+#include "CollisionHandler.h"
 #include <stdarg.h>
 
+CollisionHandler collisionHandler;
 WindowCanvas* WindowCanvas::instance;
 
 GLuint WindowCanvas::defaultShader;
@@ -356,42 +359,13 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 	createPostprocessFrameBuffer();
 }
 
-// AABB collision with spheres and rays. This only checks models that has had transformation modified in the last frame (indicated by transformUpdated in VAOInfo)
-void collisionCheck()
-{
-	// For each VAO
-	for (int i = 0; i < vertexArrayIDs.size(); i++)
-	{
-		std::shared_ptr<VAOInfo> vaoInfo = vertexArrayIDs[i];
-		// Has velocity and collider
-		if (vaoInfo->velocity.length != 0 && vaoInfo->colliderProp.size() > 0)
-		{
-			// For each collider property
-			for (int colliderPropIndex = 0; colliderPropIndex < vaoInfo->colliderProp.size(); colliderPropIndex++)
-			{
-				if (auto properties = std::dynamic_pointer_cast<EllipsoidCollider>(vaoInfo->colliderProp[colliderPropIndex]))
-				{
-					glm::mat4 transformation = vaoInfo->translation * vaoInfo->rotation * vaoInfo->scale * glm::scale(glm::mat4(), properties->getDimensions()); // include dimension!!!!
-					glm::mat4 ellipsoidSpace = glm::inverse(transformation);
-					
-
-					// With ellipsoidSpace the ellipsoid is a unit circle at (0, 0, 0)
-					//glm::distance()
-				}
-			}
-
-			// When no collision then move as expected
-			vaoInfo->translation = glm::translate(vaoInfo->translation, vaoInfo->velocity * WindowCanvas::deltaCallbackTime);
-		}
-	}
-}
-
 //wraps the game loop with anything that needs to be done before and/or after
 void gameLoopWrapper()
 {
 	WindowCanvas::deltaCallbackTime = (glutGet(GLUT_ELAPSED_TIME) - lastCallbackTime) * 0.001f;//
 
-	collisionCheck();
+	// Collision check
+	collisionHandler.CollisionFrame(vertexArrayIDs);
 	
 	if (WindowCanvas::deltaCallbackTime != 0)//can be increased to control frequency of external gmae loop call
 	{
