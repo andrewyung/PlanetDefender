@@ -87,6 +87,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\Andy\Documents\Visual Studio 2015\Projects\OpenglTriangularization\OpenGLModelTriangularizing\lib\qhull-2015.2\src\libqhull_r;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;glew32.lib;freeglut.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -121,11 +122,11 @@
   <ItemGroup>
     <ClCompile Include="AppDriver.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="ColliderProperties.cpp" />
-    <ClCompile Include="EllipsoidCollider.cpp" />
+    <ClCompile Include="CollisionHandler.cpp" />
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
+    <ClCompile Include="RayCollider.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
@@ -136,6 +137,8 @@
     <ClInclude Include="AppDriver.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ColliderProperties.h" />
+    <ClInclude Include="CollisionHandler.h" />
+    <ClInclude Include="CollisionInfo.h" />
     <ClInclude Include="EllipsoidCollider.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="GameScene.h" />
@@ -144,9 +147,11 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="OBJ_Loader.h" />
     <ClInclude Include="Particles.h" />
+    <ClInclude Include="RayCollider.h" />
     <ClInclude Include="ShaderLoader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="TextureLoader.h" />
+    <ClInclude Include="TriangleCollider.h" />
     <ClInclude Include="Triangularization.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WindowCanvas.h" />

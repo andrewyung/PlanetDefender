@@ -11,6 +11,16 @@ public:
 		type = RAY;
 	}
 
+	glm::vec3 getDirection()
+	{
+		return direction;
+	}
+
+	glm::vec3 getPoint()
+	{
+		return point;
+	}
+
 private:
 	glm::vec3 point;
 	glm::vec3 direction;

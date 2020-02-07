@@ -5,5 +5,8 @@
 class CollisionInfo
 {
 public:
+	CollisionInfo(glm::vec3 collisionPoint) : collisionPoint(collisionPoint) {};
+
+private:
 	glm::vec3 collisionPoint;
 };

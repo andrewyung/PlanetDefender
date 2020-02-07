@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
+#include <optional>
 
 #include "WindowCanvas.h"
 #include "CollisionInfo.h"
