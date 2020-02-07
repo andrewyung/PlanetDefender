@@ -7,7 +7,7 @@ constexpr unsigned int collision_pair(ColliderType t1, ColliderType t2) {
 	return (t1 << 16) + t2;
 }
 
-void CollisionHandler::CollisionFrame(std::vector<std::shared_ptr<VAOInfo>> vertexArrayIDs)
+void CollisionHandler::CollisionFrame(const std::vector<std::shared_ptr<VAOInfo>> vertexArrayIDs)
 {
 	// For each VAO
 	for (int i{ 0 }; i < vertexArrayIDs.size(); i++)
