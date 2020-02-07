@@ -49,8 +49,35 @@ void CollisionHandler::CollisionFrame(std::vector<std::shared_ptr<VAOInfo>> vert
 }
 
 CollisionInfo rayToTriangleCollisionCheck(std::shared_ptr<RayCollider> col1, std::shared_ptr<TriangleCollider> col2)
+std::optional<CollisionInfo> rayToTriangleCollisionCheck(std::shared_ptr<RayCollider> col1, std::shared_ptr<TriangleCollider> col2)
 {
-	return CollisionInfo();
+	glm::vec3 p0 = col2->getP0();
+	glm::vec3 p1 = col2->getP1();
+	glm::vec3 p2 = col2->getP2();
+	glm::vec3 v2v0 = p2 - p0;
+	glm::vec3 v1v0 = p1 - p0;
+	glm::vec3 rayv0 = col1->getDirection() - p0;
+
+	float a = glm::dot(v1v0, v2v0);
+	float b = glm::dot(rayv0, v2v0);
+	float c = glm::dot(rayv0, v1v0);
+	float d = glm::dot(v2v0, v2v0);
+	float e = glm::dot(v1v0, v1v0);
+
+	float s = ((a * b) - (d * c)) / ((a * a) - (d * e));
+	if (s < 0)
+	{
+		return std::nullopt;
+	}
+
+	float t = ((a * c) - (e * b)) / ((a * a) - (d * e));
+
+	if (t < 0 || s + t > 1)
+	{
+		return std::nullopt;
+	}
+
+	return CollisionInfo(p0 + (s * v1v0) + (t * v2v0));
 }
 
 CollisionInfo rayToEllipsoidCollisionCheck(std::shared_ptr<RayCollider> col1, std::shared_ptr<EllipsoidCollider> col2)
