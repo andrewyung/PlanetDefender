@@ -55,15 +55,15 @@ void printVertexBufferContent(GLuint bufferID)
 void WindowCanvas::applyBloom()
 {
 	postprocessingQuad->getVAOInfo()->shaderID = bloomShader;
+	glUseProgram(bloomShader);
 	bool horizontal = true, first_iteration = true;
-	int amount = 20;
+	int amount = 30; // gaussian blur passes
 	for (unsigned int i = 0; i < amount; i++)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, bloomFBO[horizontal]);
 		ShaderLoader::setInt(postprocessingQuad->getVAOInfo()->shaderID, "horizontal", horizontal);
 
 		drawPostprocessQuad(1, first_iteration ? preprocessTextures[1] : bloomTexture[!horizontal]);
-		glErrorCheck();
 
 		horizontal = !horizontal;
 		if (first_iteration)
@@ -127,6 +127,7 @@ void WindowCanvas::renderScene()
 
 	glClearColor(0.0, 0.0, 0.0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 
 	//better way of doing this rather than getting all positions every render frame
 	std::vector <glm::vec4> lightPositions;
