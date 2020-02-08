@@ -4,7 +4,7 @@
 
 #include "ColliderProperties.h"
 
-struct EllipsoidCollider : ColliderProperties
+struct EllipsoidCollider : public ColliderProperties
 {
 public:
 	EllipsoidCollider()

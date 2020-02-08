@@ -4,7 +4,7 @@
 
 #include "ColliderProperties.h"
 
-class TriangleCollider : ColliderProperties
+class TriangleCollider : public ColliderProperties
 {
 public:
 	TriangleCollider(glm::vec3 p0, glm::vec3 p1, glm::vec3 p2) : p0(p0), p1(p1), p2(p2) 
