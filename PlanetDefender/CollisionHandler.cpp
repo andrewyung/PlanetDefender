@@ -48,7 +48,7 @@ void CollisionHandler::CollisionFrame(const std::vector<std::shared_ptr<VAOInfo>
 						
 						if (colInfo.has_value())
 						{
-
+							std::cout << "collision" << std::endl;
 						}
 					}
 				}

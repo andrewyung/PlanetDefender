@@ -119,10 +119,10 @@ void gameLoop()
 		origin /= origin.w;
 		glm::vec3 direction = glm::normalize(glm::vec3(origin) - mainCamera.getCameraPos());
 		std::static_pointer_cast<RayCollider>(mouseRay.getColliderProperty(0))->setRay(origin, direction);
+
+		// Visually represent ray picking
 		mouseRay.setDrawing(true);
 		mouseRay.resetTransformation();
-		std::cout << "sd " << origin.x << " : " << origin.y << " : " << origin.z << std::endl;
-		std::cout << direction.x << " : " << direction.y << " : " << direction.z << std::endl;
 		mouseRay.translate(glm::vec3(origin) + (direction * 10.0f));
 	}
 	else
