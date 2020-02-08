@@ -124,6 +124,13 @@ public:
 		return vaoInfo;
 	}
 
+	void resetTransformation()
+	{
+		vaoInfo->translation = glm::mat4();
+		vaoInfo->rotation = glm::mat4();
+		vaoInfo->scale = glm::mat4();
+	}
+
 protected:
 	//Information used by WindowCanvas to manage Model
 	GLsizeiptr vertexDataOffset = -1;

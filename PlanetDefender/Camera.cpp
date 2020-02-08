@@ -9,6 +9,14 @@ glm::mat4 Camera::getMVP()
 	return ProjectionMatrix * ViewMatrix * ModelMatrix;
 }
 
+glm::vec3 Camera::getCameraPos()
+{
+	glm::mat3 rotationMat(ViewMatrix);
+	glm::vec3 pos(ViewMatrix[3]);
+
+	return -pos * rotationMat;
+}
+
 void Camera::printMVP()
 {
 	std::cout << "PROJECTION: " << glm::to_string(ProjectionMatrix) << std::endl;

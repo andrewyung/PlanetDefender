@@ -110,7 +110,24 @@ void gameLoop()
 
 	if (leftMouseDown)
 	{
-		//std::dynamic_pointer_cast<RayCollider>(mouseRay.getColliderProperty(0))->setRay(;
+		glm::vec4 screenPos{ (lastMouseX / float(WindowCanvas::windowWidth)) * 2.0f - 1.0f, 
+							((lastMouseY / float(WindowCanvas::windowHeight)) * 2.0f - 1.0f) * -1.0f, // flip Y 
+							-1.0f,
+							1.0f };
+
+		glm::vec4 origin =  glm::inverse(mainCamera.ProjectionMatrix * mainCamera.ViewMatrix) * screenPos;
+		origin /= origin.w;
+		glm::vec3 direction = glm::normalize(glm::vec3(origin) - mainCamera.getCameraPos());
+		std::static_pointer_cast<RayCollider>(mouseRay.getColliderProperty(0))->setRay(origin, direction);
+		mouseRay.setDrawing(true);
+		mouseRay.resetTransformation();
+		std::cout << "sd " << origin.x << " : " << origin.y << " : " << origin.z << std::endl;
+		std::cout << direction.x << " : " << direction.y << " : " << direction.z << std::endl;
+		mouseRay.translate(glm::vec3(origin) + (direction * 10.0f));
+	}
+	else
+	{
+		mouseRay.setDrawing(false);
 	}
 	//scene->test->rotate(WindowCanvas::deltaCallbackTime * 90, glm::vec3(1.0f, 0.0f, 0.0f), false);
 

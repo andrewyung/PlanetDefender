@@ -12,6 +12,7 @@ public:
 	glm::mat4 ProjectionMatrix = glm::mat4();
 
 	glm::mat4 getMVP();
+	glm::vec3 getCameraPos();
 
 	void translate(glm::vec3 translation, bool localSpace = true);
 
@@ -20,6 +21,6 @@ public:
 	Camera();
 	~Camera();
 private:
-	void printMVP();
+	void printMVP(); // Debugging purposes
 };
 
