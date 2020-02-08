@@ -23,7 +23,7 @@ class GameScene
 public:
 	GameScene();
 
-	GLuint diffuseShader, sunShader, diffuseNormalShader, lightShader;
+	GLuint diffuseShader, sunShader, diffuseNormalShader, lightShader, shipShader, shipOutlineShader;
 	GLuint greenTiledTexture, skyboxTextureAlias;
 	GLuint earthTexture, earthNormalTexture, earthSpecularTexture;
 

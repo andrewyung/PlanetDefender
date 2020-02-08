@@ -13,6 +13,7 @@
 #include "stb_image.h"
 #include "TextureLoader.h"
 #include "EllipsoidCollider.h"
+#include "RayCollider.h"
 
 using namespace std;
 
@@ -27,11 +28,13 @@ int lastMouseX, lastMouseY;
 
 Model planet = ModelLoader::loadModel("Sphere.obj");
 Model planetGreen = ModelLoader::loadModel("Sphere.obj");
+Model ship = ModelLoader::loadModel("Ship.obj");
 
 Model test = ModelLoader::createPrimitive(ModelLoader::QUAD);
 
-Model sunModel = ModelLoader::loadModel("Sphere.obj");
 Light sunLight = ModelLoader::createLight();
+
+Model mouseRay = ModelLoader::createPrimitive(ModelLoader::CUBE);
 
 Camera mainCamera;
 
@@ -54,9 +57,6 @@ void gameInitialization()
 	sunLight.lightColor = glm::vec3(100.0f/255.0f, 182.0f/255.0f, 255.0f/255.0f);
 	sunLight.intensity = 0.2f;
 
-	sunModel.shader = scene.sunShader;
-	ShaderLoader::setVector4(scene.sunShader, "flat_color", glm::vec4(255, 255 / 255, 255 / 255, 0.3));
-
 	// Planet
 	planetGreen.textures.push_back(scene.greenTiledTexture);
 	planetGreen.shader = scene.diffuseShader;
@@ -78,19 +78,28 @@ void gameInitialization()
 	canvas.addModel(planet, false);
 	planetGreen.addVelocity(glm::vec3(0.02, 0.03, 0));
 
+	// Ship
+	ship.shader = scene.shipShader;
+	canvas.addModel(ship, false);
+	ship.translate(glm::vec3(-1.5f, 0, 0));
+	ship.rotate(90, glm::vec3(0, 1.0f, 0));
+	ship.scale(glm::vec3(0.2f, 0.2f, 0.2f));
+
 	// Lights
 	canvas.addLight(sunLight); 
 	sunLight.translate(glm::vec3(-1.8f, 0.4f, 0.0f));
 	sunLight.scale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sunLight.setDrawing(true);
 	//canvas.addModel(sunModel, false);
-	sunModel.translate(glm::vec3(-2, 0, 0));
-	sunModel.scale(glm::vec3(0.3, 0.3, 0.3));
-	sunModel.setDrawing(false);
 
 	//canvas.addModel(test, false);
 
 	canvas.bloom = true;
+
+
+	mouseRay.addColliderProperty(std::make_shared<ColliderProperties>(RayCollider({ 0,0,0 }, { 0,0,0 })));
+	mouseRay.setDrawing(false);
+	canvas.addModel(mouseRay, false);
 }
 
 //called repeatly as soon as possible
@@ -99,6 +108,10 @@ void gameLoop()
 	sunLight.rotate(WindowCanvas::deltaCallbackTime * 28, glm::vec3(0.0f, 1.0f, 0.0f), false);
 	sunLight.translate(glm::vec3(0, 0, WindowCanvas::deltaCallbackTime * 0.8f));
 
+	if (leftMouseDown)
+	{
+		//std::dynamic_pointer_cast<RayCollider>(mouseRay.getColliderProperty(0))->setRay(;
+	}
 	//scene->test->rotate(WindowCanvas::deltaCallbackTime * 90, glm::vec3(1.0f, 0.0f, 0.0f), false);
 
 	//scene->test->translate(glm::vec3(0, WindowCanvas::deltaCallbackTime * 5, 0), false);

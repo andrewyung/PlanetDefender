@@ -1,0 +1,29 @@
+Mesh 0: Cube
+Vertices:
+V0: P(0, -0.064673, 0.686671) N(1, 0, 0) TC(0, 0)
+V1: P(0, -0.288049, 1) N(1, 0, 0) TC(1, 0)
+V2: P(0, -0.440966, -0.678661) N(1, 0, 0) TC(1, 1)
+V3: P(0, 0.017241, -1) N(1, 0, 0) TC(0, 1)
+V4: P(0, 0.059965, -0.462074) N(1, 0, 0) TC(0, 0.875)
+V5: P(0, 0.180996, 0.000334) N(1, 0, 0) TC(0, 0.75)
+V6: P(0, -0.127538, 0.283911) N(1, 0, 0) TC(0, 0.5)
+Indices:
+T0: 0, 1, 6
+T1: 2, 3, 4
+T2: 2, 4, 5
+T3: 1, 2, 6
+T4: 2, 5, 6
+Material: Material
+Ambient Color: 1, 1, 1
+Diffuse Color: 0.64, 0.64, 0.64
+Specular Color: 0.5, 0.5, 0.5
+Specular Exponent: 96.0784
+Optical Density: 1
+Dissolve: 1
+Illumination: 2
+Ambient Texture Map: 
+Diffuse Texture Map: 
+Specular Texture Map: 
+Alpha Texture Map: 
+Bump Map: 
+
