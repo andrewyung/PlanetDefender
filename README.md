@@ -8,10 +8,18 @@ Work in progress.
 Uses stb_image.h from https://github.com/nothings/stb/blob/master/stb_image.h for textures
 
 ## Additional implementations
+- Diffuse
+- Specular
 - Texturing
+- Normal mapping
 - Skybox
+- Bloom
+- Ray picking
+- Collision detection
+  - Ray-Triangle collision detection
+
 
 ## TODO
-- Collision detection and resolution http://www.peroxide.dk/papers/collision/collision.pdf
+- Additional collision detection
 - Game logic
 - Particle effects
