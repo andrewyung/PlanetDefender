@@ -1,7 +1,7 @@
 #include "CollisionHandler.h"
 
-std::optional<CollisionInfo> rayToTriangleCollisionCheck(glm::mat4 rayMVP, std::shared_ptr<RayCollider> col1, glm::mat4 triangleMVP, std::shared_ptr<TriangleCollider> col2);
-std::optional<CollisionInfo> rayToEllipsoidCollisionCheck(std::shared_ptr<RayCollider> col1, std::shared_ptr<EllipsoidCollider> col2);
+std::optional<CollisionInfo> rayToTriangleCollisionCheck(std::shared_ptr<RayCollider> col1, glm::mat4 triangleMVP, std::shared_ptr<TriangleCollider> col2);
+std::optional<CollisionInfo> rayToEllipsoidCollisionCheck(std::shared_ptr<RayCollider> col1, glm::mat4 ellipsoidMVP, std::shared_ptr<EllipsoidCollider> col2);
 
 constexpr unsigned int collision_pair(ColliderType t1, ColliderType t2) {
 	return (t1 << 16) + t2;
@@ -36,15 +36,15 @@ void CollisionHandler::CollisionFrame(const std::vector<std::shared_ptr<VAOInfo>
 						switch (collision_pair(vaoInfo->colliderProp[sourceColliderIndex]->type, dest_vaoInfo->colliderProp[destColliderIndex]->type))
 						{
 						case collision_pair(RAY, TRIANGLE):
-							colInfo = rayToTriangleCollisionCheck(vaoInfo->translation * vaoInfo->rotation * vaoInfo->scale,
-								std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
-								dest_vaoInfo->translation * dest_vaoInfo->rotation * dest_vaoInfo->scale,
-								std::static_pointer_cast<TriangleCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
+							colInfo = rayToTriangleCollisionCheck(	std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
+																	dest_vaoInfo->translation * dest_vaoInfo->rotation * dest_vaoInfo->scale,
+																	std::static_pointer_cast<TriangleCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
 
 							break;
 						case collision_pair(RAY, ELLIPSOID):
-							colInfo = rayToEllipsoidCollisionCheck(std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
-								std::static_pointer_cast<EllipsoidCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
+							colInfo = rayToEllipsoidCollisionCheck(	std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
+																	dest_vaoInfo->translation * dest_vaoInfo->rotation * dest_vaoInfo->scale,
+																	std::static_pointer_cast<EllipsoidCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
 
 							break;
 
@@ -52,7 +52,8 @@ void CollisionHandler::CollisionFrame(const std::vector<std::shared_ptr<VAOInfo>
 
 						if (colInfo.has_value())
 						{
-							std::cout << "collide " << colInfo->getCollisionPoint().x << " : " << colInfo->getCollisionPoint().y << " : " << colInfo->getCollisionPoint().z << std::endl;
+							if (dest_vaoInfo->onCollisionCallback) dest_vaoInfo->onCollisionCallback(*dest_vaoInfo, *vaoInfo, colInfo.value());
+							//std::cout << "collide " << colInfo->getCollisionPoint().x << " : " << colInfo->getCollisionPoint().y << " : " << colInfo->getCollisionPoint().z << std::endl;
 						}
 					}
 				}
@@ -61,7 +62,7 @@ void CollisionHandler::CollisionFrame(const std::vector<std::shared_ptr<VAOInfo>
 	}
 }
 
-std::optional<CollisionInfo> rayToTriangleCollisionCheck(glm::mat4 rayMVP, std::shared_ptr<RayCollider> col1, glm::mat4 triangleMVP, std::shared_ptr<TriangleCollider> col2)
+std::optional<CollisionInfo> rayToTriangleCollisionCheck(std::shared_ptr<RayCollider> col1, glm::mat4 triangleMVP, std::shared_ptr<TriangleCollider> col2)
 {
 	const double ep = 0.000001;
 	glm::vec3 p0 = triangleMVP * glm::vec4(col2->getP0(), 1.0f);
@@ -96,7 +97,8 @@ std::optional<CollisionInfo> rayToTriangleCollisionCheck(glm::mat4 rayMVP, std::
 	return CollisionInfo(col1->getPoint() + (col1->getDirection() * t), RAY, TRIANGLE);
 }
 
-std::optional<CollisionInfo> rayToEllipsoidCollisionCheck(std::shared_ptr<RayCollider> col1, std::shared_ptr<EllipsoidCollider> col2)
+std::optional<CollisionInfo> rayToEllipsoidCollisionCheck(std::shared_ptr<RayCollider> col1, glm::mat4 ellipsoidMVP, std::shared_ptr<EllipsoidCollider> col2)
 {
+	
 	return std::nullopt;
 }

@@ -86,6 +86,10 @@ void gameInitialization()
 	assignTriangleColliders(ship);
 
 	canvas.addModel(ship, false);
+	ship.setCollisionCallback([](VAOInfo& source, VAOInfo& dest, CollisionInfo info) {
+		std::cout << "collided!" << std::endl;
+	});
+
 	ship.translate(glm::vec3(-1.5f, 0, 0));
 	ship.scale(glm::vec3(0.2f, 0.2f, 0.2f));
 

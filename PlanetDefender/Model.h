@@ -131,6 +131,10 @@ public:
 		vaoInfo->scale = glm::mat4();
 	}
 
+	void setCollisionCallback(std::function<void(VAOInfo&, VAOInfo&, CollisionInfo)> func)
+	{
+		vaoInfo->onCollisionCallback = std::bind(func, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+	}
 protected:
 	//Information used by WindowCanvas to manage Model
 	GLsizeiptr vertexDataOffset = -1;

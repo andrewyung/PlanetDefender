@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <functional>
 
 #include <stdlib.h> 
 #include <GL\glew.h>
@@ -11,7 +12,7 @@
 
 #include "ShaderLoader.h"
 #include "Camera.h"
-#include "ColliderProperties.h"
+#include "CollisionInfo.h"
 
 const int BLOOM_TEX_COUNT = 2;
 const int PRE_PROCESS_TEX_COUNT = 2;
@@ -62,6 +63,8 @@ public:
 	glm::mat4 rotation;
 	glm::mat4 scale;
 	glm::mat4 translation;
+
+	std::function<void(VAOInfo&, VAOInfo&, CollisionInfo)> onCollisionCallback;
 };
 
 class WindowCanvas

@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 
+#include "ColliderProperties.h"
+
 class CollisionInfo
 {
 public:
