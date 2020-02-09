@@ -126,7 +126,6 @@
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
-    <ClCompile Include="RayCollider.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
@@ -182,10 +181,17 @@
     <None Include="shaders\PostprocessVert.vs" />
     <None Include="shaders\PreprocessFrag.fs" />
     <None Include="shaders\PreprocessVert.vs" />
+    <None Include="shaders\ShipFrag.fs" />
+    <None Include="shaders\ShipOutlineFrag.fs" />
+    <None Include="shaders\ShipOutlineVert.vs" />
+    <None Include="shaders\ShipVert.vs" />
     <None Include="shaders\SkyboxFrag.fs" />
     <None Include="shaders\SkyboxVert.vs" />
   </ItemGroup>
   <ItemGroup>
+    <Object Include="Models\Ship.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Object>
     <Object Include="Models\Sphere.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Object>

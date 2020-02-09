@@ -54,9 +54,6 @@
     <ClCompile Include="CollisionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RayCollider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vertex.h">
@@ -203,9 +200,24 @@
     <None Include="shaders\LightFrag.fs">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="shaders\ShipOutlineFrag.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\ShipOutlineVert.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\ShipFrag.fs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\ShipVert.vs">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Object Include="Models\Sphere.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
+    <Object Include="Models\Ship.obj">
       <Filter>Resource Files</Filter>
     </Object>
   </ItemGroup>

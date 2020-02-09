@@ -13,6 +13,7 @@
 #include "stb_image.h"
 #include "TextureLoader.h"
 #include "EllipsoidCollider.h"
+#include "TriangleCollider.h"
 #include "RayCollider.h"
 
 using namespace std;
@@ -37,6 +38,8 @@ Light sunLight = ModelLoader::createLight();
 Model mouseRay = ModelLoader::createPrimitive(ModelLoader::CUBE);
 
 Camera mainCamera;
+
+void assignTriangleColliders(Model &model);
 
 //called once at the beginning
 void gameInitialization()
@@ -80,9 +83,10 @@ void gameInitialization()
 
 	// Ship
 	ship.shader = scene.shipShader;
+	assignTriangleColliders(ship);
+
 	canvas.addModel(ship, false);
 	ship.translate(glm::vec3(-1.5f, 0, 0));
-	ship.rotate(90, glm::vec3(0, 1.0f, 0));
 	ship.scale(glm::vec3(0.2f, 0.2f, 0.2f));
 
 	// Lights
@@ -96,10 +100,25 @@ void gameInitialization()
 
 	canvas.bloom = true;
 
-
+	// Used for ray picking
 	mouseRay.addColliderProperty(std::make_shared<ColliderProperties>(RayCollider({ 0,0,0 }, { 0,0,0 })));
 	mouseRay.setDrawing(false);
 	canvas.addModel(mouseRay, false);
+}
+
+// Assigns triangle colliders based on mesh triangles
+void assignTriangleColliders(Model &model)
+{
+	vector<Model> triangles = Triangularization::EarTriangularize(model);
+
+	for (int i = 0; i < triangles.size(); i++)
+	{
+		TriangleCollider collider{	triangles[i].vertexData[0].getPoint(), 
+									triangles[i].vertexData[1].getPoint(), 
+									triangles[i].vertexData[2].getPoint() };
+		model.addColliderProperty(std::make_shared<TriangleCollider>(collider));
+	}
+
 }
 
 //called repeatly as soon as possible
@@ -119,7 +138,6 @@ void gameLoop()
 		origin /= origin.w;
 		glm::vec3 direction = glm::normalize(glm::vec3(origin) - mainCamera.getCameraPos());
 		std::static_pointer_cast<RayCollider>(mouseRay.getColliderProperty(0))->setRay(origin, direction);
-
 		// Visually represent ray picking
 		mouseRay.setDrawing(true);
 		mouseRay.resetTransformation();
@@ -148,7 +166,7 @@ void gameLoop()
 
 void mouseCallback(int button, int state, int x, int y)
 {
-	std::cout << x << " : " << y << std::endl;
+	//std::cout << x << " : " << y << std::endl;
 	if ((button == 3) || (button == 4)) // scroll wheel event
 	{
 		if (button == 3)

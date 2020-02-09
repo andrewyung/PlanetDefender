@@ -3,12 +3,18 @@
 
 #include "ColliderProperties.h"
 
-class RayCollider : ColliderProperties
+class RayCollider : public ColliderProperties
 {
 public:
 	RayCollider(glm::vec3 point, glm::vec3 direction) : point(point), direction(direction)
 	{
 		type = RAY;
+	}
+
+	void setRay(glm::vec3 point, glm::vec3 direction)
+	{
+		this->point = point;
+		this->direction = direction;
 	}
 
 	glm::vec3 getDirection()

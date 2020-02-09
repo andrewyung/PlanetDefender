@@ -104,12 +104,12 @@ public:
 
 	std::unique_ptr<Model> postprocessingQuad;
 
+	static const int windowHeight = 720;
+	static const int windowWidth = 1280;
+
 private:
 	static GLuint defaultShader;
 	static GLuint defaultParticleShader;
-
-	static const int windowHeight = 900;
-	static const int windowWidth = 1600;
 
 	void applyBloom();
 	void renderScene();
