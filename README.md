@@ -14,7 +14,7 @@ Uses stb_image.h from https://github.com/nothings/stb/blob/master/stb_image.h fo
 - Skybox
 - Bloom
 - Ray picking
-- Collision detection
+- Collision detection and callbacks
   - Ray-Triangle collision detection
 
 
