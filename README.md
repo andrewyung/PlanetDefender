@@ -8,7 +8,6 @@ Work in progress.
 Uses stb_image.h from https://github.com/nothings/stb/blob/master/stb_image.h for textures
 
 ## Additional implementations
-- Diffuse
 - Specular
 - Texturing
 - Normal mapping
