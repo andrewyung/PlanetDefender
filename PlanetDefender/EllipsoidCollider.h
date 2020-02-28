@@ -26,7 +26,5 @@ private:
 	glm::vec3 _center;
 	glm::vec3 _dimensions;
 
-	glm::vec3 _foci1;
-	glm::vec3 _foci2;
 	float _fociDistanceSum;
 };

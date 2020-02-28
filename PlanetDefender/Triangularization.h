@@ -1,6 +1,7 @@
 #pragma once
 #include "Vertex.h"
 #include "Model.h"
+#include "WindowCanvas.h"
 
 #include <glm/glm.hpp>
 #include <vector>
@@ -15,4 +16,5 @@ public:
 	// http://www-cgrl.cs.mcgill.ca/~godfried/teaching/cg-projects/97/Ian/algorithm1.html
 	// Triangularizes 2D polygons
 	static std::vector<Model> EarTriangularize(Model m);
+	static std::vector<Model> EarTriangularize(Model m, glm::vec3 centerSplit);
 };

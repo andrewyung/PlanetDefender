@@ -52,9 +52,6 @@ void GameScene::loadShaders()
 		lightShader = ShaderLoader::load("shaders/LightVert.vs", "shaders/LightFrag.fs");
 		std::cout << "shader " << lightShader << std::endl;
 
-		shipOutlineShader = ShaderLoader::load("shaders/ShipOutlineVert.vs", "shaders/ShipOutlineFrag.fs");
-		std::cout << "shader " << shipOutlineShader << std::endl;
-
 		shipShader = ShaderLoader::load("shaders/ShipVert.vs", "shaders/ShipFrag.fs");
 		std::cout << "shader " << shipShader << std::endl;
 	}

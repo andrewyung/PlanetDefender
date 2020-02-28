@@ -102,19 +102,19 @@ public:
 		return colliderProperties[index];
 	}
 
-	std::vector<float> getCenter()
+	glm::vec3 getCenter()
 	{
-		std::vector<float> center{ 0, 0, 0 };
+		glm::vec3 center{ 0, 0, 0 };
 		for (int i = 0; i < vertexData.size(); i++)
 		{
-			center[0] += vertexData[i].x;
-			center[1] += vertexData[i].y;
-			center[2] += vertexData[i].z;
+			center.x += vertexData[i].x;
+			center.y += vertexData[i].y;
+			center.z += vertexData[i].z;
 		}
 
-		center[0] /= vertexData.size();
-		center[1] /= vertexData.size();
-		center[2] /= vertexData.size();
+		center.x /= vertexData.size();
+		center.y /= vertexData.size();
+		center.z /= vertexData.size();
 
 		return center;
 	}
@@ -133,7 +133,7 @@ public:
 
 	void setCollisionCallback(std::function<void(VAOInfo&, VAOInfo&, CollisionInfo)> func)
 	{
-		vaoInfo->onCollisionCallback = std::bind(func, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+		vaoInfo->onCollisionCallback = func;
 	}
 protected:
 	//Information used by WindowCanvas to manage Model

@@ -18,43 +18,44 @@ void CollisionHandler::CollisionFrame(const std::vector<std::shared_ptr<VAOInfo>
 		// Update based on velocity
 		vaoInfo->translation = glm::translate(vaoInfo->translation, vaoInfo->velocity * WindowCanvas::deltaCallbackTime);
 
-		if (vaoInfo->drawing)
+		if (!vaoInfo->drawing) continue;
+		//std::cout << vaoInfo->colliderProp.size() << std::endl;
+		for (int sourceColliderIndex{ 0 }; sourceColliderIndex < vaoInfo->colliderProp.size(); sourceColliderIndex++)
 		{
-			//std::cout << vaoInfo->colliderProp.size() << std::endl;
-			for (int sourceColliderIndex{ 0 }; sourceColliderIndex < vaoInfo->colliderProp.size(); sourceColliderIndex++)
+			for (int destVAOIndex{ 0 }; destVAOIndex < vertexArrayIDs.size(); destVAOIndex++)
 			{
-				for (int destVAOIndex{ 0 }; destVAOIndex < vertexArrayIDs.size(); destVAOIndex++)
+				if (destVAOIndex == sourceVAOIndex) continue;
+
+				std::shared_ptr<VAOInfo> dest_vaoInfo = vertexArrayIDs[destVAOIndex];
+
+				if (!dest_vaoInfo->drawing) continue;
+
+				// For each collider property
+				for (int destColliderIndex{ 0 }; destColliderIndex < dest_vaoInfo->colliderProp.size(); destColliderIndex++)
 				{
-					if (destVAOIndex == sourceVAOIndex) continue;
-
-					std::shared_ptr<VAOInfo> dest_vaoInfo = vertexArrayIDs[destVAOIndex];
-					// For each collider property
-					for (int destColliderIndex{ 0 }; destColliderIndex < dest_vaoInfo->colliderProp.size(); destColliderIndex++)
+					//std::cout << vaoInfo->colliderProp[sourceColliderIndex]->type << " : " << dest_vaoInfo->colliderProp[destColliderIndex]->type << std::endl;
+					std::optional<CollisionInfo> colInfo{};
+					switch (collision_pair(vaoInfo->colliderProp[sourceColliderIndex]->type, dest_vaoInfo->colliderProp[destColliderIndex]->type))
 					{
-						//std::cout << vaoInfo->colliderProp[sourceColliderIndex]->type << " : " << dest_vaoInfo->colliderProp[destColliderIndex]->type << std::endl;
-						std::optional<CollisionInfo> colInfo{};
-						switch (collision_pair(vaoInfo->colliderProp[sourceColliderIndex]->type, dest_vaoInfo->colliderProp[destColliderIndex]->type))
-						{
-						case collision_pair(RAY, TRIANGLE):
-							colInfo = rayToTriangleCollisionCheck(	std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
-																	dest_vaoInfo->translation * dest_vaoInfo->rotation * dest_vaoInfo->scale,
-																	std::static_pointer_cast<TriangleCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
+					case collision_pair(RAY, TRIANGLE):
+						colInfo = rayToTriangleCollisionCheck(	std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
+																dest_vaoInfo->translation * dest_vaoInfo->rotation * dest_vaoInfo->scale,
+																std::static_pointer_cast<TriangleCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
 
-							break;
-						case collision_pair(RAY, ELLIPSOID):
-							colInfo = rayToEllipsoidCollisionCheck(	std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
-																	dest_vaoInfo->translation * dest_vaoInfo->rotation * dest_vaoInfo->scale,
-																	std::static_pointer_cast<EllipsoidCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
+						break;
+					case collision_pair(RAY, ELLIPSOID):
+						colInfo = rayToEllipsoidCollisionCheck(	std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
+																dest_vaoInfo->translation * dest_vaoInfo->rotation * dest_vaoInfo->scale,
+																std::static_pointer_cast<EllipsoidCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
 
-							break;
+						break;
 
-						}
+					}
 
-						if (colInfo.has_value())
-						{
-							if (dest_vaoInfo->onCollisionCallback) dest_vaoInfo->onCollisionCallback(*dest_vaoInfo, *vaoInfo, colInfo.value());
-							//std::cout << "collide " << colInfo->getCollisionPoint().x << " : " << colInfo->getCollisionPoint().y << " : " << colInfo->getCollisionPoint().z << std::endl;
-						}
+					if (colInfo.has_value())
+					{
+						if (dest_vaoInfo->onCollisionCallback) dest_vaoInfo->onCollisionCallback(*dest_vaoInfo, *vaoInfo, colInfo.value());
+						//std::cout << "collide " << colInfo->getCollisionPoint().x << " : " << colInfo->getCollisionPoint().y << " : " << colInfo->getCollisionPoint().z << std::endl;
 					}
 				}
 			}

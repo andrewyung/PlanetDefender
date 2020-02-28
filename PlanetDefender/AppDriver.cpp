@@ -29,7 +29,8 @@ int lastMouseX, lastMouseY;
 
 Model planet = ModelLoader::loadModel("Sphere.obj");
 Model planetGreen = ModelLoader::loadModel("Sphere.obj");
-Model ship = ModelLoader::loadModel("Ship.obj");
+Model shipBlock = ModelLoader::loadModel("ShipBlock.obj");
+Model shipSpike = ModelLoader::loadModel("ShipSpike.obj");
 
 Model test = ModelLoader::createPrimitive(ModelLoader::QUAD);
 
@@ -68,6 +69,8 @@ void gameInitialization()
 	canvas.addModel(planetGreen, false);
 	planetGreen.translate(glm::vec3(-4, 0, 0));
 
+	planetGreen.addVelocity(glm::vec3(0.02, 0.03, 0));
+
 	// Planet 
 	planet.textures.push_back(scene.earthTexture);
 	planet.textures.push_back(scene.earthNormalTexture);
@@ -79,19 +82,62 @@ void gameInitialization()
 	planet.addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
 
 	canvas.addModel(planet, false);
-	planetGreen.addVelocity(glm::vec3(0.02, 0.03, 0));
 
 	// Ship
-	ship.shader = scene.shipShader;
-	assignTriangleColliders(ship);
+	shipBlock.shader = scene.shipShader;
+	assignTriangleColliders(shipBlock);
 
-	canvas.addModel(ship, false);
-	ship.setCollisionCallback([](VAOInfo& source, VAOInfo& dest, CollisionInfo info) {
+	canvas.addModel(shipBlock, false);
+	shipBlock.setCollisionCallback([caller = &shipBlock](VAOInfo& source, VAOInfo& dest, CollisionInfo info) {
 		std::cout << "collided!" << std::endl;
+		source.drawing = false;
+
+		glm::mat4 mvp = caller->getVAOInfo()->translation * caller->getVAOInfo()->rotation * caller->getVAOInfo()->scale;
+		glm::mat4 invTransform = glm::inverse(mvp);
+
+		vector<Model> triangles = Triangularization::EarTriangularize(*caller, invTransform * glm::vec4(info.getCollisionPoint(), 1.0f));
+		std::cout << triangles.size() << std::endl;
+
+		for (int i{ 0 }; i < triangles.size(); i++)
+		{
+			canvas.addModel(triangles[i], false);
+			triangles[i].translate(glm::vec3(-1.5f, 0, 0));
+			triangles[i].scale(glm::vec3(0.2f, 0.2f, 0.2f));
+
+			triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.1f);
+		}
 	});
 
-	ship.translate(glm::vec3(-1.5f, 0, 0));
-	ship.scale(glm::vec3(0.2f, 0.2f, 0.2f));
+	shipBlock.translate(glm::vec3(-1.5f, 0, 0));
+	shipBlock.scale(glm::vec3(0.2f, 0.2f, 0.2f));
+
+	//Ship
+	shipSpike.shader = scene.shipShader;
+	assignTriangleColliders(shipSpike);
+
+	canvas.addModel(shipSpike, false);
+	shipSpike.setCollisionCallback([caller = &shipSpike](VAOInfo& source, VAOInfo& dest, CollisionInfo info) {
+		std::cout << "collided!" << std::endl;
+		source.drawing = false;
+		
+		glm::mat4 mvp = caller->getVAOInfo()->translation * caller->getVAOInfo()->rotation * caller->getVAOInfo()->scale;
+		glm::mat4 invTransform = glm::inverse(mvp);
+
+		vector<Model> triangles = Triangularization::EarTriangularize(*caller, invTransform * glm::vec4(info.getCollisionPoint(), 1.0f));
+		std::cout << triangles.size() << std::endl;
+
+		for (int i{ 0 }; i < triangles.size(); i++)
+		{
+			canvas.addModel(triangles[i], false);
+			triangles[i].translate(glm::vec3(-1.5f, -0.5f, 0));
+			triangles[i].scale(glm::vec3(0.2f, 0.2f, 0.2f));
+
+			triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.1f);
+		}
+	});
+
+	shipSpike.translate(glm::vec3(-1.5f, -0.5f, 0));
+	shipSpike.scale(glm::vec3(0.2f, 0.2f, 0.2f));
 
 	// Lights
 	canvas.addLight(sunLight); 
