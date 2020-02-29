@@ -98,9 +98,6 @@
     <ClInclude Include="GameScene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AppDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ColliderProperties.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -117,6 +114,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CollisionInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -215,9 +215,6 @@
   </ItemGroup>
   <ItemGroup>
     <Object Include="Models\Sphere.obj">
-      <Filter>Resource Files</Filter>
-    </Object>
-    <Object Include="Models\Ship.obj">
       <Filter>Resource Files</Filter>
     </Object>
   </ItemGroup>

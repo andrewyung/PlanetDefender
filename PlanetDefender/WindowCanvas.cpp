@@ -354,7 +354,7 @@ void WindowCanvas::initializeWindow(int argc, char **argv)
 
 	glewInit();
 
-	glutInitContextVersion(3, 1);
+	glutInitContextVersion(4, 5);
 	glutInitContextFlags(GLUT_FORWARD_COMPATIBLE | GLUT_DEBUG);
 
 	createPostprocessFrameBuffer();
