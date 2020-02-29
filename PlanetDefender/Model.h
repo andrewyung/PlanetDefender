@@ -119,6 +119,32 @@ public:
 		return center;
 	}
 
+	void setTranslation(glm::mat4 translationMat)
+	{
+		vaoInfo->translation = translationMat;
+	}
+	void setRotation(glm::mat4 rotationMat)
+	{
+		vaoInfo->rotation = rotationMat;
+	}
+	void setScale(glm::mat4 scaleMat)
+	{
+		vaoInfo->scale = scaleMat;
+	}
+
+	glm::mat4 getTranslation()
+	{
+		return vaoInfo->translation;
+	}
+	glm::mat4 getRotation()
+	{
+		return vaoInfo->rotation;
+	}
+	glm::mat4 getScale()
+	{
+		return vaoInfo->scale;
+	}
+
 	std::shared_ptr<VAOInfo> getVAOInfo()
 	{
 		return vaoInfo;

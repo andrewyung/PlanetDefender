@@ -16,7 +16,7 @@ void CollisionHandler::CollisionFrame(const std::vector<std::shared_ptr<VAOInfo>
 
 		// Has velocity and collider
 		// Update based on velocity
-		vaoInfo->translation = glm::translate(vaoInfo->translation, vaoInfo->velocity * WindowCanvas::deltaCallbackTime);
+		vaoInfo->translation = glm::translate(vaoInfo->translation, glm::mat3(vaoInfo->rotation) * vaoInfo->velocity * WindowCanvas::deltaCallbackTime);
 
 		if (!vaoInfo->drawing) continue;
 		//std::cout << vaoInfo->colliderProp.size() << std::endl;

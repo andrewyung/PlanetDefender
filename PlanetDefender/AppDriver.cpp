@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <random>
 #include <filesystem>
 
 #include "GameScene.h"
@@ -15,6 +16,7 @@
 #include "EllipsoidCollider.h"
 #include "TriangleCollider.h"
 #include "RayCollider.h"
+#include "Utilities.h"
 
 using namespace std;
 
@@ -45,6 +47,9 @@ void assignTriangleColliders(Model &model);
 //called once at the beginning
 void gameInitialization()
 {
+	// Seed random
+	srand(time(NULL));
+
 	scene.loadAll();
 
 	canvas.addSkybox(scene.skyboxTextureAlias);
@@ -101,8 +106,9 @@ void gameInitialization()
 		for (int i{ 0 }; i < triangles.size(); i++)
 		{
 			canvas.addModel(triangles[i], false);
-			triangles[i].translate(glm::vec3(-1.5f, 0, 0));
-			triangles[i].scale(glm::vec3(0.2f, 0.2f, 0.2f));
+			triangles[i].setTranslation(caller->getTranslation());
+			triangles[i].setRotation(caller->getRotation());
+			triangles[i].setScale(caller->getScale());
 
 			triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.1f);
 		}
@@ -129,19 +135,17 @@ void gameInitialization()
 		for (int i{ 0 }; i < triangles.size(); i++)
 		{
 			canvas.addModel(triangles[i], false);
-			triangles[i].translate(glm::vec3(-1.5f, -0.5f, 0));
-			triangles[i].scale(glm::vec3(0.2f, 0.2f, 0.2f));
+			triangles[i].setTranslation(caller->getTranslation());
+			triangles[i].setRotation(caller->getRotation());
+			triangles[i].setScale(caller->getScale());
 
 			triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.1f);
 		}
 	});
 
-	shipSpike.translate(glm::vec3(-1.5f, -0.5f, 0));
-	shipSpike.scale(glm::vec3(0.2f, 0.2f, 0.2f));
-
 	// Lights
 	canvas.addLight(sunLight); 
-	sunLight.translate(glm::vec3(-1.8f, 0.4f, 0.0f));
+	sunLight.translate(glm::vec3(-1.2f, 0.4f, 0.0f));
 	sunLight.scale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sunLight.setDrawing(true);
 	//canvas.addModel(sunModel, false);
@@ -174,9 +178,22 @@ void assignTriangleColliders(Model &model)
 //called repeatly as soon as possible
 void gameLoop()
 {
+	float spawnDistance = 4.5f;
+	glm::vec3 spawnPoint = mapToHemisphere(0, ((float)rand() / (RAND_MAX)), ((float)rand() / (RAND_MAX))) * spawnDistance;
+
+	glm::vec3 planetWorldPos = glm::vec3(planet.getTranslation()[3]);
+	glm::mat4 rotMatrix = glm::lookAt(spawnPoint + planetWorldPos, planetWorldPos, glm::vec3{ 0,1,0 });
+
+	shipSpike.resetTransformation();
+	shipSpike.scale(glm::vec3(0.2f, 0.2f, 0.2f), false);
+	shipSpike.translate(spawnPoint + planetWorldPos, false);
+	shipSpike.setRotation(rotMatrix);
+
+
 	sunLight.rotate(WindowCanvas::deltaCallbackTime * 28, glm::vec3(0.0f, 1.0f, 0.0f), false);
 	sunLight.translate(glm::vec3(0, 0, WindowCanvas::deltaCallbackTime * 0.8f));
 
+	// ray pick from mouse cursor
 	if (leftMouseDown)
 	{
 		glm::vec4 screenPos{ (lastMouseX / float(WindowCanvas::windowWidth)) * 2.0f - 1.0f, 
