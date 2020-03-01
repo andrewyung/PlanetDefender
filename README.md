@@ -2,6 +2,7 @@
 Defend your planet from alien attackers.
 Work in progress.
 <img src="/gifs/ShaderScene.gif?raw=true">
+<img src="/gifs/DefendScene.gif?raw=false">
 
 (some artifacts due to mp4 to gif conversion)
 
