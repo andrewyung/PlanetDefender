@@ -64,7 +64,9 @@ vector<Model> Triangularization::EarTriangularize(Model m, glm::vec3 centerSplit
 {
 	Vertex centerVert{ centerSplit.x, centerSplit.y, centerSplit.z };
 
-	vector<Model> ears;
+	vector<Model> ears;		
+	std::cout << " V " << m.vertexData.size() << std::endl;
+
 	for (int i = 0; i < m.vertexData.size() - 1; i++)
 	{
 		if (Triangularization::isConvexVertex(m.vertexData[i], m.vertexData[i + 1], centerVert))

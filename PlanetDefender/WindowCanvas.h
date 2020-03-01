@@ -76,6 +76,7 @@ public:
 
 	void initializeWindow(int argc, char ** argv);
 	void start(void(*gameLoopCallback)(), void(*gameInitializeCallback)(), void(*mouseCallback)(int button, int state, int x, int y), void(*keyboardCallback)(unsigned char key, int x, int y), void(*mouseMotionCallback)(int x, int y));
+	void registerTimedCallback(void(*func)(int value), int value, unsigned int interval);
 
 	void addParticles(Particles &particles, int instances, std::vector<glm::mat4> particleTransformations);
 	void addModel(Model &model, bool group, VAOInfo::Type renderType = VAOInfo::Type::MODEL, bool depthMask = true);

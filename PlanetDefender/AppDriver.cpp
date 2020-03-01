@@ -23,7 +23,8 @@ using namespace std;
 GameScene scene;
 WindowCanvas canvas;
 
-int currentControlledLightIndex = 0; //used to switch between lights to move around
+int shipSpeed = 12;
+int spawnIntervalms = 2000;
 
 bool leftMouseDown = false;
 bool rightMouseDown = false;
@@ -42,7 +43,11 @@ Model mouseRay = ModelLoader::createPrimitive(ModelLoader::CUBE);
 
 Camera mainCamera;
 
+vector<Model> ships;
+
 void assignTriangleColliders(Model &model);
+void spawnShip(int value);
+
 
 //called once at the beginning
 void gameInitialization()
@@ -59,7 +64,7 @@ void gameInitialization()
 	//camera
 	canvas.setCamera(mainCamera);
 	//translate camera to view test objects (since camera is at origin)
-	mainCamera.translate(glm::vec3(0, 0, -4), true);
+	mainCamera.translate(glm::vec3(0, 0, -5), true);
 
 
 	ShaderLoader::setVector4(sunLight.shader, "emit_color", glm::vec4(0.4f, 0.8f, 1, 1));
@@ -110,7 +115,7 @@ void gameInitialization()
 			triangles[i].setRotation(caller->getRotation());
 			triangles[i].setScale(caller->getScale());
 
-			triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.1f);
+			triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.45f);
 		}
 	});
 
@@ -139,13 +144,13 @@ void gameInitialization()
 			triangles[i].setRotation(caller->getRotation());
 			triangles[i].setScale(caller->getScale());
 
-			triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.1f);
+			triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.45f);
 		}
 	});
 
 	// Lights
 	canvas.addLight(sunLight); 
-	sunLight.translate(glm::vec3(-1.2f, 0.4f, 0.0f));
+	sunLight.translate(glm::vec3(-2.0f, 0.0f, 0.5f));
 	sunLight.scale(glm::vec3(0.2f, 0.2f, 0.2f));
 	sunLight.setDrawing(true);
 	//canvas.addModel(sunModel, false);
@@ -158,6 +163,12 @@ void gameInitialization()
 	mouseRay.addColliderProperty(std::make_shared<ColliderProperties>(RayCollider({ 0,0,0 }, { 0,0,0 })));
 	mouseRay.setDrawing(false);
 	canvas.addModel(mouseRay, false);
+
+	ships.emplace_back(shipSpike);
+	ships.emplace_back(shipBlock);
+	canvas.registerTimedCallback(spawnShip, shipSpeed, spawnIntervalms);
+	shipSpike.setDrawing(false);
+	shipBlock.setDrawing(false);
 }
 
 // Assigns triangle colliders based on mesh triangles
@@ -175,21 +186,35 @@ void assignTriangleColliders(Model &model)
 
 }
 
-//called repeatly as soon as possible
-void gameLoop()
+void spawnShip(int value)
 {
-	float spawnDistance = 4.5f;
+	float spawnDistance = 5.0f;
 	glm::vec3 spawnPoint = mapToHemisphere(0, ((float)rand() / (RAND_MAX)), ((float)rand() / (RAND_MAX))) * spawnDistance;
 
 	glm::vec3 planetWorldPos = glm::vec3(planet.getTranslation()[3]);
-	glm::mat4 rotMatrix = glm::lookAt(spawnPoint + planetWorldPos, planetWorldPos, glm::vec3{ 0,1,0 });
+	//glm::mat4 rotMatrix = glm::lookAt(spawnPoint + planetWorldPos, planetWorldPos, glm::vec3{ 0,1,0 });
+	//pair<float, glm::vec3> rotation = getRotationAxisAngle(rotMatrix);
+	cout << ships.size() << endl;
+	for (size_t i{ 0 }; i < ships.size(); i++)
+	{
+		if (!ships[i].drawing())
+		{
+			ships[i].setDrawing(true);
+			ships[i].resetTransformation();
+			ships[i].scale(glm::vec3(0.2f, 0.2f, 0.2f));
+			ships[i].translate(spawnPoint + planetWorldPos);
 
-	shipSpike.resetTransformation();
-	shipSpike.scale(glm::vec3(0.2f, 0.2f, 0.2f), false);
-	shipSpike.translate(spawnPoint + planetWorldPos, false);
-	shipSpike.setRotation(rotMatrix);
+			ships[i].addVelocity(-(spawnPoint - planetWorldPos) * (0.01f * value), true);
+			break;
+		}
+	}
 
+	canvas.registerTimedCallback(spawnShip, shipSpeed, spawnIntervalms);
+}
 
+//called repeatly as soon as possible
+void gameLoop()
+{
 	sunLight.rotate(WindowCanvas::deltaCallbackTime * 28, glm::vec3(0.0f, 1.0f, 0.0f), false);
 	sunLight.translate(glm::vec3(0, 0, WindowCanvas::deltaCallbackTime * 0.8f));
 

@@ -340,6 +340,11 @@ WindowCanvas::WindowCanvas()
 	instance = this;
 }
 
+void WindowCanvas::registerTimedCallback(void(*func)(int value), int value, unsigned int interval)
+{
+	glutTimerFunc(interval, func, value);
+}
+
 //initalizes glut
 void WindowCanvas::initializeWindow(int argc, char **argv)
 {

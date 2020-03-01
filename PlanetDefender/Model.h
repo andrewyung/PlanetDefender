@@ -50,11 +50,11 @@ public:
 		}
 	}
 
-	void addVelocity(glm::vec3 veloVector, bool localSpace = true)
+	void addVelocity(glm::vec3 veloVector, bool reset = false)
 	{
 		if (vaoInfo == nullptr) return;
 
-		if (localSpace)
+		if (!reset)
 		{
 			vaoInfo->velocity += glm::vec3(vaoInfo->rotation * glm::vec4(veloVector, 0));
 		}

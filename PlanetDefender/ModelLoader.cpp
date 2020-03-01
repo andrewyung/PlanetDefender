@@ -397,7 +397,7 @@ Model ModelLoader::loadModel(std::string objPath)
 			file << "Mesh " << i << ": " << curMesh.MeshName << "\n";
 
 			// Print Vertices
-			file << "Vertices:\n";
+			file << "Vertices:\n" << curMesh.Vertices.size() << "\n";
 
 			// Go through each vertex and print its number,
 			//  position, normal, and texture coordinate

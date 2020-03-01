@@ -15,16 +15,16 @@ void main()
     {
         for (int i = 1; i < 3; i++) 
         {
-            fragColor += texture2D(brightTexture, uvCoord + vec2(0.0, offset[i] / 900)) * weight[i];
-            fragColor += texture2D(brightTexture, uvCoord - vec2(0.0, offset[i] / 900)) * weight[i];
+            fragColor += texture2D(brightTexture, uvCoord + vec2(0.0, offset[i] / 1280)) * weight[i];
+            fragColor += texture2D(brightTexture, uvCoord - vec2(0.0, offset[i] / 1280)) * weight[i];
         }
     }
     else
     {
         for (int i = 1; i < 3; i++) 
         {
-            fragColor += texture2D(brightTexture, uvCoord + vec2(offset[i] / 1600, 0.0)) * weight[i];
-            fragColor += texture2D(brightTexture, uvCoord - vec2(offset[i] / 1600, 0.0)) * weight[i];
+            fragColor += texture2D(brightTexture, uvCoord + vec2(offset[i] / 1280, 0.0)) * weight[i];
+            fragColor += texture2D(brightTexture, uvCoord - vec2(offset[i] / 1280, 0.0)) * weight[i];
         }
     }
 }

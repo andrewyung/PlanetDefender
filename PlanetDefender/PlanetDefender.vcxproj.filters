@@ -214,16 +214,22 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Object Include="Models\Sphere.obj">
-      <Filter>Resource Files</Filter>
-    </Object>
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="Textures\GreenTiled.jpg">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Textures\skyboxAlias.jpg">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Models\Sphere.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
+    <Object Include="Models\ShipSpike.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
+    <Object Include="Models\ShipBlock.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
   </ItemGroup>
 </Project>
