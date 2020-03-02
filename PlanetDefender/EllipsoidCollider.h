@@ -7,24 +7,29 @@
 struct EllipsoidCollider : public ColliderProperties
 {
 public:
-	EllipsoidCollider()
+	EllipsoidCollider(glm::vec3 center, glm::vec3 dimensions) : center(center), dimensions(dimensions)
 	{
 		type = ELLIPSOID;
 	}
-	void EllipsoidCollider::setOrientation(glm::vec3 center, glm::vec3 dimensions)
+	void EllipsoidCollider::setCenter(glm::vec3 center)
 	{
-		int focalDistance = glm::sqrt(dimensions.x + dimensions.y + dimensions.z);
-		//_foci1 = center.x - glm::sqrt(dimensions.x + dimensions.y + dimensions.z);
+		this->center = center;
+	}
+	void EllipsoidCollider::setDimension(glm::vec3 dimension)
+	{
+		this->dimensions = dimensions;
 	}
 
 	glm::vec3 getDimensions()
 	{
-		return _dimensions;
+		return dimensions;
+	}
+	glm::vec3 getCenter()
+	{
+		return center;
 	}
 
 private:
-	glm::vec3 _center;
-	glm::vec3 _dimensions;
-
-	float _fociDistanceSum;
+	glm::vec3 center;
+	glm::vec3 dimensions;
 };

@@ -1,7 +1,7 @@
 #include "CollisionHandler.h"
 
 std::optional<CollisionInfo> rayToTriangleCollisionCheck(std::shared_ptr<RayCollider> col1, glm::mat4 triangleMVP, std::shared_ptr<TriangleCollider> col2);
-std::optional<CollisionInfo> rayToEllipsoidCollisionCheck(std::shared_ptr<RayCollider> col1, glm::mat4 ellipsoidMVP, std::shared_ptr<EllipsoidCollider> col2);
+std::optional<CollisionInfo> triangleToSphereCollisionCheck(std::shared_ptr<TriangleCollider> col1, glm::mat4 ellipsoidMVP, std::shared_ptr<EllipsoidCollider> col2);
 
 constexpr unsigned int collision_pair(ColliderType t1, ColliderType t2) {
 	return (t1 << 16) + t2;
@@ -43,10 +43,10 @@ void CollisionHandler::CollisionFrame(const std::vector<std::shared_ptr<VAOInfo>
 																std::static_pointer_cast<TriangleCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
 
 						break;
-					case collision_pair(RAY, ELLIPSOID):
-						colInfo = rayToEllipsoidCollisionCheck(	std::static_pointer_cast<RayCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
-																dest_vaoInfo->translation * dest_vaoInfo->rotation * dest_vaoInfo->scale,
-																std::static_pointer_cast<EllipsoidCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
+					case collision_pair(TRIANGLE, ELLIPSOID):
+						colInfo = triangleToSphereCollisionCheck(	std::static_pointer_cast<TriangleCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
+																	dest_vaoInfo->translation * dest_vaoInfo->rotation * dest_vaoInfo->scale,
+																	std::static_pointer_cast<EllipsoidCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
 
 						break;
 
@@ -98,8 +98,24 @@ std::optional<CollisionInfo> rayToTriangleCollisionCheck(std::shared_ptr<RayColl
 	return CollisionInfo(col1->getPoint() + (col1->getDirection() * t), RAY, TRIANGLE);
 }
 
-std::optional<CollisionInfo> rayToEllipsoidCollisionCheck(std::shared_ptr<RayCollider> col1, glm::mat4 ellipsoidMVP, std::shared_ptr<EllipsoidCollider> col2)
+std::optional<CollisionInfo> triangleToSphereCollisionCheck(std::shared_ptr<TriangleCollider> col1, glm::mat4 ellipsoidMVP, std::shared_ptr<EllipsoidCollider> col2)
 {
+	glm::mat4 ellipsoidInvMatrix = 1.0f / glm::scale(glm::mat4{}, col2->getDimensions());
+	ellipsoidInvMatrix[3] = -glm::vec4{ col2->getCenter(), -1 };
+
+	glm::vec3 v0 = ellipsoidInvMatrix * glm::vec4{ col1->getP0(), 1 };
+	glm::vec3 v1 = ellipsoidInvMatrix * glm::vec4{ col1->getP1(), 1 };
+	glm::vec3 v2 = ellipsoidInvMatrix * glm::vec4{ col1->getP2(), 1 };
+
+	glm::vec3 triangleNorm = glm::cross(v0, v1);
 	
+	// project onto the normal
+	float distanceToCenter = glm::length(glm::dot(triangleNorm, v0)) / glm::length(triangleNorm);
+
+	// No collision from plane (on same plane as triangle) to sphere
+	if (distanceToCenter > 1)
+	{
+		return std::nullopt;
+	}
 	return std::nullopt;
 }
