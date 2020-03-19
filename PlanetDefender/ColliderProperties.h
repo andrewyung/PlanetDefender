@@ -13,5 +13,5 @@ struct ColliderProperties
 public:
 	ColliderType type;
 	std::string name = "default";
-	bool collidable = false;
+	bool collidable = true;
 };

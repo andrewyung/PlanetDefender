@@ -75,7 +75,7 @@ void gameInitialization()
 	planetGreen.textures.push_back(scene.greenTiledTexture);
 	planetGreen.shader = scene.diffuseShader;
 
-	planetGreen.addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
+	//planetGreen.addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider({ 0,0,0 }, { 1,1,1 })));
 	canvas.addModel(planetGreen, false);
 	planetGreen.translate(glm::vec3(-4, 0, 0));
 
@@ -88,8 +88,8 @@ void gameInitialization()
 	planet.shader = scene.diffuseNormalShader;
 	ShaderLoader::setVector4(planet.shader, "ambientLight", 0.05f * glm::vec4(204/255, 221/255, 255/255, 1));
 	ShaderLoader::setFloat(planet.shader, "shininess", 1.0f);
-	
-	planet.addColliderProperty(std::make_shared<ColliderProperties>(EllipsoidCollider()));
+	std::shared_ptr<EllipsoidCollider> colProp = std::make_shared<EllipsoidCollider>(EllipsoidCollider({ 0,0,0 }, { 1,1,1 }));
+	planet.addColliderProperty(colProp);
 
 	canvas.addModel(planet, false);
 
@@ -99,23 +99,32 @@ void gameInitialization()
 
 	canvas.addModel(shipBlock, false);
 	shipBlock.setCollisionCallback([caller = &shipBlock](VAOInfo& source, VAOInfo& dest, CollisionInfo info) {
+
 		std::cout << "collided!" << std::endl;
-		source.drawing = false;
-
-		glm::mat4 mvp = caller->getVAOInfo()->translation * caller->getVAOInfo()->rotation * caller->getVAOInfo()->scale;
-		glm::mat4 invTransform = glm::inverse(mvp);
-
-		vector<Model> triangles = Triangularization::EarTriangularize(*caller, invTransform * glm::vec4(info.getCollisionPoint(), 1.0f));
-		std::cout << triangles.size() << std::endl;
-
-		for (int i{ 0 }; i < triangles.size(); i++)
+		if (info.getSourceType() == RAY && info.getDestType() == TRIANGLE)
 		{
-			canvas.addModel(triangles[i], false);
-			triangles[i].setTranslation(caller->getTranslation());
-			triangles[i].setRotation(caller->getRotation());
-			triangles[i].setScale(caller->getScale());
+			std::cout << "raytriangle!" << std::endl;
+			source.drawing = false;
 
-			triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.45f);
+			glm::mat4 mvp = caller->getVAOInfo()->translation * caller->getVAOInfo()->rotation * caller->getVAOInfo()->scale;
+			glm::mat4 invTransform = glm::inverse(mvp);
+
+			vector<Model> triangles = Triangularization::EarTriangularize(*caller, invTransform * glm::vec4(info.getCollisionPoint(), 1.0f));
+			std::cout << triangles.size() << std::endl;
+
+			for (int i{ 0 }; i < triangles.size(); i++)
+			{
+				canvas.addModel(triangles[i], false);
+				triangles[i].setTranslation(caller->getTranslation());
+				triangles[i].setRotation(caller->getRotation());
+				triangles[i].setScale(caller->getScale());
+
+				triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.45f);
+			}
+		}
+		else if (info.getSourceType() == TRIANGLE && info.getDestType() == ELLIPSOID)
+		{
+			std::cout << "triangleellipsoid!" << std::endl;
 		}
 	});
 
@@ -129,22 +138,30 @@ void gameInitialization()
 	canvas.addModel(shipSpike, false);
 	shipSpike.setCollisionCallback([caller = &shipSpike](VAOInfo& source, VAOInfo& dest, CollisionInfo info) {
 		std::cout << "collided!" << std::endl;
-		source.drawing = false;
-		
-		glm::mat4 mvp = caller->getVAOInfo()->translation * caller->getVAOInfo()->rotation * caller->getVAOInfo()->scale;
-		glm::mat4 invTransform = glm::inverse(mvp);
-
-		vector<Model> triangles = Triangularization::EarTriangularize(*caller, invTransform * glm::vec4(info.getCollisionPoint(), 1.0f));
-		std::cout << triangles.size() << std::endl;
-
-		for (int i{ 0 }; i < triangles.size(); i++)
+		if (info.getSourceType() == RAY && info.getDestType() == TRIANGLE)
 		{
-			canvas.addModel(triangles[i], false);
-			triangles[i].setTranslation(caller->getTranslation());
-			triangles[i].setRotation(caller->getRotation());
-			triangles[i].setScale(caller->getScale());
+			std::cout << "raytriangle!" << std::endl;
+			source.drawing = false;
+		
+			glm::mat4 mvp = caller->getVAOInfo()->translation * caller->getVAOInfo()->rotation * caller->getVAOInfo()->scale;
+			glm::mat4 invTransform = glm::inverse(mvp);
 
-			triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.45f);
+			vector<Model> triangles = Triangularization::EarTriangularize(*caller, invTransform * glm::vec4(info.getCollisionPoint(), 1.0f));
+			std::cout << triangles.size() << std::endl;
+
+			for (int i{ 0 }; i < triangles.size(); i++)
+			{
+				canvas.addModel(triangles[i], false);
+				triangles[i].setTranslation(caller->getTranslation());
+				triangles[i].setRotation(caller->getRotation());
+				triangles[i].setScale(caller->getScale());
+
+				triangles[i].addVelocity((glm::vec3((mvp * glm::vec4(triangles[i].getCenter(), 1.0f))) - info.getCollisionPoint()) * 0.45f);
+			}
+		}
+		else if (info.getSourceType() == TRIANGLE && info.getDestType() == ELLIPSOID)
+		{
+			std::cout << "triangleellipsoid!" << std::endl;
 		}
 	});
 

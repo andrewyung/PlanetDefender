@@ -1,7 +1,7 @@
 #include "CollisionHandler.h"
 
 std::optional<CollisionInfo> rayToTriangleCollisionCheck(std::shared_ptr<RayCollider> col1, glm::mat4 triangleMVP, std::shared_ptr<TriangleCollider> col2);
-std::optional<CollisionInfo> triangleToSphereCollisionCheck(std::shared_ptr<TriangleCollider> col1, glm::mat4 ellipsoidMVP, std::shared_ptr<EllipsoidCollider> col2);
+std::optional<CollisionInfo> triangleToSphereCollisionCheck(glm::mat4 triangleMVP, std::shared_ptr<TriangleCollider> col1, glm::mat4 ellipsoidMVP, std::shared_ptr<EllipsoidCollider> col2);
 
 constexpr unsigned int collision_pair(ColliderType t1, ColliderType t2) {
 	return (t1 << 16) + t2;
@@ -44,7 +44,8 @@ void CollisionHandler::CollisionFrame(const std::vector<std::shared_ptr<VAOInfo>
 
 						break;
 					case collision_pair(TRIANGLE, ELLIPSOID):
-						colInfo = triangleToSphereCollisionCheck(	std::static_pointer_cast<TriangleCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
+						colInfo = triangleToSphereCollisionCheck(	vaoInfo->translation * vaoInfo->rotation * vaoInfo->scale,
+																	std::static_pointer_cast<TriangleCollider>(vaoInfo->colliderProp[sourceColliderIndex]),
 																	dest_vaoInfo->translation * dest_vaoInfo->rotation * dest_vaoInfo->scale,
 																	std::static_pointer_cast<EllipsoidCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
 
@@ -98,24 +99,72 @@ std::optional<CollisionInfo> rayToTriangleCollisionCheck(std::shared_ptr<RayColl
 	return CollisionInfo(col1->getPoint() + (col1->getDirection() * t), RAY, TRIANGLE);
 }
 
-std::optional<CollisionInfo> triangleToSphereCollisionCheck(std::shared_ptr<TriangleCollider> col1, glm::mat4 ellipsoidMVP, std::shared_ptr<EllipsoidCollider> col2)
+// This only checks for circles that lay inside of triangle (no vertex or edge detection with circle).
+std::optional<CollisionInfo> triangleToSphereCollisionCheck(glm::mat4 triangleMVP, std::shared_ptr<TriangleCollider> col1, glm::mat4 ellipsoidMVP, std::shared_ptr<EllipsoidCollider> col2)
 {
-	glm::mat4 ellipsoidInvMatrix = 1.0f / glm::scale(glm::mat4{}, col2->getDimensions());
-	ellipsoidInvMatrix[3] = -glm::vec4{ col2->getCenter(), -1 };
+	float epsilon = 0.0000005f;
 
-	glm::vec3 v0 = ellipsoidInvMatrix * glm::vec4{ col1->getP0(), 1 };
-	glm::vec3 v1 = ellipsoidInvMatrix * glm::vec4{ col1->getP1(), 1 };
-	glm::vec3 v2 = ellipsoidInvMatrix * glm::vec4{ col1->getP2(), 1 };
+	// Construct matrix for ellipsoid space
+	glm::mat4 ellipsoidInvMatrix = inverse(glm::scale(glm::mat4(1.0f), col2->getDimensions()) * glm::translate(glm::mat4(1.0f), col2->getCenter()));
 
-	glm::vec3 triangleNorm = glm::cross(v0, v1);
-	
+	glm::vec3 v0 = ellipsoidInvMatrix * triangleMVP * glm::vec4{ col1->getP0(), 1 };
+	glm::vec3 v1 = ellipsoidInvMatrix * triangleMVP * glm::vec4{ col1->getP1(), 1 };
+	glm::vec3 v2 = ellipsoidInvMatrix * triangleMVP * glm::vec4{ col1->getP2(), 1 };
+
+	glm::vec3 triangleNorm = normalize(glm::cross(v2 - v1, v0 - v1));
+
 	// project onto the normal
-	float distanceToCenter = glm::length(glm::dot(triangleNorm, v0)) / glm::length(triangleNorm);
+	glm::vec3 nearestPlanePointToCenter = triangleNorm * (glm::dot(triangleNorm, -v0));
 
 	// No collision from plane (on same plane as triangle) to sphere
-	if (distanceToCenter > 1)
+	if (length(nearestPlanePointToCenter) > 1)
+	{
+		//std::cout << "fail chk" << distanceToCenter << std::endl;
+		return std::nullopt;
+	}
+
+	// This point lays onto the plane of the triangle
+	glm::vec3 intersectionPointonPlane = -nearestPlanePointToCenter;
+	std::cout << intersectionPointonPlane.x << " : " << intersectionPointonPlane.y << " : " << intersectionPointonPlane.z << std::endl;
+	// Check if point is within triangle
+	//https://math.stackexchange.com/questions/2582202/does-a-3d-point-lie-on-a-triangular-plane
+	/*
+	glm::mat3x4 coefMatrix = glm::mat3x4{ glm::vec4(v0, 1.0f), glm::vec4(v1, 1.0f), glm::vec4(v2, 1.0f) };
+
+	glm::mat4x3 transpCoefMatrix = transpose(coefMatrix);
+	glm::vec3 barycentricCoords = (glm::inverse(transpCoefMatrix * coefMatrix) * transpCoefMatrix) * glm::vec4(intersectionPointonPlane, 1.0f);
+
+	if (barycentricCoords[0] > 1 || barycentricCoords[0] < 0 || barycentricCoords[1] > 1 || barycentricCoords[1] < 0 || barycentricCoords[2] > 1 || barycentricCoords[2] < 0)
 	{
 		return std::nullopt;
 	}
-	return std::nullopt;
+	*/
+	float v0v0 = dot(v0, v0);
+	float v0v1 = dot(v0, v1);
+	float v0v2 = dot(v0, v2);
+	float v1v0 = dot(v1, v0);
+	float v1v1 = dot(v1, v1);
+	float v1v2 = dot(v1, v2);
+	float v2v0 = dot(v2, v0);
+	float v2v1 = dot(v2, v1);
+	float v2v2 = dot(v2, v2);
+
+	glm::mat3 invMat{	1 + v0v0, 1 + v0v1, 1 + v0v2,
+						1 + v1v0, 1 + v1v1, 1 + v1v2,
+						1 + v2v0, 1 + v2v1, 1 + v2v2 };
+	invMat = glm::inverse(invMat);
+
+	glm::vec3 barycentricCoords = invMat * glm::vec3{	1 + dot(v0, intersectionPointonPlane), 
+														1 + dot(v1, intersectionPointonPlane), 
+														1 + dot(v2, intersectionPointonPlane) };
+
+	if (barycentricCoords[0] > 1 || barycentricCoords[0] < 0 || barycentricCoords[1] > 1 || barycentricCoords[1] < 0 || barycentricCoords[2] > 1 || barycentricCoords[2] < 0
+		|| abs(length(barycentricCoords) - 1) > epsilon)
+	{
+		return std::nullopt;
+	}
+
+	std::cout << "1true" << std::endl;
+
+	return CollisionInfo((inverse(ellipsoidInvMatrix)) * glm::vec4(intersectionPointonPlane, 1), TRIANGLE, ELLIPSOID);
 }
