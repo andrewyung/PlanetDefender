@@ -218,7 +218,7 @@ void spawnShip(int value)
 		{
 			ships[i].setDrawing(true);
 			ships[i].resetTransformation();
-			ships[i].scale(glm::vec3(0.2f, 0.2f, 0.2f));
+			ships[i].scale(glm::vec3(0.2f, 0.2f, 0.2f), false);
 			ships[i].translate(spawnPoint + planetWorldPos);
 
 			ships[i].addVelocity(-(spawnPoint - planetWorldPos) * (0.01f * value), true);

@@ -49,7 +49,7 @@ void CollisionHandler::CollisionFrame(const std::vector<std::shared_ptr<VAOInfo>
 																	dest_vaoInfo->translation * dest_vaoInfo->rotation * dest_vaoInfo->scale,
 																	std::static_pointer_cast<EllipsoidCollider>(dest_vaoInfo->colliderProp[destColliderIndex]));
 
-						break;
+break;
 
 					}
 
@@ -79,7 +79,7 @@ std::optional<CollisionInfo> rayToTriangleCollisionCheck(std::shared_ptr<RayColl
 	float invDet = 1.0f / det;
 
 	float u = glm::dot(rayv0, pvec) * invDet;
-	
+
 	if (u < 0 || u > 1)
 	{
 		return std::nullopt;
@@ -125,41 +125,32 @@ std::optional<CollisionInfo> triangleToSphereCollisionCheck(glm::mat4 triangleMV
 
 	// This point lays onto the plane of the triangle
 	glm::vec3 intersectionPointonPlane = -nearestPlanePointToCenter;
-	std::cout << intersectionPointonPlane.x << " : " << intersectionPointonPlane.y << " : " << intersectionPointonPlane.z << std::endl;
-	// Check if point is within triangle
-	//https://math.stackexchange.com/questions/2582202/does-a-3d-point-lie-on-a-triangular-plane
+
 	/*
-	glm::mat3x4 coefMatrix = glm::mat3x4{ glm::vec4(v0, 1.0f), glm::vec4(v1, 1.0f), glm::vec4(v2, 1.0f) };
+	// Check if point is within triangle with barycentric coordinates
+	//https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+	glm::vec3	v1v0 = v1 - v0,
+				v2v0 = v2 - v0,
+				pv0 = intersectionPointonPlane - v0;
+	float d00 = glm::dot(v1v0, v1v0);
+	float d01 = glm::dot(v1v0, v2v0);
+	float d11 = glm::dot(v2v0, v2v0);
+	float d20 = glm::dot(pv0, v1v0);
+	float d21 = glm::dot(pv0, v2v0);
+	float denom = d00 * d11 - d01 * d01;
+	float gamma = (d11 * d20 - d01 * d21) / denom;
+	float beta = (d00 * d21 - d01 * d20) / denom;
+	float alpha = 1.0f - gamma - beta;
 
-	glm::mat4x3 transpCoefMatrix = transpose(coefMatrix);
-	glm::vec3 barycentricCoords = (glm::inverse(transpCoefMatrix * coefMatrix) * transpCoefMatrix) * glm::vec4(intersectionPointonPlane, 1.0f);
-
-	if (barycentricCoords[0] > 1 || barycentricCoords[0] < 0 || barycentricCoords[1] > 1 || barycentricCoords[1] < 0 || barycentricCoords[2] > 1 || barycentricCoords[2] < 0)
+	float val = gamma + beta + alpha;
+	if (gamma > 1 || gamma < 0 || beta > 1 || beta < 0 || alpha > 1 || alpha < 0)
 	{
 		return std::nullopt;
 	}
 	*/
-	float v0v0 = dot(v0, v0);
-	float v0v1 = dot(v0, v1);
-	float v0v2 = dot(v0, v2);
-	float v1v0 = dot(v1, v0);
-	float v1v1 = dot(v1, v1);
-	float v1v2 = dot(v1, v2);
-	float v2v0 = dot(v2, v0);
-	float v2v1 = dot(v2, v1);
-	float v2v2 = dot(v2, v2);
 
-	glm::mat3 invMat{	1 + v0v0, 1 + v0v1, 1 + v0v2,
-						1 + v1v0, 1 + v1v1, 1 + v1v2,
-						1 + v2v0, 1 + v2v1, 1 + v2v2 };
-	invMat = glm::inverse(invMat);
-
-	glm::vec3 barycentricCoords = invMat * glm::vec3{	1 + dot(v0, intersectionPointonPlane), 
-														1 + dot(v1, intersectionPointonPlane), 
-														1 + dot(v2, intersectionPointonPlane) };
-
-	if (barycentricCoords[0] > 1 || barycentricCoords[0] < 0 || barycentricCoords[1] > 1 || barycentricCoords[1] < 0 || barycentricCoords[2] > 1 || barycentricCoords[2] < 0
-		|| abs(length(barycentricCoords) - 1) > epsilon)
+	// If any vertex is within the sphere
+	if (length(v0) > 1 || length(v1) > 1 || length(v2) > 1)
 	{
 		return std::nullopt;
 	}
